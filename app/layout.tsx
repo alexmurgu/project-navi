@@ -11,8 +11,8 @@ const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'});
 
 export const metadata: Metadata = {
-  title: "Family Finance",
-  description: "Family Finance Dashboard",
+  title: "Project Navi",
+  description: "Advanced Finance Dashboard",
 };
 
 export default async function RootLayout({

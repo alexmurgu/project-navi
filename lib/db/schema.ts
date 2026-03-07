@@ -93,6 +93,14 @@ export const task = sqliteTable('task', {
   priority: integer('priority').notNull().default(1)
 });
 
+export const categoryConfig = sqliteTable('category_config', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull().unique(),
+  color: text('color').notNull().default('#F59E0B') // Default Amber
+});
+
 export const expense = sqliteTable('expense', {
   id: text('id')
     .primaryKey()
@@ -114,6 +122,7 @@ export const income = sqliteTable('income', {
   userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
   description: text('description').notNull(),
   amount: integer('amount').notNull(), // in cents
+  category: text('category').notNull().default('Salary'),
   date: integer('date', { mode: 'timestamp' })
     .notNull()
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

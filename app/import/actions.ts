@@ -27,6 +27,7 @@ export async function bulkImportTransactions(transactions: any[]) {
                 userId,
                 description: tx.description,
                 amount: amountCents,
+                category: tx.category,
                 date: new Date(tx.date)
             });
         }

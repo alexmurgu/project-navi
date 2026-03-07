@@ -24,6 +24,7 @@ interface CategoryComboboxProps {
   onChange: (val: string) => void;
   className?: string;
   placeholder?: string;
+  style?: React.CSSProperties;
 }
 
 export function CategoryCombobox({
@@ -32,6 +33,7 @@ export function CategoryCombobox({
   onChange,
   className,
   placeholder = "Select category...",
+  style,
 }: CategoryComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
@@ -42,22 +44,27 @@ export function CategoryCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            "h-12 w-full justify-between border-white/10 bg-black/20 text-white font-normal hover:bg-white/5",
-            className
-          )}
-        >
-          {value || placeholder}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger
+        render={
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn(
+              "flex w-full items-center justify-between border border-white/10 bg-black/20 px-3 text-white font-normal hover:bg-white/5 rounded-none",
+              !className?.includes("h-") && "h-9",
+              !className?.includes("text-") && "text-xs",
+              className
+            )}
+            style={style}
+          >
+            {value || placeholder}
+            <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+          </Button>
+        }
+      />
       <PopoverContent
-        className="glass-panel w-[200px] border-white/10 p-0 text-left shadow-2xl"
+        className="glass-panel w-[200px] border-white/10 p-0 text-left shadow-2xl rounded-none"
         align="start"
       >
         <Command>
@@ -65,10 +72,10 @@ export function CategoryCombobox({
             placeholder="Search categories..."
             value={searchValue}
             onValueChange={setSearchValue}
-            className="h-11 border-none bg-transparent text-white"
+            className="h-9 border-none bg-transparent text-white text-xs"
           />
           <CommandList className="max-h-[200px] overflow-y-auto text-left">
-            <CommandEmpty className="px-4 py-2 text-left text-xs text-white/50">
+            <CommandEmpty className="px-4 py-2 text-left text-[10px] text-white/50">
               {!showAddNew && "No category found."}
             </CommandEmpty>
             <CommandGroup>
@@ -81,11 +88,11 @@ export function CategoryCombobox({
                     setOpen(false);
                     setSearchValue("");
                   }}
-                  className="cursor-pointer text-left text-white hover:bg-white/10 aria-selected:bg-white/10"
+                  className="cursor-pointer text-left text-white text-xs hover:bg-white/10 aria-selected:bg-white/10"
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "mr-2 h-3 w-3",
                       value === cat ? "opacity-100" : "opacity-0"
                     )}
                   />
@@ -102,9 +109,9 @@ export function CategoryCombobox({
                     setOpen(false);
                     setSearchValue("");
                   }}
-                  className="cursor-pointer text-left font-bold text-primary hover:bg-primary/10 aria-selected:bg-primary/10"
+                  className="cursor-pointer text-left font-bold text-primary text-xs hover:bg-primary/10 aria-selected:bg-primary/10"
                 >
-                  <PlusCircle className="mr-2 h-4 w-4" />
+                  <PlusCircle className="mr-2 h-3 w-3" />
                   Add "{searchValue}"
                 </CommandItem>
               </CommandGroup>

@@ -51,7 +51,7 @@ export default async function UsersPage() {
                                     id="name"
                                     required
                                     placeholder="e.g. Maria"
-                                    className="h-11 border-white/10 bg-black/20 text-white placeholder:text-white/30 focus-visible:ring-blue-500"
+                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-none"
                                 />
                             </div>
 
@@ -65,7 +65,7 @@ export default async function UsersPage() {
                                     id="email"
                                     required
                                     placeholder="maria@aftermind.net"
-                                    className="h-11 border-white/10 bg-black/20 text-white placeholder:text-white/30 focus-visible:ring-blue-500"
+                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-none"
                                 />
                             </div>
 
@@ -80,13 +80,14 @@ export default async function UsersPage() {
                                     required
                                     minLength={8}
                                     placeholder="Minimum 8 characters"
-                                    className="h-11 border-white/10 bg-black/20 text-white placeholder:text-white/30 focus-visible:ring-blue-500"
+                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-none"
                                 />
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-4 h-12 w-full bg-blue-600 font-bold text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:bg-blue-500 hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]"
+                                size="xl"
+                                className="mt-4 w-full bg-blue-600 transition-all hover:bg-blue-500 rounded-none"
                             >
                                 Create Account
                             </Button>
@@ -96,9 +97,9 @@ export default async function UsersPage() {
 
                 <Card className="glass-panel col-span-4 border-white/10">
                     <CardHeader>
-                        <CardTitle className="text-xl text-white">Current Members</CardTitle>
+                        <CardTitle className="text-xl text-white font-black uppercase tracking-tighter">Current Members</CardTitle>
                         <CardDescription className="text-white/60">
-                            Manage access to your family finance dashboard.
+                            Manage access to the Project Navi protocol.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -106,27 +107,27 @@ export default async function UsersPage() {
                             <Table>
                                 <TableHeader className="bg-white/5">
                                     <TableRow className="border-white/10 hover:bg-transparent">
-                                        <TableHead className="h-10 text-[10px] font-bold tracking-widest text-white/50 uppercase">Name</TableHead>
-                                        <TableHead className="h-10 text-[10px] font-bold tracking-widest text-white/50 uppercase">Email</TableHead>
-                                        <TableHead className="h-10 text-[10px] font-bold tracking-widest text-white/50 uppercase">Role</TableHead>
-                                        <TableHead className="h-10 w-[50px]"></TableHead>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>Role</TableHead>
+                                        <TableHead className="w-[50px]"></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {allUsers.map((u) => (
                                         <TableRow key={u.id} className="group border-white/10 transition-colors hover:bg-white/5">
-                                            <TableCell className="font-medium text-white">
+                                            <TableCell className="font-bold text-white">
                                                 <div className="flex items-center gap-2">
                                                     {u.email === ADMIN_EMAIL && (
-                                                        <ShieldCheck className="h-4 w-4 text-primary" />
+                                                        <ShieldCheck className="h-5 w-5 text-primary" />
                                                     )}
                                                     {u.name}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-white/60">{u.email}</TableCell>
+                                            <TableCell className="text-white/60 font-medium">{u.email}</TableCell>
                                             <TableCell>
                                                 <div
-                                                    className={`inline-flex items-center  border px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase transition-colors ${
+                                                    className={`inline-flex items-center border px-3 py-1 font-bold tracking-wider uppercase transition-colors ${
                                                         u.email === ADMIN_EMAIL
                                                             ? "border-primary/30 bg-primary/20 text-primary"
                                                             : "border-white/10 bg-white/5 text-white/60"

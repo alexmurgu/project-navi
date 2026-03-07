@@ -29,10 +29,16 @@ interface Transaction {
 interface PageProps {
   users: { id: string; name: string }[];
   categories: string[];
+  categoryConfigs: { name: string, color: string }[];
   currentUserId: string;
 }
 
-export function ImportContent({ users, categories }: PageProps) {
+export function ImportContent({ users, categories, categoryConfigs, currentUserId }: PageProps) {
+  const getCategoryColor = (name: string, defaultColor: string) => {
+    const config = categoryConfigs.find(c => c.name.toLowerCase() === name.toLowerCase());
+    return config?.color || defaultColor;
+  };
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [availableCategories, setAvailableCategories] = useState<string[]>(categories);
   const [loading, setLoading] = useState(false);
@@ -89,7 +95,7 @@ export function ImportContent({ users, categories }: PageProps) {
             amount: Math.abs(amount),
             type,
             category: type === "income" ? "Income" : (availableCategories[0] || "General"),
-            userId: "family",
+            userId: currentUserId,
             isMonthly: false
           };
         }).filter(tx => tx.amount > 0);
@@ -192,67 +198,105 @@ export function ImportContent({ users, categories }: PageProps) {
               <Table>
                 <TableHeader className="bg-white/5">
                   <TableRow className="border-white/10 hover:bg-transparent">
-                    <TableHead className="w-[150px] text-[10px] font-bold tracking-widest text-white/50 uppercase">Date</TableHead>
-                    <TableHead className="text-[10px] font-bold tracking-widest text-white/50 uppercase">Description</TableHead>
-                    <TableHead className="w-[120px] text-[10px] font-bold tracking-widest text-white/50 uppercase text-right">Amount</TableHead>
-                    <TableHead className="w-[200px] text-[10px] font-bold tracking-widest text-white/50 uppercase">Category</TableHead>
-                    <TableHead className="w-[150px] text-[10px] font-bold tracking-widest text-white/50 uppercase">Attribution</TableHead>
+                    <TableHead className="w-[180px]">Date</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="w-[150px] text-right">Amount</TableHead>
+                    <TableHead className="w-[250px]">Category</TableHead>
+                    <TableHead className="w-[200px]">Attribution</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactions.map((tx) => (
-                    <TableRow key={tx.id} className="border-white/10 transition-colors hover:bg-white/5">
-                      <TableCell className="p-2">
-                        <Input 
-                          type="date" 
-                          value={tx.date} 
-                          onChange={(e) => updateTransaction(tx.id, "date", e.target.value)}
-                          className="h-9 border-white/10 bg-black/20 text-white text-xs"
-                        />
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Input 
-                          value={tx.description} 
-                          onChange={(e) => updateTransaction(tx.id, "description", e.target.value)}
-                          className="h-9 border-white/10 bg-black/20 text-white text-xs"
-                        />
-                      </TableCell>
-                      <TableCell className="p-2 text-right">
-                        <span className={cn("text-xs font-mono font-bold", tx.type === "income" ? "text-green-400" : "text-white")}>
-                          {tx.type === "income" ? "+" : "-"}${tx.amount.toFixed(2)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="p-2 text-left">
-                        {tx.type === "expense" ? (
+                  {transactions.map((tx) => {
+                    const rowColor = getCategoryColor(tx.category, tx.type === 'income' ? '#A855F7' : '#FFFFFF');
+                    return (
+                      <TableRow 
+                        key={tx.id} 
+                        className="border-white/10 transition-colors hover:bg-white/5"
+                      >
+                        <TableCell className="p-2">
+                          <Input 
+                            type="date" 
+                            value={tx.date} 
+                            onChange={(e) => updateTransaction(tx.id, "date", e.target.value)}
+                            className="h-12 border-white/10 bg-black/20 text-base rounded-none text-white"
+                          />
+                        </TableCell>
+                        <TableCell className="p-2">
+                          <Input 
+                            value={tx.description} 
+                            onChange={(e) => updateTransaction(tx.id, "description", e.target.value)}
+                            className="h-12 border-white/10 bg-black/20 text-base rounded-none uppercase text-white"
+                          />
+                        </TableCell>
+                        <TableCell className="p-2 text-right">
+                          <span 
+                            className="text-base font-mono font-bold"
+                            style={{ color: tx.type === "income" ? rowColor : undefined }}
+                          >
+                            {tx.type === "income" ? "+" : "-"}${tx.amount.toFixed(2)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="p-2 text-left">
                           <CategoryCombobox 
                             value={tx.category} 
                             options={availableCategories} 
                             onChange={(val) => updateTransaction(tx.id, "category", val)}
-                            className="h-9 text-xs"
+                            className="h-12 text-base"
+                            style={{ 
+                              borderColor: `${rowColor}33`,
+                              backgroundColor: `${rowColor}1A`,
+                              color: rowColor
+                            }}
                           />
-                        ) : (
-                          <span className="text-[10px] font-bold tracking-wider uppercase text-purple-400 bg-purple-500/10 px-2 py-1  border border-purple-500/20 ml-2">Income</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="p-2">
-                        <Select 
-                          value={tx.userId} 
-                          onValueChange={(val) => updateTransaction(tx.id, "userId", val)}
-                        >
-                          <SelectTrigger className="h-9 border-white/10 bg-black/20 text-white text-xs">
-                            <SelectValue placeholder="Attribution" />
-                          </SelectTrigger>
-                          <SelectContent className="glass-panel border-white/10">
-                            <SelectItem value="family" className="text-xs">
-                              <div className="flex items-center gap-2"><Users className="h-3 w-3" /> Family</div>
-                            </SelectItem>
-                            {users.map(u => (
-                              <SelectItem key={u.id} value={u.id} className="text-xs">{u.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
+                        </TableCell>
+                        <TableCell className="p-2">
+                          <Select 
+                            value={tx.userId} 
+                            onValueChange={(val) => updateTransaction(tx.id, "userId", val)}
+                          >
+                            <SelectTrigger 
+                              className="h-12 border-white/10 bg-black/20 text-base rounded-none px-2 text-white"
+                            >
+                              <div className="flex items-center gap-2">
+                                {tx.userId === "family" ? (
+                                  <div 
+                                    className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5 text-white/40"
+                                  >
+                                    <Users className="h-4 w-4" />
+                                  </div>
+                                ) : (
+                                  <div 
+                                    className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5 text-[10px] font-black uppercase text-white/60"
+                                  >
+                                    {users.find(u => u.id === tx.userId)?.name[0] || "?"}
+                                  </div>
+                                )}
+                                <SelectValue placeholder="Attribution" />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent className="glass-panel border-white/10">
+                              <SelectItem value="family" className="text-base">
+                                <div className="flex items-center gap-2">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5">
+                                    <Users className="h-4 w-4" />
+                                  </div>
+                                  Family Wide
+                                </div>
+                              </SelectItem>
+                              {users.map(u => (
+                                <SelectItem key={u.id} value={u.id} className="text-base">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5 text-[10px] font-black uppercase">
+                                      {u.name[0]}
+                                    </div>
+                                    {u.name}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
                       <TableCell className="p-2 text-right">
                         <Button 
                           variant="ghost" 
@@ -264,7 +308,8 @@ export function ImportContent({ users, categories }: PageProps) {
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>

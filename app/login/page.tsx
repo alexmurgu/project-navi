@@ -47,15 +47,15 @@ export default function LoginPage() {
         <div className="flex min-h-screen flex-col justify-center px-4 py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="flex justify-center">
-                    <div className="flex h-12 w-12 items-center justify-center  bg-blue-600 text-white shadow-lg shadow-blue-200">
-                        <Wallet className="h-8 w-8" />
+                    <div className="flex h-16 w-16 items-center justify-center border-2 border-primary bg-primary/10 text-primary shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+                        <span className="text-3xl font-black">N</span>
                     </div>
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-white">
-                    Welcome back
+                <h2 className="mt-6 text-center text-4xl font-black tracking-tighter text-white uppercase">
+                    Project Navi
                 </h2>
-                <p className="mt-2 text-center text-sm text-white/60">
-                    Securely access your family's finances
+                <p className="mt-2 text-center text-sm font-bold tracking-[0.2em] text-white/40 uppercase">
+                    Advanced Finance Protocol
                 </p>
             </div>
 
@@ -109,9 +109,9 @@ export default function LoginPage() {
                             <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full h-12 bg-blue-600 hover:bg-blue-500 font-bold text-white shadow-lg transition-all"
+                                className="w-full h-12 bg-primary hover:bg-primary/90 font-black text-primary-foreground uppercase tracking-widest shadow-[0_0_30px_rgba(245,158,11,0.2)] transition-all rounded-none"
                             >
-                                {loading ? <Loader2 className="animate-spin" /> : "Sign in"}
+                                {loading ? <Loader2 className="animate-spin" /> : "Authorize"}
                             </Button>
                         </form>
 

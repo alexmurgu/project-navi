@@ -48,16 +48,49 @@ export async function deleteExpense(formData: FormData) {
     revalidatePath("/");
 }
 
+export async function updateExpense(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    const id = formData.get('id')?.toString();
+    const description = formData.get('description')?.toString();
+    const amount = parseFloat(formData.get('amount')?.toString() || '0');
+    const category = formData.get('category')?.toString();
+    const isMonthly = formData.get('isMonthly') === 'on';
+    const dateStr = formData.get('date')?.toString();
+    const targetUserId = formData.get('userId')?.toString();
+
+    if (!id || !description || isNaN(amount) || !category) {
+        return;
+    }
+
+    const amountCents = Math.round(amount * 100);
+    const date = dateStr ? new Date(dateStr) : new Date();
+    const userId = targetUserId === 'family' ? null : targetUserId || session.user.id;
+
+    await db.update(expense).set({
+        userId,
+        description,
+        amount: amountCents,
+        category,
+        isMonthly,
+        date
+    }).where(eq(expense.id, id));
+
+    revalidatePath("/");
+}
+
 export async function addIncome(formData: FormData) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
 
     const description = formData.get('description')?.toString();
     const amount = parseFloat(formData.get('amount')?.toString() || '0');
+    const category = formData.get('category')?.toString();
     const dateStr = formData.get('date')?.toString();
     const targetUserId = formData.get('userId')?.toString();
 
-    if (!description || isNaN(amount)) {
+    if (!description || isNaN(amount) || !category) {
         return;
     }
 
@@ -69,6 +102,7 @@ export async function addIncome(formData: FormData) {
         userId,
         description,
         amount: amountCents,
+        category,
         date
     });
 
@@ -83,5 +117,35 @@ export async function deleteIncome(formData: FormData) {
     if (!id) return;
 
     await db.delete(income).where(eq(income.id, id));
+    revalidatePath("/");
+}
+
+export async function updateIncome(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    const id = formData.get('id')?.toString();
+    const description = formData.get('description')?.toString();
+    const amount = parseFloat(formData.get('amount')?.toString() || '0');
+    const category = formData.get('category')?.toString();
+    const dateStr = formData.get('date')?.toString();
+    const targetUserId = formData.get('userId')?.toString();
+
+    if (!id || !description || isNaN(amount) || !category) {
+        return;
+    }
+
+    const amountCents = Math.round(amount * 100);
+    const date = dateStr ? new Date(dateStr) : new Date();
+    const userId = targetUserId === 'family' ? null : targetUserId || session.user.id;
+
+    await db.update(income).set({
+        userId,
+        description,
+        amount: amountCents,
+        category,
+        date
+    }).where(eq(income.id, id));
+
     revalidatePath("/");
 }
