@@ -941,17 +941,17 @@ export function DashboardContent({ data }: PageProps) {
                         Description <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
-                    <TableHead className="text-left">
+                    <TableHead className="hidden md:table-cell text-left">
                       <button className="flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("userName")}>
                         User <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
-                    <TableHead className="text-left">
+                    <TableHead className="hidden sm:table-cell text-left">
                       <button className="flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("category")}>
                         Category <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
-                    <TableHead className="text-center">
+                    <TableHead className="hidden lg:table-cell text-center">
                       <button className="mx-auto flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("date")}>
                         Date <ArrowUpDown className="h-3 w-3" />
                       </button>
@@ -1003,7 +1003,7 @@ export function DashboardContent({ data }: PageProps) {
                             <span className="truncate flex-1 uppercase font-black tracking-tight">{item.description}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-left font-bold text-white/70">
+                        <TableCell className="hidden md:table-cell text-left font-bold text-white/70">
                           <div className="flex items-center justify-start">
                             {item.userName === 'Family Wide' ? (
                               <div className="flex h-10 w-10 items-center justify-center rounded-none border border-white/10 bg-white/5 text-white/40" title="Family Wide">
@@ -1016,7 +1016,7 @@ export function DashboardContent({ data }: PageProps) {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="text-left">
+                        <TableCell className="hidden sm:table-cell text-left">
                           <div 
                             className="inline-flex items-center rounded-none border px-3 py-1 font-bold tracking-wider uppercase transition-colors"
                             style={{ 
@@ -1028,7 +1028,7 @@ export function DashboardContent({ data }: PageProps) {
                             {item.category}
                           </div>
                         </TableCell>
-                        <TableCell className="text-center font-mono text-white/30">
+                        <TableCell className="hidden lg:table-cell text-center font-mono text-white/30">
                           {new Date(item.date).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-right font-mono font-black tracking-tight text-white">
@@ -1103,7 +1103,7 @@ export function DashboardContent({ data }: PageProps) {
       </div>
 
       <Sheet open={expenseSheetOpen} onOpenChange={setExpenseSheetOpen}>
-        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left sm:max-w-md rounded-none">
+        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-none">
           <div className="flex h-full flex-col bg-slate-950/50 text-left backdrop-blur-3xl">
             <SheetHeader className="border-b border-white/10 p-8 text-left">
               <SheetTitle className="flex items-center gap-2 text-left text-2xl font-bold text-white">
@@ -1179,7 +1179,7 @@ export function DashboardContent({ data }: PageProps) {
       </Sheet>
 
       <Sheet open={incomeSheetOpen} onOpenChange={setIncomeSheetOpen}>
-        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left sm:max-w-md rounded-none">
+        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-none">
           <div className="flex h-full flex-col bg-slate-950/50 text-left backdrop-blur-3xl">
             <SheetHeader className="border-b border-white/10 p-8 text-left">
               <SheetTitle className="flex items-center gap-2 text-left text-2xl font-bold text-white">
