@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { expense, income, user } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { getSession } from "@/lib/get-session";
 import { revalidatePath } from "next/cache";
 
@@ -146,6 +146,21 @@ export async function updateIncome(formData: FormData) {
         category,
         date
     }).where(eq(income.id, id));
+
+    revalidatePath("/");
+}
+
+export async function bulkDeleteTransactions(ids: string[], type: 'expense' | 'income') {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    if (ids.length === 0) return;
+
+    if (type === 'expense') {
+        await db.delete(expense).where(inArray(expense.id, ids));
+    } else {
+        await db.delete(income).where(inArray(income.id, ids));
+    }
 
     revalidatePath("/");
 }

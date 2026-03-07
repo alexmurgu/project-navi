@@ -6,10 +6,16 @@ import {
   Receipt, CircleDollarSign, ChartArea, Search, ListFilter, 
   CalendarIcon, ArrowUpDown, Trash2, Pencil, Filter, Users, 
   Check, ChevronsUpDown, PlusCircle, Plus, X, FileUp, Loader2, 
-  Save
+  Save, SquareMousePointer
 } from "lucide-react";
 import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, 
+  AlertDialogTitle, AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
 import { 
   Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, Legend
 } from "recharts";
@@ -29,7 +35,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { DateRange } from "react-day-picker";
-import { addExpense, addIncome, deleteExpense, deleteIncome, updateExpense, updateIncome } from "./actions";
+import { addExpense, addIncome, deleteExpense, deleteIncome, updateExpense, updateIncome, bulkDeleteTransactions } from "./actions";
 import { CategoryCombobox } from "@/components/category-combobox";
 
 interface PageProps {
@@ -80,6 +86,9 @@ export function DashboardContent({ data }: PageProps) {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [sortColumn, setSortColumn] = useState<string>("date");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -136,6 +145,38 @@ export function DashboardContent({ data }: PageProps) {
         router.push("/import");
       }
     });
+  };
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredHistory.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredHistory.map(item => item.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+
+    // Filter selection by type because bulk action is type-specific in our current schema implementation
+    const expensesToDelete = filteredHistory.filter(i => i.type === 'expense' && selectedIds.includes(i.id)).map(i => i.id);
+    const incomesToDelete = filteredHistory.filter(i => i.type === 'income' && selectedIds.includes(i.id)).map(i => i.id);
+
+    if (expensesToDelete.length > 0) {
+      await bulkDeleteTransactions(expensesToDelete, 'expense');
+    }
+    if (incomesToDelete.length > 0) {
+      await bulkDeleteTransactions(incomesToDelete, 'income');
+    }
+
+    setSelectedIds([]);
+    setSelectionMode(false);
   };
 
   const totalIncome = data.incomes.reduce((acc, curr) => acc + curr.amount, 0);
@@ -278,6 +319,8 @@ export function DashboardContent({ data }: PageProps) {
     setTableSearch("");
     setHistoryView("all");
     setDateRange(undefined);
+    setSelectionMode(false);
+    setSelectedIds([]);
   };
 
   const resetEntryDate = () => {
@@ -289,6 +332,8 @@ export function DashboardContent({ data }: PageProps) {
   };
 
   const handleEdit = (item: any) => {
+    setSelectionMode(false);
+    setSelectedIds([]);
     setEditingItem(item);
     setSelectedUserId(item.userId || "family");
     if (item.type === "expense") {
@@ -755,6 +800,57 @@ export function DashboardContent({ data }: PageProps) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={selectionMode ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => {
+                        setSelectionMode(!selectionMode);
+                        setSelectedIds([]);
+                      }}
+                      className={cn(
+                        "h-10 w-10 border-white/10 bg-black/20 text-white hover:bg-white/5 rounded-none",
+                        selectionMode && "bg-primary text-primary-foreground border-primary"
+                      )}
+                      title="Toggle Multi-select"
+                    >
+                      <SquareMousePointer className="h-4 w-4" />
+                    </Button>
+
+                    {selectionMode && selectedIds.length > 0 && (
+                      <AlertDialog>
+                        <AlertDialogTrigger
+                          render={
+                            <Button
+                              variant="destructive"
+                              size="default"
+                              className="h-10 px-4 text-xs font-bold uppercase tracking-widest rounded-none"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete ({selectedIds.length})
+                            </Button>
+                          }
+                        />
+                        <AlertDialogContent className="glass-panel border-white/10 rounded-none shadow-2xl">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-white font-black uppercase tracking-tighter">Confirm Deletion</AlertDialogTitle>
+                            <AlertDialogDescription className="text-white/40">
+                              You are about to permanently remove {selectedIds.length} transactions. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-none">Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={handleBulkDelete}
+                              className="bg-red-600 text-white hover:bg-red-500 rounded-none font-bold uppercase tracking-widest"
+                            >
+                              Confirm Protocol
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+
                   <div className="relative flex items-center gap-2">
                     <div className="relative w-full text-left md:w-64">
                       <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/30" />
@@ -831,6 +927,15 @@ export function DashboardContent({ data }: PageProps) {
               <Table>
                 <TableHeader className="bg-white/5 text-left">
                   <TableRow className="border-white/10 hover:bg-transparent">
+                    {selectionMode && (
+                      <TableHead className="w-[50px] px-4">
+                        <Checkbox 
+                          checked={selectedIds.length === filteredHistory.length && filteredHistory.length > 0}
+                          onCheckedChange={toggleSelectAll}
+                          className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        />
+                      </TableHead>
+                    )}
                     <TableHead>
                       <button className="flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("description")}>
                         Description <ArrowUpDown className="h-3 w-3" />
@@ -862,11 +967,24 @@ export function DashboardContent({ data }: PageProps) {
                 <TableBody>
                   {filteredHistory.map((item) => {
                     const rowColor = getCategoryColor(item.category, item.type === 'income' ? '#A855F7' : '#FFFFFF');
+                    const isSelected = selectedIds.includes(item.id);
                     return (
                       <TableRow 
                         key={item.id} 
-                        className="group border-white/10 transition-colors hover:bg-white/5"
+                        className={cn(
+                          "group border-white/10 transition-colors hover:bg-white/5",
+                          isSelected && "bg-white/5"
+                        )}
                       >
+                        {selectionMode && (
+                          <TableCell className="w-[50px] px-4">
+                            <Checkbox 
+                              checked={isSelected}
+                              onCheckedChange={() => toggleSelection(item.id)}
+                              className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                            />
+                          </TableCell>
+                        )}
                         <TableCell className="max-w-[200px] font-medium text-white md:max-w-[400px]">
                           <div className="flex items-center gap-3 text-left min-w-0">
                             {item.type === "income" ? (
@@ -930,12 +1048,39 @@ export function DashboardContent({ data }: PageProps) {
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <form action={item.type === 'expense' ? deleteExpense : deleteIncome}>
-                             <input type="hidden" name="id" value={item.id} />
-                              <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-400/10 hover:text-red-400 rounded-none">
+                          <AlertDialog>
+                            <AlertDialogTrigger
+                              render={
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-8 w-8 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-400/10 hover:text-red-400 rounded-none"
+                                >
                                   <Trash2 className="h-4 w-4" />
-                              </Button>
-                          </form>
+                                </Button>
+                              }
+                            />
+                            <AlertDialogContent className="glass-panel border-white/10 rounded-none shadow-2xl">
+                              <AlertDialogHeader>
+                                <AlertDialogTitle className="text-white font-black uppercase tracking-tighter">Delete Transaction?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-white/40">
+                                  This will permanently remove "{item.description}".
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-none">Cancel</AlertDialogCancel>
+                                <form action={item.type === 'expense' ? deleteExpense : deleteIncome}>
+                                  <input type="hidden" name="id" value={item.id} />
+                                  <AlertDialogAction 
+                                    type="submit"
+                                    className="bg-red-600 text-white hover:bg-red-500 rounded-none font-bold uppercase tracking-widest"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </form>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>
