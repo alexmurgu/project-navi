@@ -8,7 +8,7 @@ import {
   Check, ChevronsUpDown, PlusCircle, Plus, X, FileUp, Loader2, 
   Save, SquareMousePointer
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, isToday, isYesterday } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
@@ -61,6 +61,31 @@ const toTitleCase = (str: string) => {
   return str.toLowerCase().split(' ').map(word => {
     return (word.charAt(0).toUpperCase() + word.slice(1));
   }).join(' ');
+};
+
+const cleanDescription = (str: string) => {
+  if (!str) return "";
+  
+  // Remove common bank jargon and noise
+  let cleaned = str
+    .replace(/Purchase\s+Cy\s+Card\s+\d*\**\d*/gi, "")
+    .replace(/Payment\s+Account\s+\d*\**\d*/gi, "")
+    .replace(/Account\s+\d*\**\d*/gi, "")
+    .replace(/Card\s+\d*\**\d*/gi, "")
+    .replace(/Visa\s+Purchase\s+/gi, "")
+    .replace(/Mastercard\s+Purchase\s+/gi, "")
+    .replace(/\d{4,}/g, "") // Remove long number sequences
+    .replace(/\s+/g, " ") // Collapse spaces
+    .trim();
+    
+  return toTitleCase(cleaned);
+};
+
+const formatFriendlyDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
+  return format(date, "MMM dd");
 };
 
 export function DashboardContent({ data }: PageProps) {
@@ -1007,7 +1032,7 @@ export function DashboardContent({ data }: PageProps) {
                                 <ArrowDownCircle className="h-4 w-4" />
                               </div>
                             )}
-                            <span className="truncate flex-1 font-semibold tracking-tight">{toTitleCase(item.description)}</span>
+                            <span className="truncate flex-1 font-semibold tracking-tight">{cleanDescription(item.description)}</span>
                           </div>
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-left font-semibold text-white/70">
@@ -1034,8 +1059,8 @@ export function DashboardContent({ data }: PageProps) {
                             {item.category}
                           </div>
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell text-center font-mono text-white/30">
-                          {new Date(item.date).toLocaleDateString()}
+                        <TableCell className="hidden lg:table-cell text-center font-mono text-xs text-white/30">
+                          {formatFriendlyDate(item.date)}
                         </TableCell>
                         <TableCell className="text-right font-mono font-semibold tracking-tight text-white">
                           {item.type === "income" ? (
