@@ -955,7 +955,7 @@ export function DashboardContent({ data }: PageProps) {
             </div>
           </CardHeader>
           <CardContent className="pt-6 text-left">
-            <div className="overflow-hidden rounded-lg border border-white/10 bg-black/20">
+            <div className="overflow-hidden rounded-lg border border-white/10 bg-slate-950/50 backdrop-blur-md">
               <Table>
                 <TableHeader className="bg-white/5 text-left">
                   <TableRow className="border-white/10 hover:bg-transparent">

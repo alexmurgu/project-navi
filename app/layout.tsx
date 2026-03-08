@@ -40,10 +40,11 @@ export default async function RootLayout({
       )}
     >
       <body className="antialiased min-h-screen">
-        {/* Decorative background orbs */}
+        {/* Ambient background glow blobs */}
         <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-[10%] -right-[10%] h-[500px] w-[500px] rounded-lg bg-primary/20 blur-[120px]"></div>
-          <div className="absolute bottom-[20%] -left-[10%] h-[400px] w-[400px] rounded-lg bg-purple-600/20 blur-[120px]"></div>
+          <div className="absolute -top-[15%] -left-[10%] h-[600px] w-[600px] rounded-full bg-purple-600/10 blur-[150px]"></div>
+          <div className="absolute -top-[10%] -right-[10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px]"></div>
+          <div className="absolute bottom-[10%] right-[20%] h-[400px] w-[400px] rounded-full bg-blue-600/10 blur-[150px]"></div>
         </div>
 
         <SidebarProvider>
