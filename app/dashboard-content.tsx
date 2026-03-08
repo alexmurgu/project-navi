@@ -6,7 +6,7 @@ import {
   Receipt, CircleDollarSign, ChartArea, Search, ListFilter, 
   CalendarIcon, ArrowUpDown, Trash2, Pencil, Filter, Users, 
   Check, ChevronsUpDown, PlusCircle, Plus, X, FileUp, Loader2, 
-  Save, SquareMousePointer
+  Save, SquareMousePointer, ChevronDown
 } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -48,6 +48,8 @@ interface PageProps {
     categoryConfigs: { name: string, color: string }[];
   }
 }
+
+const INITIAL_PAGE_SIZE = 15;
 
 const formatCurrency = (amountCents: number) => {
   return (amountCents / 100).toLocaleString("en-US", {
@@ -121,6 +123,7 @@ export function DashboardContent({ data }: PageProps) {
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -186,10 +189,10 @@ export function DashboardContent({ data }: PageProps) {
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.length === filteredHistory.length) {
+    if (selectedIds.length === paginatedHistory.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(filteredHistory.map(item => item.id));
+      setSelectedIds(paginatedHistory.map(item => item.id));
     }
   };
 
@@ -197,8 +200,8 @@ export function DashboardContent({ data }: PageProps) {
     if (selectedIds.length === 0) return;
 
     // Filter selection by type because bulk action is type-specific in our current schema implementation
-    const expensesToDelete = filteredHistory.filter(i => i.type === 'expense' && selectedIds.includes(i.id)).map(i => i.id);
-    const incomesToDelete = filteredHistory.filter(i => i.type === 'income' && selectedIds.includes(i.id)).map(i => i.id);
+    const expensesToDelete = allItems.filter(i => i.type === 'expense' && selectedIds.includes(i.id)).map(i => i.id);
+    const incomesToDelete = allItems.filter(i => i.type === 'income' && selectedIds.includes(i.id)).map(i => i.id);
 
     if (expensesToDelete.length > 0) {
       await bulkDeleteTransactions(expensesToDelete, 'expense');
@@ -259,6 +262,16 @@ export function DashboardContent({ data }: PageProps) {
     });
   }, [allItems, historyView, tableSearch, dateRange, sortColumn, sortDirection]);
 
+  const paginatedHistory = useMemo(() => {
+    return filteredHistory.slice(0, visibleCount);
+  }, [filteredHistory, visibleCount]);
+
+  const hasMore = filteredHistory.length > visibleCount;
+
+  const loadMore = () => {
+    setVisibleCount(prev => prev + INITIAL_PAGE_SIZE);
+  };
+
   const chartData = useMemo(() => {
     const dailyMap = new Map<string, { date: Date; income: number; expense: number; label: string }>();
 
@@ -298,28 +311,6 @@ export function DashboardContent({ data }: PageProps) {
       .sort((a, b) => b.value - a.value);
   }, [data.incomes]);
 
-  const incomeUserData = useMemo(() => {
-    const userMap = new Map<string, number>();
-    data.incomes.forEach((inc) => {
-      const name = inc.userName || "Family Wide";
-      userMap.set(name, (userMap.get(name) || 0) + inc.amount / 100);
-    });
-    return Array.from(userMap.entries())
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [data.incomes]);
-
-  const expenseUserData = useMemo(() => {
-    const userMap = new Map<string, number>();
-    data.expenses.forEach((exp) => {
-      const name = exp.userName || "Family Wide";
-      userMap.set(name, (userMap.get(name) || 0) + exp.amount / 100);
-    });
-    return Array.from(userMap.entries())
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [data.expenses]);
-
   const combinedUserData = useMemo(() => {
     const userMap = new Map<string, { name: string; income: number; expense: number }>();
     
@@ -353,6 +344,7 @@ export function DashboardContent({ data }: PageProps) {
     setDateRange(undefined);
     setSelectionMode(false);
     setSelectedIds([]);
+    setVisibleCount(INITIAL_PAGE_SIZE);
   };
 
   const resetEntryDate = () => {
@@ -827,7 +819,7 @@ export function DashboardContent({ data }: PageProps) {
                 <div className="text-left">
                   <CardTitle className="text-left text-xl text-white">Recent Transactions</CardTitle>
                   <CardDescription className="text-left text-white/60">
-                    View and manage your family's financial logs.
+                    Showing {paginatedHistory.length} of {filteredHistory.length} logs.
                   </CardDescription>
                 </div>
 
@@ -889,7 +881,10 @@ export function DashboardContent({ data }: PageProps) {
                       <Input
                         placeholder="Search transactions..."
                         value={tableSearch}
-                        onChange={(e) => setTableSearch(e.target.value)}
+                        onChange={(e) => {
+                          setTableSearch(e.target.value);
+                          setVisibleCount(INITIAL_PAGE_SIZE);
+                        }}
                         className="h-10 border-white/10 bg-black/20 pl-9 text-white rounded-lg"
                       />
                     </div>
@@ -918,7 +913,10 @@ export function DashboardContent({ data }: PageProps) {
                                 variant="ghost"
                                 size="sm"
                                 className="h-6 text-[10px] text-primary hover:bg-primary/10 hover:text-primary rounded-lg"
-                                onClick={() => setDateRange(undefined)}
+                                onClick={() => {
+                                  setDateRange(undefined);
+                                  setVisibleCount(INITIAL_PAGE_SIZE);
+                                }}
                               >
                                 Reset
                               </Button>
@@ -927,7 +925,10 @@ export function DashboardContent({ data }: PageProps) {
                           <Calendar
                             mode="range"
                             selected={dateRange}
-                            onSelect={setDateRange}
+                            onSelect={(range) => {
+                              setDateRange(range);
+                              setVisibleCount(INITIAL_PAGE_SIZE);
+                            }}
                             className="rounded-lg border border-white/5 bg-transparent"
                           />
                         </div>
@@ -944,7 +945,10 @@ export function DashboardContent({ data }: PageProps) {
                             ? "border border-white/10 bg-white/10 text-white shadow-sm"
                             : "text-white/50 hover:bg-white/5 hover:text-white/80"
                         }`}
-                        onClick={() => setHistoryView(view)}
+                        onClick={() => {
+                          setHistoryView(view);
+                          setVisibleCount(INITIAL_PAGE_SIZE);
+                        }}
                       >
                         {view}
                       </button>
@@ -962,7 +966,7 @@ export function DashboardContent({ data }: PageProps) {
                     {selectionMode && (
                       <TableHead className="w-[50px] px-4">
                         <Checkbox 
-                          checked={selectedIds.length === filteredHistory.length && filteredHistory.length > 0}
+                          checked={selectedIds.length === paginatedHistory.length && paginatedHistory.length > 0}
                           onCheckedChange={toggleSelectAll}
                           className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
@@ -997,7 +1001,7 @@ export function DashboardContent({ data }: PageProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredHistory.map((item) => {
+                  {paginatedHistory.map((item) => {
                     const rowColor = getCategoryColor(item.category, item.type === 'income' ? '#A855F7' : '#FFFFFF');
                     const isSelected = selectedIds.includes(item.id);
                     return (
@@ -1129,6 +1133,18 @@ export function DashboardContent({ data }: PageProps) {
                 </div>
               )}
             </div>
+            
+            {hasMore && (
+              <div className="mt-6 flex justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={loadMore}
+                  className="h-10 border-white/10 bg-white/5 text-white hover:bg-white/10 px-8 rounded-lg"
+                >
+                  <ChevronDown className="mr-2 h-4 w-4" /> Load More Transactions
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
