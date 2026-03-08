@@ -352,17 +352,17 @@ export function DashboardContent({ data }: PageProps) {
         <Card className="glass-panel relative overflow-hidden border-primary/30 shadow-[0_0_20px_rgba(245,158,11,0.1)] rounded-lg">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
           <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-bold text-primary">Net Balance</CardTitle>
+            <CardTitle className="text-sm font-semibold text-primary">Net Balance</CardTitle>
             <ArrowUpCircle className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent className="relative z-10 text-left">
-            <div className={`text-2xl font-bold tracking-tight ${balance >= 0 ? "text-white" : "text-red-400"}`}>
+            <div className={`text-3xl font-extrabold tracking-tight ${balance >= 0 ? "text-white" : "text-red-400"}`}>
               {formatCurrency(balance)}
             </div>
             <div className="mt-1 flex items-center gap-3">
               <div className="flex flex-col">
-                <p className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Total Income</p>
-                <p className="font-mono text-xs text-green-400">{formatCurrency(totalIncome)}</p>
+                <p className="text-[10px] font-medium tracking-wider text-white/40 uppercase">Total Income</p>
+                <p className="font-mono text-xs font-semibold text-green-400">{formatCurrency(totalIncome)}</p>
               </div>
             </div>
           </CardContent>
@@ -371,22 +371,22 @@ export function DashboardContent({ data }: PageProps) {
         <Card className="glass-panel group relative overflow-hidden border-white/10 rounded-lg">
           <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 text-left">
-            <CardTitle className="text-sm font-medium text-white/70">Current Month Expenses</CardTitle>
+            <CardTitle className="text-sm font-semibold text-white/70">Current Month Expenses</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-400" />
           </CardHeader>
           <CardContent className="text-left">
-            <div className="text-2xl font-bold tracking-tight text-white">
+            <div className="text-2xl font-extrabold tracking-tight text-white">
               {formatCurrency(totalExpenses)}
             </div>
             <div className="mt-1 flex items-center gap-3">
               <div className="flex flex-col">
-                <p className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Monthly</p>
-                <p className="font-mono text-xs text-blue-400">{formatCurrency(totalMonthly)}</p>
+                <p className="text-[10px] font-medium tracking-wider text-white/40 uppercase">Monthly</p>
+                <p className="font-mono text-xs font-semibold text-blue-400">{formatCurrency(totalMonthly)}</p>
               </div>
               <div className="mt-2 h-4 w-[1px] bg-white/10"></div>
               <div className="flex flex-col">
-                <p className="text-[10px] font-bold tracking-widest text-white/40 uppercase">Extras</p>
-                <p className="font-mono text-xs text-amber-400">{formatCurrency(totalExtra)}</p>
+                <p className="text-[10px] font-medium tracking-wider text-white/40 uppercase">Extras</p>
+                <p className="font-mono text-xs font-semibold text-amber-400">{formatCurrency(totalExtra)}</p>
               </div>
             </div>
           </CardContent>
@@ -394,7 +394,7 @@ export function DashboardContent({ data }: PageProps) {
 
         <Card className="glass-panel border-white/20 bg-white/5 rounded-lg">
           <CardHeader className="pb-2 text-left">
-            <CardTitle className="text-xs font-bold tracking-[0.2em] text-white/40 uppercase">
+            <CardTitle className="text-xs font-medium tracking-wider text-white/40 uppercase">
               Quick Actions
             </CardTitle>
           </CardHeader>
@@ -436,7 +436,7 @@ export function DashboardContent({ data }: PageProps) {
               />
               <DialogContent className="glass-panel border-white/10 sm:max-w-md rounded-lg">
                 <DialogHeader>
-                  <DialogTitle className="text-white">Import Bank Statement</DialogTitle>
+                  <DialogTitle className="text-white font-semibold">Import Bank Statement</DialogTitle>
                   <DialogDescription className="text-white/60">
                     Upload your bank history CSV to review and import transactions.
                   </DialogDescription>
@@ -461,7 +461,7 @@ export function DashboardContent({ data }: PageProps) {
                         <FileUp className="size-6 text-blue-400" />
                       </div>
                     )}
-                    <span className="text-sm font-bold text-white">{isParsing ? "Parsing..." : "Click to select CSV"}</span>
+                    <span className="text-sm font-semibold text-white">{isParsing ? "Parsing..." : "Click to select CSV"}</span>
                   </label>
                 </div>
               </DialogContent>
@@ -515,17 +515,17 @@ export function DashboardContent({ data }: PageProps) {
                       if (active && payload && payload.length) {
                         return (
                           <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
-                            <div className="mb-2 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">
+                            <div className="mb-2 text-left text-[10px] font-medium tracking-wider text-white/40 uppercase">
                               {label}
                             </div>
                             <div className="flex flex-col gap-1.5">
                               {payload.map((entry, index) => (
                                 <div key={index} className="flex items-center justify-between gap-8">
-                                  <span className={`flex items-center gap-1.5 text-xs font-bold ${entry.dataKey === "income" ? "text-green-400" : "text-red-400"}`}>
+                                  <span className={`flex items-center gap-1.5 text-xs font-semibold ${entry.dataKey === "income" ? "text-green-400" : "text-red-400"}`}>
                                     <div className={`h-1.5 w-1.5 rounded-lg ${entry.dataKey === "income" ? "bg-green-400" : "bg-red-400"}`}></div>
                                     {entry.dataKey === "income" ? "Income" : "Expense"}
                                   </span>
-                                  <span className="font-mono text-xs font-bold text-white">
+                                  <span className="font-mono text-xs font-semibold text-white">
                                     ${(entry.value as number).toFixed(2)}
                                   </span>
                                 </div>
@@ -546,7 +546,7 @@ export function DashboardContent({ data }: PageProps) {
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/5">
                   <ChartArea className="h-6 w-6 text-white/20" />
                 </div>
-                <p className="text-sm font-bold tracking-widest text-white/30 uppercase">
+                <p className="text-sm font-medium tracking-wider text-white/30 uppercase">
                   Not enough data to generate trend
                 </p>
                 <p className="mt-1 text-xs text-white/20">
@@ -558,11 +558,11 @@ export function DashboardContent({ data }: PageProps) {
           <div className="mt-4 flex items-center justify-center gap-6">
             <div className="flex items-center gap-2">
               <div className="h-2 w-6 rounded-lg border border-green-500/50 bg-green-500/30"></div>
-              <span className="text-[10px] font-bold tracking-wider text-white/50 uppercase">Income</span>
+              <span className="text-[10px] font-medium tracking-wider text-white/50 uppercase">Income</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-6 rounded-lg border border-red-500/50 bg-red-500/30"></div>
-              <span className="text-[10px] font-bold tracking-wider text-white/50 uppercase">Expenses</span>
+              <span className="text-[10px] font-medium tracking-wider text-white/50 uppercase">Expenses</span>
             </div>
           </div>
         </CardContent>
@@ -618,13 +618,13 @@ export function DashboardContent({ data }: PageProps) {
                             if (active && payload && payload.length) {
                               return (
                                 <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
-                                  <div className="mb-1 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">Category</div>
-                                  <div className="mb-2 text-left text-xs font-bold text-white">{label}</div>
+                                  <div className="mb-1 text-left text-[10px] font-medium tracking-wider text-white/40 uppercase">Category</div>
+                                  <div className="mb-2 text-left text-xs font-semibold text-white">{label}</div>
                                   <div className="flex items-center justify-between gap-8">
-                                    <span className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+                                    <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-400">
                                       <div className="h-1.5 w-1.5 rounded-lg bg-amber-400"></div> Spent
                                     </span>
-                                    <span className="font-mono text-xs font-bold text-white">${parseFloat(payload[0].value as string).toFixed(2)}</span>
+                                    <span className="font-mono text-xs font-semibold text-white">${parseFloat(payload[0].value as string).toFixed(2)}</span>
                                   </div>
                                 </div>
                               );
@@ -641,7 +641,7 @@ export function DashboardContent({ data }: PageProps) {
                     </ResponsiveContainer>
                   ) : (
                     <div className="flex h-full flex-col items-center justify-center text-center">
-                      <p className="text-sm font-bold tracking-widest text-white/30 uppercase">No categorical data</p>
+                      <p className="text-sm font-medium tracking-wider text-white/30 uppercase">No categorical data</p>
                     </div>
                   )}
                 </div>
@@ -676,13 +676,13 @@ export function DashboardContent({ data }: PageProps) {
                             if (active && payload && payload.length) {
                               return (
                                 <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
-                                  <div className="mb-1 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">Category</div>
-                                  <div className="mb-2 text-left text-xs font-bold text-white">{label}</div>
+                                  <div className="mb-1 text-left text-[10px] font-medium tracking-wider text-white/40 uppercase">Category</div>
+                                  <div className="mb-2 text-left text-xs font-semibold text-white">{label}</div>
                                   <div className="flex items-center justify-between gap-8">
-                                    <span className="flex items-center gap-1.5 text-xs font-bold text-purple-400">
+                                    <span className="flex items-center gap-1.5 text-xs font-semibold text-purple-400">
                                       <div className="h-1.5 w-1.5 rounded-lg bg-purple-400"></div> Earned
                                     </span>
-                                    <span className="font-mono text-xs font-bold text-white">${parseFloat(payload[0].value as string).toFixed(2)}</span>
+                                    <span className="font-mono text-xs font-semibold text-white">${parseFloat(payload[0].value as string).toFixed(2)}</span>
                                   </div>
                                 </div>
                               );
@@ -699,7 +699,7 @@ export function DashboardContent({ data }: PageProps) {
                     </ResponsiveContainer>
                   ) : (
                     <div className="flex h-full flex-col items-center justify-center text-center">
-                      <p className="text-sm font-bold tracking-widest text-white/30 uppercase">No categorical data</p>
+                      <p className="text-sm font-medium tracking-wider text-white/30 uppercase">No categorical data</p>
                     </div>
                   )}
                 </div>
@@ -745,20 +745,20 @@ export function DashboardContent({ data }: PageProps) {
                         if (active && payload && payload.length) {
                           return (
                             <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
-                              <div className="mb-1 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">Family Member</div>
-                              <div className="mb-2 text-left text-xs font-bold text-white">{label}</div>
+                              <div className="mb-1 text-left text-[10px] font-medium tracking-wider text-white/40 uppercase">Family Member</div>
+                              <div className="mb-2 text-left text-xs font-semibold text-white">{label}</div>
                               <div className="flex flex-col gap-1.5">
                                 <div className="flex items-center justify-between gap-8">
-                                  <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+                                  <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
                                     <div className="h-1.5 w-1.5 rounded-lg bg-emerald-400"></div> Earned
                                   </span>
-                                  <span className="font-mono text-xs font-bold text-white">${payload[0].value}</span>
+                                  <span className="font-mono text-xs font-semibold text-white">${payload[0].value}</span>
                                 </div>
                                 <div className="flex items-center justify-between gap-8">
-                                  <span className="flex items-center gap-1.5 text-xs font-bold text-red-400">
+                                  <span className="flex items-center gap-1.5 text-xs font-semibold text-red-400">
                                     <div className="h-1.5 w-1.5 rounded-lg bg-red-400"></div> Spent
                                   </span>
-                                  <span className="font-mono text-xs font-bold text-white">${payload[1].value}</span>
+                                  <span className="font-mono text-xs font-semibold text-white">${payload[1].value}</span>
                                 </div>
                               </div>
                             </div>
@@ -771,7 +771,7 @@ export function DashboardContent({ data }: PageProps) {
                       verticalAlign="top" 
                       align="right" 
                       iconType="circle" 
-                      wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', opacity: 0.5 }}
+                      wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'semibold', opacity: 0.5 }}
                     />
                     <Bar dataKey="income" name="Income" fill="#34d399" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="expense" name="Expenses" fill="#f87171" radius={[4, 4, 0, 0]} />
@@ -779,7 +779,7 @@ export function DashboardContent({ data }: PageProps) {
                 </ResponsiveContainer>
               ) : (
                 <div className="flex h-full flex-col items-center justify-center text-center">
-                  <p className="text-sm font-bold tracking-widest text-white/30 uppercase">No member data available</p>
+                  <p className="text-sm font-medium tracking-wider text-white/30 uppercase">No member data available</p>
                 </div>
               )}
             </div>
@@ -824,7 +824,7 @@ export function DashboardContent({ data }: PageProps) {
                             <Button
                               variant="destructive"
                               size="default"
-                              className="h-10 px-4 text-xs font-bold uppercase tracking-widest rounded-lg"
+                              className="h-10 px-4 text-xs font-semibold uppercase tracking-wider rounded-lg"
                             >
                               <Trash2 className="mr-2 h-4 w-4" /> Delete ({selectedIds.length})
                             </Button>
@@ -832,7 +832,7 @@ export function DashboardContent({ data }: PageProps) {
                         />
                         <AlertDialogContent className="glass-panel border-white/10 rounded-lg shadow-2xl">
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="text-white font-black uppercase tracking-tighter">Confirm Deletion</AlertDialogTitle>
+                            <AlertDialogTitle className="text-white font-extrabold uppercase tracking-tighter">Confirm Deletion</AlertDialogTitle>
                             <AlertDialogDescription className="text-white/40">
                               You are about to permanently remove {selectedIds.length} transactions. This action cannot be undone.
                             </AlertDialogDescription>
@@ -841,7 +841,7 @@ export function DashboardContent({ data }: PageProps) {
                             <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-lg">Cancel</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={handleBulkDelete}
-                              className="bg-red-600 text-white hover:bg-red-500 rounded-lg font-bold uppercase tracking-widest"
+                              className="bg-red-600 text-white hover:bg-red-500 rounded-lg font-semibold uppercase tracking-wider"
                             >
                               Confirm Protocol
                             </AlertDialogAction>
@@ -880,7 +880,7 @@ export function DashboardContent({ data }: PageProps) {
                       <PopoverContent className="glass-panel w-auto border-white/10 p-0 text-left shadow-2xl rounded-lg" align="end">
                         <div className="space-y-4 p-4 text-left">
                           <div className="flex items-center justify-between">
-                            <h4 className="text-xs font-bold tracking-widest text-white/70 uppercase">Filter by Date</h4>
+                            <h4 className="text-xs font-medium tracking-wider text-white/70 uppercase">Filter by Date</h4>
                             {(dateRange?.from || dateRange?.to) && (
                               <Button
                                 variant="ghost"
@@ -907,7 +907,7 @@ export function DashboardContent({ data }: PageProps) {
                     {(["all", "expenses", "incomes"] as const).map((view) => (
                       <button
                         key={view}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-bold capitalize transition-all ${
+                        className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition-all ${
                           historyView === view
                             ? "border border-white/10 bg-white/10 text-white shadow-sm"
                             : "text-white/50 hover:bg-white/5 hover:text-white/80"
@@ -937,27 +937,27 @@ export function DashboardContent({ data }: PageProps) {
                       </TableHead>
                     )}
                     <TableHead>
-                      <button className="flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("description")}>
+                      <button className="flex items-center gap-1 font-semibold transition-colors hover:text-white" onClick={() => toggleSort("description")}>
                         Description <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
                     <TableHead className="hidden md:table-cell text-left">
-                      <button className="flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("userName")}>
+                      <button className="flex items-center gap-1 font-semibold transition-colors hover:text-white" onClick={() => toggleSort("userName")}>
                         User <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
                     <TableHead className="hidden sm:table-cell text-left">
-                      <button className="flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("category")}>
+                      <button className="flex items-center gap-1 font-semibold transition-colors hover:text-white" onClick={() => toggleSort("category")}>
                         Category <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
                     <TableHead className="hidden lg:table-cell text-center">
-                      <button className="mx-auto flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("date")}>
+                      <button className="mx-auto flex items-center gap-1 font-semibold transition-colors hover:text-white" onClick={() => toggleSort("date")}>
                         Date <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
                     <TableHead className="text-right">
-                      <button className="ml-auto flex items-center gap-1 font-bold transition-colors hover:text-white" onClick={() => toggleSort("amount")}>
+                      <button className="ml-auto flex items-center gap-1 font-semibold transition-colors hover:text-white" onClick={() => toggleSort("amount")}>
                         Amount <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </TableHead>
@@ -1000,17 +1000,17 @@ export function DashboardContent({ data }: PageProps) {
                                 <ArrowDownCircle className="h-4 w-4" />
                               </div>
                             )}
-                            <span className="truncate flex-1 uppercase font-black tracking-tight">{item.description}</span>
+                            <span className="truncate flex-1 uppercase font-extrabold tracking-tight">{item.description}</span>
                           </div>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-left font-bold text-white/70">
+                        <TableCell className="hidden md:table-cell text-left font-semibold text-white/70">
                           <div className="flex items-center justify-start">
                             {item.userName === 'Family Wide' ? (
                               <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/40" title="Family Wide">
                                 <Users className="h-5 w-5" />
                               </div>
                             ) : (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-black uppercase text-white/60" title={item.userName}>
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-extrabold uppercase text-white/60" title={item.userName}>
                                 {item.userName[0]}
                               </div>
                             )}
@@ -1018,7 +1018,7 @@ export function DashboardContent({ data }: PageProps) {
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-left">
                           <div 
-                            className="inline-flex items-center rounded-lg border px-3 py-1 font-bold tracking-wider uppercase transition-colors"
+                            className="inline-flex items-center rounded-lg border px-3 py-1 font-semibold tracking-wider uppercase transition-colors"
                             style={{ 
                               borderColor: `${rowColor}4D`,
                               backgroundColor: `${rowColor}1A`,
@@ -1031,7 +1031,7 @@ export function DashboardContent({ data }: PageProps) {
                         <TableCell className="hidden lg:table-cell text-center font-mono text-white/30">
                           {new Date(item.date).toLocaleDateString()}
                         </TableCell>
-                        <TableCell className="text-right font-mono font-black tracking-tight text-white">
+                        <TableCell className="text-right font-mono font-extrabold tracking-tight text-white">
                           {item.type === "income" ? (
                             <span style={{ color: rowColor }}>+{formatCurrency(item.amount)}</span>
                           ) : (
@@ -1062,7 +1062,7 @@ export function DashboardContent({ data }: PageProps) {
                             />
                             <AlertDialogContent className="glass-panel border-white/10 rounded-lg shadow-2xl">
                               <AlertDialogHeader>
-                                <AlertDialogTitle className="text-white font-black uppercase tracking-tighter">Delete Transaction?</AlertDialogTitle>
+                                <AlertDialogTitle className="text-white font-extrabold uppercase tracking-tighter">Delete Transaction?</AlertDialogTitle>
                                 <AlertDialogDescription className="text-white/40">
                                   This will permanently remove "{item.description}".
                                 </AlertDialogDescription>
@@ -1073,7 +1073,7 @@ export function DashboardContent({ data }: PageProps) {
                                   <input type="hidden" name="id" value={item.id} />
                                   <AlertDialogAction 
                                     type="submit"
-                                    className="bg-red-600 text-white hover:bg-red-500 rounded-lg font-bold uppercase tracking-widest"
+                                    className="bg-red-600 text-white hover:bg-red-500 rounded-lg font-semibold uppercase tracking-wider"
                                   >
                                     Delete
                                   </AlertDialogAction>
@@ -1093,7 +1093,7 @@ export function DashboardContent({ data }: PageProps) {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/5">
                     <Filter className="h-5 w-5 text-white/30" />
                   </div>
-                  <p className="text-center text-sm font-bold tracking-widest text-white/50 uppercase">No results match your filters</p>
+                  <p className="text-center text-sm font-medium tracking-wider text-white/50 uppercase">No results match your filters</p>
                   <Button variant="link" className="mt-2 text-xs text-primary rounded-lg" onClick={clearFilters}>Clear all filters</Button>
                 </div>
               )}
@@ -1106,7 +1106,7 @@ export function DashboardContent({ data }: PageProps) {
         <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-lg">
           <div className="flex h-full flex-col bg-slate-950/50 text-left backdrop-blur-3xl">
             <SheetHeader className="border-b border-white/10 p-8 text-left">
-              <SheetTitle className="flex items-center gap-2 text-left text-2xl font-bold text-white">
+              <SheetTitle className="flex items-center gap-2 text-left text-2xl font-extrabold text-white">
                 <Receipt className="h-6 w-6 text-primary" /> {editingItem ? "Edit Expense" : "Add New Expense"}
               </SheetTitle>
               <SheetDescription className="text-left text-white/60">
@@ -1117,11 +1117,11 @@ export function DashboardContent({ data }: PageProps) {
               <form action={editingItem ? updateExpense : addExpense} className="space-y-8 text-left" onSubmit={() => setExpenseSheetOpen(false)}>
                 {editingItem && <input type="hidden" name="id" value={editingItem.id} />}
                 <div className="space-y-4 text-left">
-                  <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Attribution</Label>
+                  <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Attribution</Label>
                   <div className="flex flex-wrap gap-3 py-2">
                     {data.users.map((u) => (
                       <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === u.id ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
-                        <span className="text-sm font-black uppercase">{u.name[0]}</span>
+                        <span className="text-sm font-extrabold uppercase">{u.name[0]}</span>
                       </button>
                     ))}
                     <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === "family" ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
@@ -1132,26 +1132,26 @@ export function DashboardContent({ data }: PageProps) {
                 </div>
 
                 <div className="space-y-4 text-left">
-                  <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Expense Type</Label>
+                  <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Expense Type</Label>
                   <div className="flex w-full items-center gap-2 rounded-lg border border-white/5 bg-black/40 p-1.5">
-                    <button type="button" onClick={() => setSelectedExpenseType("monthly")} className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all ${selectedExpenseType === "monthly" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Monthly</button>
-                    <button type="button" onClick={() => setSelectedExpenseType("extra")} className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all ${selectedExpenseType === "extra" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Extras</button>
+                    <button type="button" onClick={() => setSelectedExpenseType("monthly")} className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${selectedExpenseType === "monthly" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Monthly</button>
+                    <button type="button" onClick={() => setSelectedExpenseType("extra")} className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all ${selectedExpenseType === "extra" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Extras</button>
                   </div>
                   <input type="hidden" name="isMonthly" value={selectedExpenseType === "monthly" ? "on" : "off"} />
                 </div>
 
                 <div className="space-y-4 text-left">
-                  <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Description</Label>
+                  <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Description</Label>
                   <Input name="description" key={editingItem?.id || 'new'} type="text" required defaultValue={editingItem?.description || ""} placeholder="e.g. Rent, Whole Foods" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-primary rounded-lg" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-8 text-left sm:grid-cols-2">
                   <div className="space-y-4 text-left">
-                    <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Amount ($)</Label>
+                    <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Amount ($)</Label>
                     <Input name="amount" key={editingItem?.id || 'new-amt'} type="number" step="0.01" required defaultValue={editingItem ? (editingItem.amount / 100).toFixed(2) : ""} placeholder="0.00" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-primary rounded-lg" />
                   </div>
                   <div className="flex flex-col space-y-4 text-left">
-                    <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Category</Label>
+                    <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Category</Label>
                     <CategoryCombobox 
                       value={expenseCategory} 
                       options={availableCategories} 
@@ -1167,7 +1167,7 @@ export function DashboardContent({ data }: PageProps) {
                   </div>
                 </div>
                 <div className="pt-8 text-left">
-                  <Button type="submit" className="h-14 w-full bg-primary text-lg font-bold transition-all hover:bg-primary/90 rounded-lg">
+                  <Button type="submit" className="h-14 w-full bg-primary text-lg font-semibold transition-all hover:bg-primary/90 rounded-lg">
                     {editingItem ? <Save className="mr-2 h-5 w-5" /> : <Plus className="mr-2 h-5 w-5" />}
                     {editingItem ? "Update Expense" : "Save Expense"}
                   </Button>
@@ -1182,7 +1182,7 @@ export function DashboardContent({ data }: PageProps) {
         <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-lg">
           <div className="flex h-full flex-col bg-slate-950/50 text-left backdrop-blur-3xl">
             <SheetHeader className="border-b border-white/10 p-8 text-left">
-              <SheetTitle className="flex items-center gap-2 text-left text-2xl font-bold text-white">
+              <SheetTitle className="flex items-center gap-2 text-left text-2xl font-extrabold text-white">
                 <CircleDollarSign className="h-6 w-6 text-purple-400" /> {editingItem ? "Edit Family Income" : "Add Family Income"}
               </SheetTitle>
               <SheetDescription className="text-left text-white/60">
@@ -1193,11 +1193,11 @@ export function DashboardContent({ data }: PageProps) {
               <form action={editingItem ? updateIncome : addIncome} className="space-y-8 text-left" onSubmit={() => setIncomeSheetOpen(false)}>
                 {editingItem && <input type="hidden" name="id" value={editingItem.id} />}
                 <div className="space-y-4 text-left">
-                  <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Attribution</Label>
+                  <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Attribution</Label>
                   <div className="flex flex-wrap gap-3 py-2 text-left">
                     {data.users.map((u) => (
                       <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === u.id ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
-                        <span className="text-sm font-black uppercase">{u.name[0]}</span>
+                        <span className="text-sm font-extrabold uppercase">{u.name[0]}</span>
                       </button>
                     ))}
                     <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === "family" ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
@@ -1208,17 +1208,17 @@ export function DashboardContent({ data }: PageProps) {
                 </div>
 
                 <div className="space-y-4 text-left">
-                  <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Income Source</Label>
+                  <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Income Source</Label>
                   <Input name="description" key={editingItem?.id || 'new-inc'} type="text" required defaultValue={editingItem?.description || ""} placeholder="e.g. Salary, Bonus" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-purple-500 rounded-lg" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-8 text-left sm:grid-cols-2">
                   <div className="space-y-4 text-left">
-                    <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Amount ($)</Label>
+                    <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Amount ($)</Label>
                     <Input name="amount" key={editingItem?.id || 'new-inc-amt'} type="number" step="0.01" required defaultValue={editingItem ? (editingItem.amount / 100).toFixed(2) : ""} placeholder="0.00" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-purple-500 rounded-lg" />
                   </div>
                   <div className="flex flex-col space-y-4 text-left">
-                    <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Category</Label>
+                    <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Category</Label>
                     <CategoryCombobox 
                       value={incomeCategory} 
                       options={availableCategories} 
@@ -1235,7 +1235,7 @@ export function DashboardContent({ data }: PageProps) {
                 </div>
 
                 <div className="pt-8 text-left">
-                  <Button type="submit" className="h-14 w-full border-none bg-purple-600 text-lg font-bold text-white transition-all hover:bg-purple-500 rounded-lg">
+                  <Button type="submit" className="h-14 w-full border-none bg-purple-600 text-lg font-semibold text-white transition-all hover:bg-purple-500 rounded-lg">
                     {editingItem ? <Save className="mr-2 h-5 w-5" /> : <ArrowUpCircle className="mr-2 h-5 w-5" />}
                     {editingItem ? "Update Income" : "Save Income"}
                   </Button>
