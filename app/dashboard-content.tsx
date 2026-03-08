@@ -56,6 +56,13 @@ const formatCurrency = (amountCents: number) => {
   });
 };
 
+const toTitleCase = (str: string) => {
+  if (!str) return "";
+  return str.toLowerCase().split(' ').map(word => {
+    return (word.charAt(0).toUpperCase() + word.slice(1));
+  }).join(' ');
+};
+
 export function DashboardContent({ data }: PageProps) {
   const getCategoryColor = (name: string, defaultColor: string) => {
     const config = data.categoryConfigs.find(c => c.name.toLowerCase() === name.toLowerCase());
@@ -989,28 +996,28 @@ export function DashboardContent({ data }: PageProps) {
                           <div className="flex items-center gap-3 text-left min-w-0">
                             {item.type === "income" ? (
                               <div 
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/20 text-purple-400"
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/20 text-purple-400 opacity-60"
                               >
                                 <ArrowUpCircle className="h-4 w-4" />
                               </div>
                             ) : (
                               <div 
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/10 text-white/60"
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/10 text-white/60 opacity-60"
                               >
                                 <ArrowDownCircle className="h-4 w-4" />
                               </div>
                             )}
-                            <span className="truncate flex-1 uppercase font-extrabold tracking-tight">{item.description}</span>
+                            <span className="truncate flex-1 font-semibold tracking-tight">{toTitleCase(item.description)}</span>
                           </div>
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-left font-semibold text-white/70">
                           <div className="flex items-center justify-start">
                             {item.userName === 'Family Wide' ? (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/40" title="Family Wide">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/40" title="Family Wide">
                                 <Users className="h-5 w-5" />
                               </div>
                             ) : (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-extrabold uppercase text-white/60" title={item.userName}>
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-extrabold uppercase text-white/60" title={item.userName}>
                                 {item.userName[0]}
                               </div>
                             )}
@@ -1018,10 +1025,9 @@ export function DashboardContent({ data }: PageProps) {
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-left">
                           <div 
-                            className="inline-flex items-center rounded-lg border px-3 py-1 font-semibold tracking-wider uppercase transition-colors"
+                            className="inline-flex items-center rounded-lg px-3 py-1 font-medium tracking-wider uppercase transition-colors"
                             style={{ 
-                              borderColor: `${rowColor}4D`,
-                              backgroundColor: `${rowColor}1A`,
+                              backgroundColor: `${rowColor}26`,
                               color: rowColor
                             }}
                           >
@@ -1031,7 +1037,7 @@ export function DashboardContent({ data }: PageProps) {
                         <TableCell className="hidden lg:table-cell text-center font-mono text-white/30">
                           {new Date(item.date).toLocaleDateString()}
                         </TableCell>
-                        <TableCell className="text-right font-mono font-extrabold tracking-tight text-white">
+                        <TableCell className="text-right font-mono font-semibold tracking-tight text-white">
                           {item.type === "income" ? (
                             <span style={{ color: rowColor }}>+{formatCurrency(item.amount)}</span>
                           ) : (
@@ -1120,11 +1126,11 @@ export function DashboardContent({ data }: PageProps) {
                   <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Attribution</Label>
                   <div className="flex flex-wrap gap-3 py-2">
                     {data.users.map((u) => (
-                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === u.id ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
+                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-full border transition-all duration-300", selectedUserId === u.id ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
                         <span className="text-sm font-extrabold uppercase">{u.name[0]}</span>
                       </button>
                     ))}
-                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === "family" ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
+                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-full border transition-all duration-300", selectedUserId === "family" ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
                       <Users className="h-5 w-5" />
                     </button>
                   </div>
@@ -1196,11 +1202,11 @@ export function DashboardContent({ data }: PageProps) {
                   <Label className="text-left text-xs font-medium tracking-wider text-white/70 uppercase">Attribution</Label>
                   <div className="flex flex-wrap gap-3 py-2 text-left">
                     {data.users.map((u) => (
-                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === u.id ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
+                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-full border transition-all duration-300", selectedUserId === u.id ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
                         <span className="text-sm font-extrabold uppercase">{u.name[0]}</span>
                       </button>
                     ))}
-                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === "family" ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
+                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-full border transition-all duration-300", selectedUserId === "family" ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
                       <Users className="h-5 w-5" />
                     </button>
                   </div>
