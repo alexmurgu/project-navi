@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -8,10 +8,10 @@
 :root {
 	/* JETBRAINS MONO FROM PRESET */
 	--font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, monospace;
-	--font-sans: 'Fira Sans', ui-sans-serif, system-ui, sans-serif;
+	--font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 
-	/* RADIUS NONE FROM PRESET */
-	--radius: 0;
+	/* STANDARD SHADCN RADIUS */
+	--radius: 0.5rem;
 
 	/* PRESERVED GLASSMORPHISM THEME */
 	--background: oklch(0.129 0.042 264.695); /* #0F172A */
@@ -97,9 +97,8 @@
     --color-foreground: var(--foreground);
     --color-background: var(--background);
     
-    /* ZERO OUT RADIUS GLOBALLY */
-	--radius-*: initial;
-	--radius: 0;
+    /* STANDARD RADIUS GLOBALLY */
+	--radius: 0.5rem;
 }
 
 @layer base {

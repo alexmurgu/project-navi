@@ -41,7 +41,7 @@ export function CategoriesContent({ allCategoryNames, configMap: initialConfigMa
     return (
         <div className="relative z-10 mx-auto w-full max-w-7xl flex-1 space-y-6 p-4 pt-6 md:p-8">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="glass-panel col-span-4 h-fit border-white/10 lg:col-span-3 rounded-none">
+                <Card className="glass-panel col-span-4 h-fit border-white/10 lg:col-span-3 rounded-lg">
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent"></div>
                     <CardHeader className="relative z-10">
                         <CardTitle className="flex items-center gap-2 text-xl text-white font-black uppercase tracking-tighter">
@@ -66,7 +66,7 @@ export function CategoriesContent({ allCategoryNames, configMap: initialConfigMa
                                     value={categoryName}
                                     onChange={(e) => setCategoryName(e.target.value)}
                                     placeholder="e.g. Groceries"
-                                    className="h-12 border-white/10 bg-black/20 text-white text-base rounded-none uppercase"
+                                    className="h-12 border-white/10 bg-black/20 text-white text-base rounded-lg uppercase"
                                 />
                             </div>
 
@@ -96,7 +96,7 @@ export function CategoriesContent({ allCategoryNames, configMap: initialConfigMa
                             <Button
                                 type="submit"
                                 size="xl"
-                                className="mt-4 w-full bg-amber-600 transition-all hover:bg-amber-500 rounded-none shadow-[0_0_30px_rgba(245,158,11,0.1)]"
+                                className="mt-4 w-full bg-amber-600 transition-all hover:bg-amber-500 rounded-lg shadow-[0_0_30px_rgba(245,158,11,0.1)]"
                             >
                                 <Save className="mr-2 h-5 w-5" /> Save Category
                             </Button>
@@ -104,7 +104,7 @@ export function CategoriesContent({ allCategoryNames, configMap: initialConfigMa
                     </CardContent>
                 </Card>
 
-                <Card className="glass-panel col-span-4 border-white/10 rounded-none">
+                <Card className="glass-panel col-span-4 border-white/10 rounded-lg">
                     <CardHeader className="text-left">
                         <CardTitle className="text-xl text-white font-black uppercase tracking-tighter">Manage Categories</CardTitle>
                         <CardDescription className="text-white/60">
@@ -153,7 +153,7 @@ export function CategoriesContent({ allCategoryNames, configMap: initialConfigMa
                                                                 type="submit"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-10 w-10 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-400/10 hover:text-red-400 rounded-none"
+                                                                className="h-10 w-10 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-400/10 hover:text-red-400 rounded-lg"
                                                             >
                                                                 <Trash2 className="h-5 w-5" />
                                                             </Button>
@@ -171,7 +171,7 @@ export function CategoriesContent({ allCategoryNames, configMap: initialConfigMa
             </div>
 
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-                <DialogContent className="glass-panel border-white/10 sm:max-w-md rounded-none shadow-2xl">
+                <DialogContent className="glass-panel border-white/10 sm:max-w-md rounded-lg shadow-2xl">
                     <DialogHeader className="text-left">
                         <DialogTitle className="text-white uppercase font-black tracking-tighter">Choose Color for {targetCategory}</DialogTitle>
                         <DialogDescription className="text-white/40">

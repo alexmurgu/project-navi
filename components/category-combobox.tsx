@@ -51,7 +51,7 @@ export function CategoryCombobox({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              "flex w-full items-center justify-between border border-white/10 bg-black/20 px-3 text-white font-normal hover:bg-white/5 rounded-none",
+              "flex w-full items-center justify-between border border-white/10 bg-black/20 px-3 text-white font-normal hover:bg-white/5 rounded-lg",
               !className?.includes("h-") && "h-9",
               !className?.includes("text-") && "text-xs",
               className
@@ -64,7 +64,7 @@ export function CategoryCombobox({
         }
       />
       <PopoverContent
-        className="glass-panel w-[200px] border-white/10 p-0 text-left shadow-2xl rounded-none"
+        className="glass-panel w-[200px] border-white/10 p-0 text-left shadow-2xl rounded-lg"
         align="start"
       >
         <Command>

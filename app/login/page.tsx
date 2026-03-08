@@ -109,7 +109,7 @@ export default function LoginPage() {
                             <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full h-12 bg-primary hover:bg-primary/90 font-black text-primary-foreground uppercase tracking-widest shadow-[0_0_30px_rgba(245,158,11,0.2)] transition-all rounded-none"
+                                className="w-full h-12 bg-primary hover:bg-primary/90 font-black text-primary-foreground uppercase tracking-widest shadow-[0_0_30px_rgba(245,158,11,0.2)] transition-all rounded-lg"
                             >
                                 {loading ? <Loader2 className="animate-spin" /> : "Authorize"}
                             </Button>

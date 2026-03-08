@@ -219,14 +219,14 @@ export function ImportContent({ users, categories, categoryConfigs, currentUserI
                             type="date" 
                             value={tx.date} 
                             onChange={(e) => updateTransaction(tx.id, "date", e.target.value)}
-                            className="h-12 border-white/10 bg-black/20 text-base rounded-none text-white"
+                            className="h-12 border-white/10 bg-black/20 text-base rounded-lg text-white"
                           />
                         </TableCell>
                         <TableCell className="p-2">
                           <Input 
                             value={tx.description} 
                             onChange={(e) => updateTransaction(tx.id, "description", e.target.value)}
-                            className="h-12 border-white/10 bg-black/20 text-base rounded-none uppercase text-white"
+                            className="h-12 border-white/10 bg-black/20 text-base rounded-lg uppercase text-white"
                           />
                         </TableCell>
                         <TableCell className="p-2 text-right">
@@ -256,18 +256,18 @@ export function ImportContent({ users, categories, categoryConfigs, currentUserI
                             onValueChange={(val) => updateTransaction(tx.id, "userId", val)}
                           >
                             <SelectTrigger 
-                              className="h-12 border-white/10 bg-black/20 text-base rounded-none px-2 text-white"
+                              className="h-12 border-white/10 bg-black/20 text-base rounded-lg px-2 text-white"
                             >
                               <div className="flex items-center gap-2">
                                 {tx.userId === "family" ? (
                                   <div 
-                                    className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5 text-white/40"
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/40"
                                   >
                                     <Users className="h-4 w-4" />
                                   </div>
                                 ) : (
                                   <div 
-                                    className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5 text-[10px] font-black uppercase text-white/60"
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[10px] font-black uppercase text-white/60"
                                   >
                                     {users.find(u => u.id === tx.userId)?.name[0] || "?"}
                                   </div>
@@ -278,7 +278,7 @@ export function ImportContent({ users, categories, categoryConfigs, currentUserI
                             <SelectContent className="glass-panel border-white/10">
                               <SelectItem value="family" className="text-base">
                                 <div className="flex items-center gap-2">
-                                  <div className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5">
                                     <Users className="h-4 w-4" />
                                   </div>
                                   Family Wide
@@ -287,7 +287,7 @@ export function ImportContent({ users, categories, categoryConfigs, currentUserI
                               {users.map(u => (
                                 <SelectItem key={u.id} value={u.id} className="text-base">
                                   <div className="flex items-center gap-2">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-none border border-white/10 bg-white/5 text-[10px] font-black uppercase">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-[10px] font-black uppercase">
                                       {u.name[0]}
                                     </div>
                                     {u.name}

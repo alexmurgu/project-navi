@@ -10,7 +10,7 @@
 - **Dynamic Category Mapping**: Assign custom high-contrast colors to any category for personalized data visualization.
 - **Integrated CSV Engine**: Bulk import bank statements with automated parsing for European formats and real-time review.
 - **Secure Authorization**: Powered by Better Auth with admin-exclusive management protocols.
-- **Brutalist Aesthetic**: Strictly square-edged UI (zero border-radius) layered over a deep glassmorphism theme.
+- **Refined Aesthetic**: Clean, modern UI with standard Shadcn roundness layered over a deep glassmorphism theme.
 
 ## 🛠 Tech Stack
 
@@ -58,7 +58,7 @@ npm run dev
 
 ## 🛡 Security & Design Mandates
 
-- **Zero Radius**: All interactive elements MUST maintain a `rounded-none` state.
+- **Standard Radius**: All interactive elements MUST maintain a `rounded-lg` state (standard Shadcn roundness).
 - **Glassmorphism**: Visual hierarchy is established through backdrop blurs (`blur-xl`) and border-opacities.
 - **Local First**: All financial data is stored in the `local.db` file for maximum privacy.
 

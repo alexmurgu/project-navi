@@ -349,7 +349,7 @@ export function DashboardContent({ data }: PageProps) {
   return (
     <div className="relative z-10 mx-auto w-full max-w-7xl flex-1 space-y-6 p-4 pt-6 md:p-8">
       <div className="grid gap-4 text-left md:grid-cols-2 lg:grid-cols-3">
-        <Card className="glass-panel relative overflow-hidden border-primary/30 shadow-[0_0_20px_rgba(245,158,11,0.1)] rounded-none">
+        <Card className="glass-panel relative overflow-hidden border-primary/30 shadow-[0_0_20px_rgba(245,158,11,0.1)] rounded-lg">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent"></div>
           <CardHeader className="relative z-10 flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-bold text-primary">Net Balance</CardTitle>
@@ -368,7 +368,7 @@ export function DashboardContent({ data }: PageProps) {
           </CardContent>
         </Card>
 
-        <Card className="glass-panel group relative overflow-hidden border-white/10 rounded-none">
+        <Card className="glass-panel group relative overflow-hidden border-white/10 rounded-lg">
           <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 text-left">
             <CardTitle className="text-sm font-medium text-white/70">Current Month Expenses</CardTitle>
@@ -392,7 +392,7 @@ export function DashboardContent({ data }: PageProps) {
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-white/20 bg-white/5 rounded-none">
+        <Card className="glass-panel border-white/20 bg-white/5 rounded-lg">
           <CardHeader className="pb-2 text-left">
             <CardTitle className="text-xs font-bold tracking-[0.2em] text-white/40 uppercase">
               Quick Actions
@@ -402,7 +402,7 @@ export function DashboardContent({ data }: PageProps) {
             <Button
               variant="default"
               size="xl"
-              className="w-full bg-primary transition-all hover:bg-primary/90 rounded-none"
+              className="w-full bg-primary transition-all hover:bg-primary/90 rounded-lg"
               onClick={() => {
                 setExpenseSheetOpen(true);
                 resetEntryDate();
@@ -413,7 +413,7 @@ export function DashboardContent({ data }: PageProps) {
             <Button
               variant="outline"
               size="xl"
-              className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-none"
+              className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-lg"
               onClick={() => {
                 setIncomeSheetOpen(true);
                 resetEntryDate();
@@ -428,20 +428,20 @@ export function DashboardContent({ data }: PageProps) {
                   <Button
                     variant="outline"
                     size="xl"
-                    className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-none"
+                    className="w-full border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-lg"
                   >
                     <FileUp className="mr-2 h-5 w-5 text-blue-400" /> Import CSV
                   </Button>
                 }
               />
-              <DialogContent className="glass-panel border-white/10 sm:max-w-md rounded-none">
+              <DialogContent className="glass-panel border-white/10 sm:max-w-md rounded-lg">
                 <DialogHeader>
                   <DialogTitle className="text-white">Import Bank Statement</DialogTitle>
                   <DialogDescription className="text-white/60">
                     Upload your bank history CSV to review and import transactions.
                   </DialogDescription>
                 </DialogHeader>
-                <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-none p-8 bg-black/20 hover:bg-black/30 transition-colors">
+                <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-lg p-8 bg-black/20 hover:bg-black/30 transition-colors">
                   <input
                     type="file"
                     accept=".csv"
@@ -457,7 +457,7 @@ export function DashboardContent({ data }: PageProps) {
                     {isParsing ? (
                       <Loader2 className="size-8 text-blue-400 animate-spin mb-2" />
                     ) : (
-                      <div className="size-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-2">
+                      <div className="size-12 rounded-lg bg-blue-500/20 flex items-center justify-center mb-2">
                         <FileUp className="size-6 text-blue-400" />
                       </div>
                     )}
@@ -470,7 +470,7 @@ export function DashboardContent({ data }: PageProps) {
         </Card>
       </div>
 
-      <Card className="glass-panel border-white/10 rounded-none">
+      <Card className="glass-panel border-white/10 rounded-lg">
         <CardHeader className="pb-2 text-left">
           <CardTitle className="flex items-center gap-2 text-lg text-white">
             <ChartArea className="h-5 w-5 text-primary" />
@@ -514,7 +514,7 @@ export function DashboardContent({ data }: PageProps) {
                     content={({ active, payload, label }) => {
                       if (active && payload && payload.length) {
                         return (
-                          <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-none">
+                          <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
                             <div className="mb-2 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">
                               {label}
                             </div>
@@ -522,7 +522,7 @@ export function DashboardContent({ data }: PageProps) {
                               {payload.map((entry, index) => (
                                 <div key={index} className="flex items-center justify-between gap-8">
                                   <span className={`flex items-center gap-1.5 text-xs font-bold ${entry.dataKey === "income" ? "text-green-400" : "text-red-400"}`}>
-                                    <div className={`h-1.5 w-1.5 rounded-full ${entry.dataKey === "income" ? "bg-green-400" : "bg-red-400"}`}></div>
+                                    <div className={`h-1.5 w-1.5 rounded-lg ${entry.dataKey === "income" ? "bg-green-400" : "bg-red-400"}`}></div>
                                     {entry.dataKey === "income" ? "Income" : "Expense"}
                                   </span>
                                   <span className="font-mono text-xs font-bold text-white">
@@ -543,7 +543,7 @@ export function DashboardContent({ data }: PageProps) {
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full flex-col items-center justify-center text-center">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-none border border-white/10 bg-white/5">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/5">
                   <ChartArea className="h-6 w-6 text-white/20" />
                 </div>
                 <p className="text-sm font-bold tracking-widest text-white/30 uppercase">
@@ -557,11 +557,11 @@ export function DashboardContent({ data }: PageProps) {
           </div>
           <div className="mt-4 flex items-center justify-center gap-6">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-6 rounded-none border border-green-500/50 bg-green-500/30"></div>
+              <div className="h-2 w-6 rounded-lg border border-green-500/50 bg-green-500/30"></div>
               <span className="text-[10px] font-bold tracking-wider text-white/50 uppercase">Income</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-2 w-6 rounded-none border border-red-500/50 bg-red-500/30"></div>
+              <div className="h-2 w-6 rounded-lg border border-red-500/50 bg-red-500/30"></div>
               <span className="text-[10px] font-bold tracking-wider text-white/50 uppercase">Expenses</span>
             </div>
           </div>
@@ -570,7 +570,7 @@ export function DashboardContent({ data }: PageProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Card 1: Category Analysis with Tabs */}
-        <Card className="glass-panel border-white/10 rounded-none">
+        <Card className="glass-panel border-white/10 rounded-lg">
           <Tabs defaultValue="expenses" className="w-full">
             <CardHeader className="pb-2 text-left flex flex-row items-center justify-between">
               <div>
@@ -582,9 +582,9 @@ export function DashboardContent({ data }: PageProps) {
                   Breakdown of flows by category.
                 </CardDescription>
               </div>
-              <TabsList className="bg-black/40 border border-white/5 rounded-none h-9 p-1">
-                <TabsTrigger value="expenses" className="rounded-none px-3 text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white">Expenses</TabsTrigger>
-                <TabsTrigger value="income" className="rounded-none px-3 text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white">Income</TabsTrigger>
+              <TabsList className="bg-black/40 border border-white/5 rounded-lg h-9 p-1">
+                <TabsTrigger value="expenses" className="rounded-lg px-3 text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white">Expenses</TabsTrigger>
+                <TabsTrigger value="income" className="rounded-lg px-3 text-xs data-[state=active]:bg-white/10 data-[state=active]:text-white">Income</TabsTrigger>
               </TabsList>
             </CardHeader>
             <CardContent>
@@ -617,12 +617,12 @@ export function DashboardContent({ data }: PageProps) {
                           content={({ active, payload, label }) => {
                             if (active && payload && payload.length) {
                               return (
-                                <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-none">
+                                <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
                                   <div className="mb-1 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">Category</div>
                                   <div className="mb-2 text-left text-xs font-bold text-white">{label}</div>
                                   <div className="flex items-center justify-between gap-8">
                                     <span className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
-                                      <div className="h-1.5 w-1.5 rounded-full bg-amber-400"></div> Spent
+                                      <div className="h-1.5 w-1.5 rounded-lg bg-amber-400"></div> Spent
                                     </span>
                                     <span className="font-mono text-xs font-bold text-white">${parseFloat(payload[0].value as string).toFixed(2)}</span>
                                   </div>
@@ -632,7 +632,7 @@ export function DashboardContent({ data }: PageProps) {
                             return null;
                           }}
                         />
-                        <Bar dataKey="value" radius={[0, 0, 0, 0]}>
+                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                           {categoryData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={getCategoryColor(entry.name, "rgba(245, 158, 11, 0.7)")} />
                           ))}
@@ -675,12 +675,12 @@ export function DashboardContent({ data }: PageProps) {
                           content={({ active, payload, label }) => {
                             if (active && payload && payload.length) {
                               return (
-                                <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-none">
+                                <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
                                   <div className="mb-1 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">Category</div>
                                   <div className="mb-2 text-left text-xs font-bold text-white">{label}</div>
                                   <div className="flex items-center justify-between gap-8">
                                     <span className="flex items-center gap-1.5 text-xs font-bold text-purple-400">
-                                      <div className="h-1.5 w-1.5 rounded-full bg-purple-400"></div> Earned
+                                      <div className="h-1.5 w-1.5 rounded-lg bg-purple-400"></div> Earned
                                     </span>
                                     <span className="font-mono text-xs font-bold text-white">${parseFloat(payload[0].value as string).toFixed(2)}</span>
                                   </div>
@@ -690,7 +690,7 @@ export function DashboardContent({ data }: PageProps) {
                             return null;
                           }}
                         />
-                        <Bar dataKey="value" radius={[0, 0, 0, 0]}>
+                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                           {incomeCategoryData.map((entry, index) => (
                             <Cell key={`cell-income-${index}`} fill={getCategoryColor(entry.name, "rgba(168, 85, 247, 0.7)")} />
                           ))}
@@ -709,7 +709,7 @@ export function DashboardContent({ data }: PageProps) {
         </Card>
 
         {/* Card 2: Family Member Performance (Grouped) */}
-        <Card className="glass-panel border-white/10 rounded-none">
+        <Card className="glass-panel border-white/10 rounded-lg">
           <CardHeader className="pb-2 text-left">
             <CardTitle className="flex items-center gap-2 text-lg text-white">
               <Users className="h-5 w-5 text-emerald-400" />
@@ -744,19 +744,19 @@ export function DashboardContent({ data }: PageProps) {
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           return (
-                            <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-none">
+                            <div className="glass-panel border-white/10 p-3 shadow-2xl rounded-lg">
                               <div className="mb-1 text-left text-[10px] font-bold tracking-widest text-white/40 uppercase">Family Member</div>
                               <div className="mb-2 text-left text-xs font-bold text-white">{label}</div>
                               <div className="flex flex-col gap-1.5">
                                 <div className="flex items-center justify-between gap-8">
                                   <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-400"></div> Earned
+                                    <div className="h-1.5 w-1.5 rounded-lg bg-emerald-400"></div> Earned
                                   </span>
                                   <span className="font-mono text-xs font-bold text-white">${payload[0].value}</span>
                                 </div>
                                 <div className="flex items-center justify-between gap-8">
                                   <span className="flex items-center gap-1.5 text-xs font-bold text-red-400">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-red-400"></div> Spent
+                                    <div className="h-1.5 w-1.5 rounded-lg bg-red-400"></div> Spent
                                   </span>
                                   <span className="font-mono text-xs font-bold text-white">${payload[1].value}</span>
                                 </div>
@@ -773,8 +773,8 @@ export function DashboardContent({ data }: PageProps) {
                       iconType="circle" 
                       wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold', opacity: 0.5 }}
                     />
-                    <Bar dataKey="income" name="Income" fill="#34d399" radius={[0, 0, 0, 0]} />
-                    <Bar dataKey="expense" name="Expenses" fill="#f87171" radius={[0, 0, 0, 0]} />
+                    <Bar dataKey="income" name="Income" fill="#34d399" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="expense" name="Expenses" fill="#f87171" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -788,7 +788,7 @@ export function DashboardContent({ data }: PageProps) {
       </div>
 
       <div className="w-full text-left">
-        <Card className="glass-panel border-white/10 rounded-none">
+        <Card className="glass-panel border-white/10 rounded-lg">
           <CardHeader className="border-b border-white/5 pb-4 text-left">
             <div className="flex flex-col gap-6 text-left">
               <div className="flex flex-col justify-between gap-4 text-left md:flex-row md:items-center">
@@ -809,7 +809,7 @@ export function DashboardContent({ data }: PageProps) {
                         setSelectedIds([]);
                       }}
                       className={cn(
-                        "h-10 w-10 border-white/10 bg-black/20 text-white hover:bg-white/5 rounded-none",
+                        "h-10 w-10 border-white/10 bg-black/20 text-white hover:bg-white/5 rounded-lg",
                         selectionMode && "bg-primary text-primary-foreground border-primary"
                       )}
                       title="Toggle Multi-select"
@@ -824,13 +824,13 @@ export function DashboardContent({ data }: PageProps) {
                             <Button
                               variant="destructive"
                               size="default"
-                              className="h-10 px-4 text-xs font-bold uppercase tracking-widest rounded-none"
+                              className="h-10 px-4 text-xs font-bold uppercase tracking-widest rounded-lg"
                             >
                               <Trash2 className="mr-2 h-4 w-4" /> Delete ({selectedIds.length})
                             </Button>
                           }
                         />
-                        <AlertDialogContent className="glass-panel border-white/10 rounded-none shadow-2xl">
+                        <AlertDialogContent className="glass-panel border-white/10 rounded-lg shadow-2xl">
                           <AlertDialogHeader>
                             <AlertDialogTitle className="text-white font-black uppercase tracking-tighter">Confirm Deletion</AlertDialogTitle>
                             <AlertDialogDescription className="text-white/40">
@@ -838,10 +838,10 @@ export function DashboardContent({ data }: PageProps) {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-none">Cancel</AlertDialogCancel>
+                            <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-lg">Cancel</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={handleBulkDelete}
-                              className="bg-red-600 text-white hover:bg-red-500 rounded-none font-bold uppercase tracking-widest"
+                              className="bg-red-600 text-white hover:bg-red-500 rounded-lg font-bold uppercase tracking-widest"
                             >
                               Confirm Protocol
                             </AlertDialogAction>
@@ -858,7 +858,7 @@ export function DashboardContent({ data }: PageProps) {
                         placeholder="Search transactions..."
                         value={tableSearch}
                         onChange={(e) => setTableSearch(e.target.value)}
-                        className="h-10 border-white/10 bg-black/20 pl-9 text-white rounded-none"
+                        className="h-10 border-white/10 bg-black/20 pl-9 text-white rounded-lg"
                       />
                     </div>
 
@@ -869,7 +869,7 @@ export function DashboardContent({ data }: PageProps) {
                             variant="outline"
                             size="icon"
                             className={cn(
-                              "h-10 w-10 border-white/10 bg-black/20 text-white hover:bg-white/5 rounded-none",
+                              "h-10 w-10 border-white/10 bg-black/20 text-white hover:bg-white/5 rounded-lg",
                               (dateRange?.from || dateRange?.to) && "border-primary/50 text-primary"
                             )}
                           >
@@ -877,7 +877,7 @@ export function DashboardContent({ data }: PageProps) {
                           </Button>
                         }
                       />
-                      <PopoverContent className="glass-panel w-auto border-white/10 p-0 text-left shadow-2xl rounded-none" align="end">
+                      <PopoverContent className="glass-panel w-auto border-white/10 p-0 text-left shadow-2xl rounded-lg" align="end">
                         <div className="space-y-4 p-4 text-left">
                           <div className="flex items-center justify-between">
                             <h4 className="text-xs font-bold tracking-widest text-white/70 uppercase">Filter by Date</h4>
@@ -885,7 +885,7 @@ export function DashboardContent({ data }: PageProps) {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-6 text-[10px] text-primary hover:bg-primary/10 hover:text-primary rounded-none"
+                                className="h-6 text-[10px] text-primary hover:bg-primary/10 hover:text-primary rounded-lg"
                                 onClick={() => setDateRange(undefined)}
                               >
                                 Reset
@@ -896,18 +896,18 @@ export function DashboardContent({ data }: PageProps) {
                             mode="range"
                             selected={dateRange}
                             onSelect={setDateRange}
-                            className="rounded-none border border-white/5 bg-transparent"
+                            className="rounded-lg border border-white/5 bg-transparent"
                           />
                         </div>
                       </PopoverContent>
                     </Popover>
                   </div>
 
-                  <div className="flex items-center gap-1 rounded-none border border-white/5 bg-black/20 p-1">
+                  <div className="flex items-center gap-1 rounded-lg border border-white/5 bg-black/20 p-1">
                     {(["all", "expenses", "incomes"] as const).map((view) => (
                       <button
                         key={view}
-                        className={`rounded-none px-3 py-1.5 text-xs font-bold capitalize transition-all ${
+                        className={`rounded-lg px-3 py-1.5 text-xs font-bold capitalize transition-all ${
                           historyView === view
                             ? "border border-white/10 bg-white/10 text-white shadow-sm"
                             : "text-white/50 hover:bg-white/5 hover:text-white/80"
@@ -923,7 +923,7 @@ export function DashboardContent({ data }: PageProps) {
             </div>
           </CardHeader>
           <CardContent className="pt-6 text-left">
-            <div className="overflow-hidden rounded-none border border-white/10 bg-black/20">
+            <div className="overflow-hidden rounded-lg border border-white/10 bg-black/20">
               <Table>
                 <TableHeader className="bg-white/5 text-left">
                   <TableRow className="border-white/10 hover:bg-transparent">
@@ -989,13 +989,13 @@ export function DashboardContent({ data }: PageProps) {
                           <div className="flex items-center gap-3 text-left min-w-0">
                             {item.type === "income" ? (
                               <div 
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none border border-purple-500/30 bg-purple-500/20 text-purple-400"
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-purple-500/30 bg-purple-500/20 text-purple-400"
                               >
                                 <ArrowUpCircle className="h-4 w-4" />
                               </div>
                             ) : (
                               <div 
-                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-none border border-white/10 bg-white/10 text-white/60"
+                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/10 text-white/60"
                               >
                                 <ArrowDownCircle className="h-4 w-4" />
                               </div>
@@ -1006,11 +1006,11 @@ export function DashboardContent({ data }: PageProps) {
                         <TableCell className="hidden md:table-cell text-left font-bold text-white/70">
                           <div className="flex items-center justify-start">
                             {item.userName === 'Family Wide' ? (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-none border border-white/10 bg-white/5 text-white/40" title="Family Wide">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/40" title="Family Wide">
                                 <Users className="h-5 w-5" />
                               </div>
                             ) : (
-                              <div className="flex h-10 w-10 items-center justify-center rounded-none border border-white/10 bg-white/5 text-sm font-black uppercase text-white/60" title={item.userName}>
+                              <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-black uppercase text-white/60" title={item.userName}>
                                 {item.userName[0]}
                               </div>
                             )}
@@ -1018,7 +1018,7 @@ export function DashboardContent({ data }: PageProps) {
                         </TableCell>
                         <TableCell className="hidden sm:table-cell text-left">
                           <div 
-                            className="inline-flex items-center rounded-none border px-3 py-1 font-bold tracking-wider uppercase transition-colors"
+                            className="inline-flex items-center rounded-lg border px-3 py-1 font-bold tracking-wider uppercase transition-colors"
                             style={{ 
                               borderColor: `${rowColor}4D`,
                               backgroundColor: `${rowColor}1A`,
@@ -1043,7 +1043,7 @@ export function DashboardContent({ data }: PageProps) {
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-white/10 hover:text-white rounded-none"
+                            className="h-8 w-8 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-white/10 hover:text-white rounded-lg"
                             onClick={() => handleEdit(item)}
                           >
                             <Pencil className="h-4 w-4" />
@@ -1054,13 +1054,13 @@ export function DashboardContent({ data }: PageProps) {
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  className="h-8 w-8 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-400/10 hover:text-red-400 rounded-none"
+                                  className="h-8 w-8 text-white/40 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-400/10 hover:text-red-400 rounded-lg"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               }
                             />
-                            <AlertDialogContent className="glass-panel border-white/10 rounded-none shadow-2xl">
+                            <AlertDialogContent className="glass-panel border-white/10 rounded-lg shadow-2xl">
                               <AlertDialogHeader>
                                 <AlertDialogTitle className="text-white font-black uppercase tracking-tighter">Delete Transaction?</AlertDialogTitle>
                                 <AlertDialogDescription className="text-white/40">
@@ -1068,12 +1068,12 @@ export function DashboardContent({ data }: PageProps) {
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-none">Cancel</AlertDialogCancel>
+                                <AlertDialogCancel className="border-white/10 bg-white/5 text-white hover:bg-white/10 rounded-lg">Cancel</AlertDialogCancel>
                                 <form action={item.type === 'expense' ? deleteExpense : deleteIncome}>
                                   <input type="hidden" name="id" value={item.id} />
                                   <AlertDialogAction 
                                     type="submit"
-                                    className="bg-red-600 text-white hover:bg-red-500 rounded-none font-bold uppercase tracking-widest"
+                                    className="bg-red-600 text-white hover:bg-red-500 rounded-lg font-bold uppercase tracking-widest"
                                   >
                                     Delete
                                   </AlertDialogAction>
@@ -1090,11 +1090,11 @@ export function DashboardContent({ data }: PageProps) {
               </Table>
               {filteredHistory.length === 0 && (
                 <div className="flex flex-col items-center justify-center p-12 text-center">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-none border border-white/10 bg-white/5">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-white/5">
                     <Filter className="h-5 w-5 text-white/30" />
                   </div>
                   <p className="text-center text-sm font-bold tracking-widest text-white/50 uppercase">No results match your filters</p>
-                  <Button variant="link" className="mt-2 text-xs text-primary rounded-none" onClick={clearFilters}>Clear all filters</Button>
+                  <Button variant="link" className="mt-2 text-xs text-primary rounded-lg" onClick={clearFilters}>Clear all filters</Button>
                 </div>
               )}
             </div>
@@ -1103,7 +1103,7 @@ export function DashboardContent({ data }: PageProps) {
       </div>
 
       <Sheet open={expenseSheetOpen} onOpenChange={setExpenseSheetOpen}>
-        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-none">
+        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-lg">
           <div className="flex h-full flex-col bg-slate-950/50 text-left backdrop-blur-3xl">
             <SheetHeader className="border-b border-white/10 p-8 text-left">
               <SheetTitle className="flex items-center gap-2 text-left text-2xl font-bold text-white">
@@ -1120,11 +1120,11 @@ export function DashboardContent({ data }: PageProps) {
                   <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Attribution</Label>
                   <div className="flex flex-wrap gap-3 py-2">
                     {data.users.map((u) => (
-                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-none border transition-all duration-300", selectedUserId === u.id ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
+                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === u.id ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
                         <span className="text-sm font-black uppercase">{u.name[0]}</span>
                       </button>
                     ))}
-                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-none border transition-all duration-300", selectedUserId === "family" ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
+                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === "family" ? "border-primary bg-primary/20 text-primary shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
                       <Users className="h-5 w-5" />
                     </button>
                   </div>
@@ -1133,22 +1133,22 @@ export function DashboardContent({ data }: PageProps) {
 
                 <div className="space-y-4 text-left">
                   <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Expense Type</Label>
-                  <div className="flex w-full items-center gap-2 rounded-none border border-white/5 bg-black/40 p-1.5">
-                    <button type="button" onClick={() => setSelectedExpenseType("monthly")} className={`flex-1 rounded-none py-2.5 text-sm font-bold transition-all ${selectedExpenseType === "monthly" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Monthly</button>
-                    <button type="button" onClick={() => setSelectedExpenseType("extra")} className={`flex-1 rounded-none py-2.5 text-sm font-bold transition-all ${selectedExpenseType === "extra" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Extras</button>
+                  <div className="flex w-full items-center gap-2 rounded-lg border border-white/5 bg-black/40 p-1.5">
+                    <button type="button" onClick={() => setSelectedExpenseType("monthly")} className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all ${selectedExpenseType === "monthly" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Monthly</button>
+                    <button type="button" onClick={() => setSelectedExpenseType("extra")} className={`flex-1 rounded-lg py-2.5 text-sm font-bold transition-all ${selectedExpenseType === "extra" ? "bg-primary text-primary-foreground shadow-xl" : "text-white/50 hover:bg-white/5 hover:text-white/80"}`}>Extras</button>
                   </div>
                   <input type="hidden" name="isMonthly" value={selectedExpenseType === "monthly" ? "on" : "off"} />
                 </div>
 
                 <div className="space-y-4 text-left">
                   <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Description</Label>
-                  <Input name="description" key={editingItem?.id || 'new'} type="text" required defaultValue={editingItem?.description || ""} placeholder="e.g. Rent, Whole Foods" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-primary rounded-none" />
+                  <Input name="description" key={editingItem?.id || 'new'} type="text" required defaultValue={editingItem?.description || ""} placeholder="e.g. Rent, Whole Foods" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-primary rounded-lg" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-8 text-left sm:grid-cols-2">
                   <div className="space-y-4 text-left">
                     <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Amount ($)</Label>
-                    <Input name="amount" key={editingItem?.id || 'new-amt'} type="number" step="0.01" required defaultValue={editingItem ? (editingItem.amount / 100).toFixed(2) : ""} placeholder="0.00" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-primary rounded-none" />
+                    <Input name="amount" key={editingItem?.id || 'new-amt'} type="number" step="0.01" required defaultValue={editingItem ? (editingItem.amount / 100).toFixed(2) : ""} placeholder="0.00" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-primary rounded-lg" />
                   </div>
                   <div className="flex flex-col space-y-4 text-left">
                     <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Category</Label>
@@ -1167,7 +1167,7 @@ export function DashboardContent({ data }: PageProps) {
                   </div>
                 </div>
                 <div className="pt-8 text-left">
-                  <Button type="submit" className="h-14 w-full bg-primary text-lg font-bold transition-all hover:bg-primary/90 rounded-none">
+                  <Button type="submit" className="h-14 w-full bg-primary text-lg font-bold transition-all hover:bg-primary/90 rounded-lg">
                     {editingItem ? <Save className="mr-2 h-5 w-5" /> : <Plus className="mr-2 h-5 w-5" />}
                     {editingItem ? "Update Expense" : "Save Expense"}
                   </Button>
@@ -1179,7 +1179,7 @@ export function DashboardContent({ data }: PageProps) {
       </Sheet>
 
       <Sheet open={incomeSheetOpen} onOpenChange={setIncomeSheetOpen}>
-        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-none">
+        <SheetContent side="right" className="glass-panel w-full overflow-y-auto border-l border-white/10 p-0 text-left rounded-lg">
           <div className="flex h-full flex-col bg-slate-950/50 text-left backdrop-blur-3xl">
             <SheetHeader className="border-b border-white/10 p-8 text-left">
               <SheetTitle className="flex items-center gap-2 text-left text-2xl font-bold text-white">
@@ -1196,11 +1196,11 @@ export function DashboardContent({ data }: PageProps) {
                   <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Attribution</Label>
                   <div className="flex flex-wrap gap-3 py-2 text-left">
                     {data.users.map((u) => (
-                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-none border transition-all duration-300", selectedUserId === u.id ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
+                      <button key={u.id} type="button" onClick={() => setSelectedUserId(u.id)} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === u.id ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title={u.name}>
                         <span className="text-sm font-black uppercase">{u.name[0]}</span>
                       </button>
                     ))}
-                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-none border transition-all duration-300", selectedUserId === "family" ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
+                    <button type="button" onClick={() => setSelectedUserId("family")} className={cn("flex size-12 items-center justify-center rounded-lg border transition-all duration-300", selectedUserId === "family" ? "border-purple-500 bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]" : "border-white/10 bg-white/5 text-white/40 hover:border-white/20 hover:bg-white/10")} title="Family Wide">
                       <Users className="h-5 w-5" />
                     </button>
                   </div>
@@ -1209,13 +1209,13 @@ export function DashboardContent({ data }: PageProps) {
 
                 <div className="space-y-4 text-left">
                   <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Income Source</Label>
-                  <Input name="description" key={editingItem?.id || 'new-inc'} type="text" required defaultValue={editingItem?.description || ""} placeholder="e.g. Salary, Bonus" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-purple-500 rounded-none" />
+                  <Input name="description" key={editingItem?.id || 'new-inc'} type="text" required defaultValue={editingItem?.description || ""} placeholder="e.g. Salary, Bonus" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-purple-500 rounded-lg" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-8 text-left sm:grid-cols-2">
                   <div className="space-y-4 text-left">
                     <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Amount ($)</Label>
-                    <Input name="amount" key={editingItem?.id || 'new-inc-amt'} type="number" step="0.01" required defaultValue={editingItem ? (editingItem.amount / 100).toFixed(2) : ""} placeholder="0.00" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-purple-500 rounded-none" />
+                    <Input name="amount" key={editingItem?.id || 'new-inc-amt'} type="number" step="0.01" required defaultValue={editingItem ? (editingItem.amount / 100).toFixed(2) : ""} placeholder="0.00" className="h-12 border-white/10 bg-white/5 text-lg text-white placeholder:text-white/20 focus-visible:ring-purple-500 rounded-lg" />
                   </div>
                   <div className="flex flex-col space-y-4 text-left">
                     <Label className="text-left text-xs font-bold tracking-[0.2em] text-white/70 uppercase">Category</Label>
@@ -1235,7 +1235,7 @@ export function DashboardContent({ data }: PageProps) {
                 </div>
 
                 <div className="pt-8 text-left">
-                  <Button type="submit" className="h-14 w-full border-none bg-purple-600 text-lg font-bold text-white transition-all hover:bg-purple-500 rounded-none">
+                  <Button type="submit" className="h-14 w-full border-none bg-purple-600 text-lg font-bold text-white transition-all hover:bg-purple-500 rounded-lg">
                     {editingItem ? <Save className="mr-2 h-5 w-5" /> : <ArrowUpCircle className="mr-2 h-5 w-5" />}
                     {editingItem ? "Update Income" : "Save Income"}
                   </Button>

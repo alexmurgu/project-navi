@@ -51,7 +51,7 @@ export default async function UsersPage() {
                                     id="name"
                                     required
                                     placeholder="e.g. Maria"
-                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-none"
+                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-lg"
                                 />
                             </div>
 
@@ -65,7 +65,7 @@ export default async function UsersPage() {
                                     id="email"
                                     required
                                     placeholder="maria@aftermind.net"
-                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-none"
+                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-lg"
                                 />
                             </div>
 
@@ -80,14 +80,14 @@ export default async function UsersPage() {
                                     required
                                     minLength={8}
                                     placeholder="Minimum 8 characters"
-                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-none"
+                                    className="h-12 border-white/10 bg-black/20 text-white text-base placeholder:text-white/30 focus-visible:ring-blue-500 rounded-lg"
                                 />
                             </div>
 
                             <Button
                                 type="submit"
                                 size="xl"
-                                className="mt-4 w-full bg-blue-600 transition-all hover:bg-blue-500 rounded-none"
+                                className="mt-4 w-full bg-blue-600 transition-all hover:bg-blue-500 rounded-lg"
                             >
                                 Create Account
                             </Button>
