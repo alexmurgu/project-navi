@@ -1,6 +1,6 @@
 #!/sbin/openrc-run
 
-# Project Navi - Alpine Linux OpenRC Service
+# Project Navi - Alpine Linux OpenRC Service (BUN with Autorestart)
 # Installation:
 # 1. Copy this file to /etc/init.d/project-navi
 # 2. chmod +x /etc/init.d/project-navi
@@ -8,23 +8,29 @@
 # 4. rc-service project-navi start
 
 name="project-navi"
-description="Project Navi - Advanced Finance Protocol"
+description="Project Navi - Advanced Finance Protocol (Bun)"
+
+# Use supervise-daemon for automatic restarts
+supervisor="supervise-daemon"
+respawn_delay=5
+respawn_max=10
 
 # Directory where the project is installed
 directory="/opt/project-navi"
 
-# Start command (using npm start which calls next start)
-command="/usr/bin/npm"
-command_args="start"
+# Start command using Bun
+command="bun"
+command_args="run start"
 
 # Process management
 pidfile="/run/${RC_SVCNAME}.pid"
-command_background="yes"
 output_log="/var/log/project-navi.log"
 error_log="/var/log/project-navi.err"
 
+# supervise-daemon specific logs
+supervise_daemon_args="--stdout $output_log --stderr $error_log"
+
 # Environment configuration
-# You can also use an .env file in the directory
 export NODE_ENV="production"
 export PORT="${PORT:-3000}"
 
@@ -43,10 +49,4 @@ start_pre() {
 
     # Ensure log files exist and are writable
     touch "$output_log" "$error_log"
-    # chown node:node "$output_log" "$error_log" # If running as non-root
-}
-
-stop_post() {
-    # Clean up pid file if needed
-    rm -f "$pidfile"
 }
