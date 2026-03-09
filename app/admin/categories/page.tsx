@@ -4,7 +4,7 @@ import { getSession } from "@/lib/get-session";
 import { redirect, notFound } from "next/navigation";
 import { CategoriesContent } from "./categories-content";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'alex@aftermind.net';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
 
 export default async function CategoriesPage() {
     const session = await getSession();

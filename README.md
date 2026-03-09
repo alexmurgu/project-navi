@@ -32,7 +32,7 @@ DATABASE_URL="file:local.db"
 BETTER_AUTH_SECRET="your_secret_here"
 BETTER_AUTH_URL="http://localhost:3000"
 NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
-ADMIN_EMAIL="alex@aftermind.net"
+ADMIN_EMAIL="admin@example.com"
 ```
 
 ### 2. Install Dependencies

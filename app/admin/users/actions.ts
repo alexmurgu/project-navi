@@ -7,7 +7,7 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/get-session";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'alex@aftermind.net';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
 
 export async function createUser(formData: FormData) {
     const session = await getSession();

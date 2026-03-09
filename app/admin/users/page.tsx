@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Trash2, UserPlus, ShieldCheck } from "lucide-react";
 import { createUser, deleteUser } from "./actions";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'alex@aftermind.net';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
 
 export default async function UsersPage() {
     const session = await getSession();
