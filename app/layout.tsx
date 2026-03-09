@@ -19,6 +19,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Project Navi",
   description: "Advanced Finance Dashboard",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default async function RootLayout({
