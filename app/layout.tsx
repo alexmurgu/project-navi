@@ -30,7 +30,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getSession();
-  const isLoginPage = !session; // Or check path if preferred, but session is safer for private app
+  const isLoginPage = !session; 
 
   return (
     <html
