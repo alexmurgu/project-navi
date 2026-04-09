@@ -1,31 +1,33 @@
 #!/sbin/openrc-run
 
-# Project Navi - Alpine Linux OpenRC Service (BUN with Autorestart)
+# Aftermind Finance (NAVI) - Alpine Linux OpenRC Service (BUN Monorepo)
 # Installation:
-# 1. Copy this file to /etc/init.d/project-navi
-# 2. chmod +x /etc/init.d/project-navi
-# 3. rc-update add project-navi default
-# 4. rc-service project-navi start
+# 1. Copy this file to /etc/init.d/aftermind-finance
+# 2. chmod +x /etc/init.d/aftermind-finance
+# 3. rc-update add aftermind-finance default
+# 4. rc-service aftermind-finance start
 
-name="project-navi"
-description="Project Navi - Advanced Finance Protocol (Bun)"
+name="aftermind-finance"
+description="Aftermind Finance (NAVI) - Advanced Monorepo Service (Bun)"
 
 # Use supervise-daemon for automatic restarts
 supervisor="supervise-daemon"
 respawn_delay=5
 respawn_max=10
 
-# Directory where the project is installed
-directory="/opt/project-navi"
+# Directory where the monorepo root is located
+directory="/opt/aftermind-finance"
 
-# Start command using Bun
+# Start command using Bun workspaces
+# This triggers the root 'start' script which filters for the API package
+# The API then natively serves the built frontend from apps/web/dist
 command="bun"
 command_args="run start"
 
 # Process management
 pidfile="/run/${RC_SVCNAME}.pid"
-output_log="/var/log/project-navi.log"
-error_log="/var/log/project-navi.err"
+output_log="/var/log/${RC_SVCNAME}.log"
+error_log="/var/log/${RC_SVCNAME}.err"
 
 # supervise-daemon specific logs
 supervise_daemon_args="--stdout $output_log --stderr $error_log"
@@ -43,8 +45,13 @@ depend() {
 start_pre() {
     # Ensure the directory exists
     if [ ! -d "$directory" ]; then
-        eerror "Directory $directory not found!"
+        eerror "Project directory $directory not found! Please ensure 'directory' in the RC file matches your installation path."
         return 1
+    fi
+
+    # Check for built frontend (required for the API to serve it)
+    if [ ! -d "$directory/apps/web/dist" ]; then
+        ewarn "Warning: 'apps/web/dist' not found. Frontend will not be accessible until you run 'bun run build'."
     fi
 
     # Ensure log files exist and are writable
