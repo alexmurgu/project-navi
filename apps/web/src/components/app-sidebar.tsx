@@ -57,7 +57,7 @@ export function AppSidebar() {
                     )}
                   >
                     <div className="mr-4 opacity-70">{item.icon}</div>
-                    <span className="font-black text-[10px] uppercase tracking-[0.1em]">{item.label}</span>
+                    <span className="font-black text-[10px] uppercase tracking-widest">{item.label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -72,7 +72,7 @@ export function AppSidebar() {
                 className="h-12 px-6 rounded-xl text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all duration-500"
               >
                 <Settings className="size-5 mr-4 opacity-50" />
-                <span className="font-black text-[10px] uppercase tracking-[0.1em]">Settings</span>
+                <span className="font-black text-[10px] uppercase tracking-widest">Settings</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
@@ -81,7 +81,7 @@ export function AppSidebar() {
                 className="h-12 px-6 rounded-xl text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-all duration-500"
               >
                 <LogOut className="size-5 mr-4 opacity-50" />
-                <span className="font-black text-[10px] uppercase tracking-[0.1em]">Logout</span>
+                <span className="font-black text-[10px] uppercase tracking-widest">Logout</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

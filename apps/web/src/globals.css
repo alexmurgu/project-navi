@@ -125,7 +125,7 @@
 }
 
 .wallet-hero-gradient {
-    @apply bg-gradient-to-br from-primary/90 to-primary text-white shadow-[0_20px_40px_-10px_rgba(45,212,191,0.2)];
+    @apply bg-linear-to-br from-primary/90 to-primary text-white shadow-[0_20px_40px_-10px_rgba(45,212,191,0.2)];
 }
 
 .smooth-badge {

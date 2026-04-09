@@ -213,11 +213,11 @@ export function IncomesContent({ data }: PageProps) {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Amount (EUR)</Label><Input name="amount" type="number" step="0.01" required defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 text-emerald-600 shadow-inner" /></div>
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
+              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Amount (EUR)</Label><Input name="amount" type="number" step="0.01" required defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 text-emerald-600 shadow-inner" /></div>
+              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
             </div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Description</Label><Input name="description" required defaultValue={editingItem?.description || ""} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Category</Label>
+            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Description</Label><Input name="description" required defaultValue={editingItem?.description || ""} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
+            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Category</Label>
               <CategoryCombobox value={incomeCategory} options={availableCategories} onChange={(val) => {
                 if (val && !availableCategories.includes(val)) setAvailableCategories(prev => [...prev, val]);
                 setIncomeCategory(val);

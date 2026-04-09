@@ -64,7 +64,7 @@ export function CategoryCombobox({
         }
       />
       <PopoverContent
-        className="glass-panel w-[var(--radix-popover-trigger-width)] rounded-xl border-muted/20 p-2 shadow-2xl bg-card/80 backdrop-blur-xl"
+        className="glass-panel w-(--radix-popover-trigger-width) rounded-xl border-muted/20 p-2 shadow-2xl bg-card/80 backdrop-blur-xl"
         align="start"
       >
         <Command className="bg-transparent">

@@ -239,16 +239,16 @@ export function DashboardContent({ data }: PageProps) {
                 </div>
             </div>
             <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Amount</Label><Input name="amount" type="number" step="0.01" required placeholder="0.00" defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 shadow-inner" /></div>
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
+              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Amount</Label><Input name="amount" type="number" step="0.01" required placeholder="0.00" defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 shadow-inner" /></div>
+              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
             </div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Category</Label>
+            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Category</Label>
               <CategoryCombobox value={expenseCategory} options={availableExpenseCategories} onChange={(val) => {
                 if (val && !availableExpenseCategories.includes(val)) setAvailableExpenseCategories(prev => [...prev, val]);
                 setExpenseCategory(val);
               }} />
             </div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Description</Label><Input name="description" required defaultValue={editingItem?.description || ""} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
+            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Description</Label><Input name="description" required defaultValue={editingItem?.description || ""} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
             <div className="flex gap-4 pt-6">
               <Button type="submit" disabled={addExpenseMutation.isPending || updateExpenseMutation.isPending} className="h-14 flex-1 rounded-xl font-black uppercase tracking-[0.2em] bg-foreground text-background shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">Save</Button>
             </div>
@@ -267,10 +267,10 @@ export function DashboardContent({ data }: PageProps) {
             editingItem ? updateIncomeMutation.mutate(d) : addIncomeMutation.mutate(d);
           }} className="space-y-8">
             <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Amount</Label><Input name="amount" type="number" step="0.01" required placeholder="0.00" defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 text-emerald-600 shadow-inner" /></div>
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
+              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Amount</Label><Input name="amount" type="number" step="0.01" required placeholder="0.00" defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 text-emerald-600 shadow-inner" /></div>
+              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
             </div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-[0.1em] opacity-40 ml-1">Source</Label>
+            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Source</Label>
               <CategoryCombobox value={incomeCategory} options={availableIncomeCategories} onChange={(val) => {
                 if (val && !availableIncomeCategories.includes(val)) setAvailableIncomeCategories(prev => [...prev, val]);
                 setIncomeCategory(val);
