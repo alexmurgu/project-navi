@@ -11,6 +11,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promises as fs } from 'node:fs';
 
+declare const Bun: {
+  serve: (options: { port: number; fetch: (request: Request) => Response | Promise<Response> }) => {
+    port: number;
+    stop: (closeActiveConnections?: boolean) => void;
+  };
+};
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -308,10 +315,17 @@ app.get('*', async (c) => {
   }
 });
 
-const port = process.env.PORT || 3000;
-console.log(`Server is running on port ${port}`);
-
-export default {
+const port = Number(process.env.PORT || 3000);
+const server = Bun.serve({
   port,
   fetch: app.fetch,
+});
+
+const shutdown = () => {
+  server.stop(true);
 };
+
+process.once('SIGINT', shutdown);
+process.once('SIGTERM', shutdown);
+
+console.log(`Server is running on port ${server.port}`);
