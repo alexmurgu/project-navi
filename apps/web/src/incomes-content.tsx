@@ -94,15 +94,21 @@ export function IncomesContent({ data }: PageProps) {
   };
 
   useEffect(() => {
-    const handleQuickAdd = () => {
+    const handleQuickAddIncome = () => {
       setEditingItem(null);
       setSelectedUserId("family");
       setIncomeCategory("");
       setIncomeSheetOpen(true);
     };
 
-    window.addEventListener("open-quick-add", handleQuickAdd);
-    return () => window.removeEventListener("open-quick-add", handleQuickAdd);
+    const pendingQuickAdd = sessionStorage.getItem("pendingQuickAdd");
+    if (pendingQuickAdd === "income") {
+      handleQuickAddIncome();
+      sessionStorage.removeItem("pendingQuickAdd");
+    }
+
+    window.addEventListener("open-quick-add-income", handleQuickAddIncome);
+    return () => window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
   }, []);
 
   return (

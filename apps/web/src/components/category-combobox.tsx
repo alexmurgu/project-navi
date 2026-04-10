@@ -35,6 +35,7 @@ export function CategoryCombobox({
   placeholder = "Select category...",
   style,
 }: CategoryComboboxProps) {
+  const listboxId = React.useId();
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
 
@@ -47,8 +48,10 @@ export function CategoryCombobox({
       <PopoverTrigger
         render={
           <Button
+            type="button"
             variant="outline"
             role="combobox"
+            aria-controls={listboxId}
             aria-expanded={open}
             className={cn(
               "flex h-14 w-full items-center justify-between rounded-xl border-none bg-secondary/30 px-6 text-base font-black shadow-inner focus:ring-primary/20",
@@ -66,15 +69,15 @@ export function CategoryCombobox({
       <PopoverContent
         className="glass-panel w-(--radix-popover-trigger-width) rounded-xl border-muted/20 p-2 shadow-2xl bg-card/80 backdrop-blur-xl"
         align="start"
-      >
-        <Command className="bg-transparent">
-          <CommandInput
-            placeholder="Search categories..."
-            value={searchValue}
+        >
+          <Command className="bg-transparent">
+            <CommandInput
+              placeholder="Search categories..."
+              value={searchValue}
             onValueChange={setSearchValue}
             className="h-10 border-none bg-transparent text-sm font-bold"
           />
-          <CommandList className="max-h-[300px] overflow-y-auto text-left">
+          <CommandList id={listboxId} className="max-h-[300px] overflow-y-auto text-left">
             <CommandEmpty className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">
               {!showAddNew && "No results"}
             </CommandEmpty>

@@ -47,9 +47,24 @@ export function DashboardContent({ data }: PageProps) {
   const [editingItem, setEditingItem] = useState<Transaction | null>(null);
 
   useEffect(() => {
-    const handleQuickAdd = () => { setEditingItem(null); setExpenseSheetOpen(true); };
-    window.addEventListener('open-quick-add', handleQuickAdd);
-    return () => window.removeEventListener('open-quick-add', handleQuickAdd);
+    const handleQuickAddExpense = () => { setEditingItem(null); setExpenseSheetOpen(true); };
+    const handleQuickAddIncome = () => { setEditingItem(null); setIncomeSheetOpen(true); };
+    const pendingQuickAdd = sessionStorage.getItem('pendingQuickAdd');
+    if (pendingQuickAdd === 'expense') {
+      setEditingItem(null);
+      setExpenseSheetOpen(true);
+      sessionStorage.removeItem('pendingQuickAdd');
+    } else if (pendingQuickAdd === 'income') {
+      setEditingItem(null);
+      setIncomeSheetOpen(true);
+      sessionStorage.removeItem('pendingQuickAdd');
+    }
+    window.addEventListener('open-quick-add-expense', handleQuickAddExpense);
+    window.addEventListener('open-quick-add-income', handleQuickAddIncome);
+    return () => {
+      window.removeEventListener('open-quick-add-expense', handleQuickAddExpense);
+      window.removeEventListener('open-quick-add-income', handleQuickAddIncome);
+    };
   }, []);
   
   const addExpenseMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/expenses', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });

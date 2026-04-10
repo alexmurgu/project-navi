@@ -16,8 +16,7 @@ export function MobileNav() {
   ];
 
   const handleFabClick = () => {
-    // Custom event to trigger Quick Add Sheet in Dashboard or active page
-    window.dispatchEvent(new CustomEvent('open-quick-add'));
+    window.dispatchEvent(new CustomEvent('open-quick-add-choice'));
   };
 
   return (

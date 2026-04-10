@@ -95,15 +95,21 @@ export function ExpensesContent({ data }: PageProps) {
   };
 
   useEffect(() => {
-    const handleQuickAdd = () => {
+    const handleQuickAddExpense = () => {
       setEditingItem(null);
       setSelectedUserId("family");
       setExpenseCategory("");
       setExpenseSheetOpen(true);
     };
 
-    window.addEventListener("open-quick-add", handleQuickAdd);
-    return () => window.removeEventListener("open-quick-add", handleQuickAdd);
+    const pendingQuickAdd = sessionStorage.getItem("pendingQuickAdd");
+    if (pendingQuickAdd === "expense") {
+      handleQuickAddExpense();
+      sessionStorage.removeItem("pendingQuickAdd");
+    }
+
+    window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
+    return () => window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
   }, []);
 
   return (
