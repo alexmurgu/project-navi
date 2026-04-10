@@ -1,17 +1,13 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { UsersContent } from '@/admin/users-content'
 import { useAuthStore } from '../../store/useAuthStore'
-import { useEffect } from 'react'
 
 export const Route = createFileRoute('/admin/users')({ component: AdminUsersPage })
 
 function AdminUsersPage() {
   const { user } = useAuthStore()
-  const navigate = useNavigate()
-
-  useEffect(() => { if (!user) navigate({ to: '/login' }) }, [user, navigate])
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
@@ -19,8 +15,9 @@ function AdminUsersPage() {
     enabled: !!user,
   })
 
+  if (!user) return <Navigate to="/login" replace />
   if (isLoading) return <div className="p-8 text-foreground">Loading...</div>
-  if (!user || !users) return null
+  if (!users) return null
 
   const adminEmail = "admin@example.com"
 

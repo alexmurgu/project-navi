@@ -1,4 +1,5 @@
-const CACHE_NAME = "project-navi-pwa-v1";
+const BUILD_ID = new URL(self.location.href).searchParams.get("v") || "v1";
+const CACHE_NAME = `project-navi-pwa-${BUILD_ID}`;
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",

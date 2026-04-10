@@ -1,17 +1,13 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { DashboardContent } from '@/dashboard-content'
-import { useAuthStore } from '../store/useAuthStore'
-import { useEffect } from 'react'
+import { useRequireAuth } from '@/hooks/use-auth-guard'
 
 export const Route = createFileRoute('/')({ component: Dashboard })
 
 function Dashboard() {
-  const { user } = useAuthStore()
-  const navigate = useNavigate()
-
-  useEffect(() => { if (!user) navigate({ to: '/login' }) }, [user, navigate])
+  const { user, loading } = useRequireAuth()
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['dashboard'],
@@ -19,9 +15,11 @@ function Dashboard() {
     enabled: !!user,
   })
 
+  if (loading) return <div className="p-8 text-foreground">Loading...</div>
+  if (!user) return <Navigate to="/login" replace />
   if (isLoading) return <div className="p-8 text-foreground">Loading Dashboard...</div>
   if (error) return <div className="p-8 text-destructive">Error loading dashboard</div>
-  if (!user || !data) return null
+  if (!data) return null
 
   return <DashboardContent data={data} />
 }

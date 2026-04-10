@@ -1,17 +1,14 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { useAuthStore } from '../store/useAuthStore'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 import { SettingsContent } from '@/settings-content'
+import { useRequireAuth } from '@/hooks/use-auth-guard'
 
 export const Route = createFileRoute('/settings')({ component: SettingsPage })
 
 function SettingsPage() {
-  const { user } = useAuthStore()
-  const navigate = useNavigate()
+  const { user, loading } = useRequireAuth()
 
-  useEffect(() => { if (!user) navigate({ to: '/login' }) }, [user, navigate])
-
-  if (!user) return null
+  if (loading) return <div className="p-8 text-foreground">Loading...</div>
+  if (!user) return <Navigate to="/login" replace />
 
   return <SettingsContent />
 }

@@ -1,8 +1,9 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Navigate, useNavigate } from '@tanstack/react-router'
 import { type FormEvent, useReducer } from 'react'
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { useAuthStore } from '../store/useAuthStore'
+import { useRedirectIfAuthed } from '@/hooks/use-auth-guard'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/login')({
 
 function Login() {
   const navigate = useNavigate()
+  const { user, loading } = useRedirectIfAuthed()
   const { fetchSession } = useAuthStore()
   const [state, setState] = useReducer(
     (
@@ -39,6 +41,24 @@ function Login() {
       showPassword: false,
     }
   )
+
+  if (loading) {
+    return (
+      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.14),transparent_28%),linear-gradient(180deg,rgba(248,251,251,1)_0%,rgba(241,249,248,1)_100%)] px-4 py-10 text-foreground">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-[-8rem] top-[-8rem] h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute right-[-6rem] bottom-[-8rem] h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
+        </div>
+        <div className="flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-[#083B3A] shadow-lg">
+          <img src="/icon.svg" alt="Navi" className="h-9 w-9" />
+        </div>
+      </main>
+    )
+  }
+
+  if (user) {
+    return <Navigate to="/" replace />
+  }
 
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()

@@ -24,7 +24,10 @@ const supportsSecureServiceWorker =
 
 if ('serviceWorker' in navigator && supportsSecureServiceWorker) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((error) => {
+    navigator.serviceWorker.register(`/sw.js?v=${__APP_BUILD_ID__}`, {
+      scope: '/',
+      updateViaCache: 'none',
+    }).catch((error) => {
       if (error instanceof DOMException && error.name === 'SecurityError') {
         return
       }
