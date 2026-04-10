@@ -17,9 +17,18 @@ declare module '@tanstack/react-router' {
   interface Register { router: typeof router }
 }
 
-if ('serviceWorker' in navigator) {
+const supportsSecureServiceWorker =
+  window.isSecureContext &&
+  window.top === window.self &&
+  (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+
+if ('serviceWorker' in navigator && supportsSecureServiceWorker) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((error) => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((error) => {
+      if (error instanceof DOMException && error.name === 'SecurityError') {
+        return
+      }
+
       console.error('Service worker registration failed:', error)
     })
   })
