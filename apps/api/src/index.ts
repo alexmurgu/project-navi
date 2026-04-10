@@ -277,6 +277,26 @@ app.delete('/api/admin/categories/:id', async (c) => {
 
 // Static Assets (Production)
 app.use('/assets/*', serveStatic({ root: '../web/dist' }));
+const webDistRoot = path.join(__dirname, '../../web/dist');
+const serveWebAsset = (assetPath: string) => serveStatic({ path: assetPath, root: webDistRoot });
+
+app.get('/manifest.webmanifest', serveWebAsset('/manifest.webmanifest'));
+app.get('/sw.js', serveWebAsset('/sw.js'));
+app.get('/icon.svg', serveWebAsset('/icon.svg'));
+app.get('/navi-touch-icon.png', serveWebAsset('/navi-touch-icon.png'));
+app.get('/navi-touch-icon-precomposed.png', serveWebAsset('/navi-touch-icon-precomposed.png'));
+app.get('/apple-touch-icon.png', serveWebAsset('/apple-touch-icon.png'));
+app.get('/apple-touch-icon-precomposed.png', serveWebAsset('/apple-touch-icon-precomposed.png'));
+app.get('/apple-touch-icon-120.png', serveWebAsset('/apple-touch-icon-120.png'));
+app.get('/apple-touch-icon-152.png', serveWebAsset('/apple-touch-icon-152.png'));
+app.get('/apple-touch-icon-167.png', serveWebAsset('/apple-touch-icon-167.png'));
+app.get('/ios-splash-828x1792.png', serveWebAsset('/ios-splash-828x1792.png'));
+app.get('/ios-splash-1125x2436.png', serveWebAsset('/ios-splash-1125x2436.png'));
+app.get('/ios-splash-1170x2532.png', serveWebAsset('/ios-splash-1170x2532.png'));
+app.get('/ios-splash-1179x2556.png', serveWebAsset('/ios-splash-1179x2556.png'));
+app.get('/ios-splash-1290x2796.png', serveWebAsset('/ios-splash-1290x2796.png'));
+app.use('/icons/*', serveStatic({ root: webDistRoot }));
+
 app.get('*', async (c) => {
   // SPA fallback for TanStack Router
   try {

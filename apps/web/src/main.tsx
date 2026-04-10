@@ -44,3 +44,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </React.StrictMode>,
 )
+
+document.getElementById('boot-screen')?.remove()
