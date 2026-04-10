@@ -16,7 +16,7 @@ respawn_delay=5
 respawn_max=10
 
 # Directory where the monorepo root is located
-directory="/opt/aftermind-finance"
+directory="/opt/project-navi"
 
 # Start command using Bun workspaces
 # This triggers the root 'start' script which filters for the API package
