@@ -1,5 +1,17 @@
 const CACHE_NAME = "project-navi-pwa-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/icon.svg", "/icons/icon-180.png", "/icons/icon-192.png", "/icons/icon-512.png"];
+const APP_SHELL = [
+  "/",
+  "/manifest.webmanifest",
+  "/icon.svg",
+  "/apple-touch-icon.png",
+  "/apple-touch-icon-120.png",
+  "/apple-touch-icon-152.png",
+  "/apple-touch-icon-167.png",
+  "/apple-touch-icon-precomposed.png",
+  "/icons/icon-180.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
