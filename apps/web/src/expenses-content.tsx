@@ -105,7 +105,7 @@ export function ExpensesContent({ data }: PageProps) {
         </div>
         <button 
           onClick={() => { setEditingItem(null); setExpenseSheetOpen(true); }}
-          className="size-16 rounded-xl bg-foreground text-background flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all"
+          className="hidden size-16 rounded-xl bg-foreground text-background items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all md:flex"
         >
           <Plus className="size-8" />
         </button>

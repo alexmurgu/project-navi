@@ -8,12 +8,9 @@ import {
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { CategoryCombobox } from "@/components/category-combobox";
 import { CategoryIcon, getCategoryConfig, type CategoryConfig, withAlpha } from "@/lib/category-visuals";
+import { TransactionSheet } from "@/components/transaction-sheet";
 import axios from 'axios';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
@@ -47,7 +44,6 @@ export function DashboardContent({ data }: PageProps) {
   const [selectedUserId, setSelectedUserId] = useState<string>("family");
   const [expenseCategory, setExpenseCategory] = useState("");
   const [incomeCategory, setIncomeCategory] = useState("");
-  const [selectedExpenseType, setSelectedExpenseType] = useState<"monthly" | "extra">("extra");
   const [editingItem, setEditingItem] = useState<Transaction | null>(null);
 
   useEffect(() => {
@@ -59,7 +55,7 @@ export function DashboardContent({ data }: PageProps) {
   const addExpenseMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/expenses', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
   const updateExpenseMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/expenses/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
   const addIncomeMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/incomes', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
-  const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(true); } });
+  const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
 
   const allItems = useMemo(() => [
     ...data.expenses.map((e) => ({ ...e, type: "expense" as const })),
@@ -108,7 +104,7 @@ export function DashboardContent({ data }: PageProps) {
 
   const handleEdit = (item: Transaction) => {
     setEditingItem(item); setSelectedUserId(item.userId || "family");
-    if (item.type === "expense") { setExpenseCategory(item.category); setSelectedExpenseType(item.isMonthly ? "monthly" : "extra"); setExpenseSheetOpen(true); }
+    if (item.type === "expense") { setExpenseCategory(item.category); setExpenseSheetOpen(true); }
     else { setIncomeCategory(item.category); setIncomeSheetOpen(true); }
   };
 
@@ -228,66 +224,48 @@ export function DashboardContent({ data }: PageProps) {
         </section>
       </div>
 
-      <Sheet open={expenseSheetOpen} onOpenChange={setExpenseSheetOpen}>
-        <SheetContent side="bottom" className="h-[90vh] sm:h-fit sm:side-right border-t sm:border-l rounded-t-2xl sm:rounded-l-2xl p-8 pb-12 shadow-2xl border-none">
-          <SheetHeader className="mb-10 text-left">
-            <SheetTitle className="text-3xl font-black tracking-tighter uppercase italic">{editingItem ? "Edit Expense" : "Add Expense"}</SheetTitle>
-          </SheetHeader>
-          <form onSubmit={(e) => {
-            e.preventDefault(); const formData = new FormData(e.currentTarget);
-            const d = { id: editingItem?.id, description: formData.get('description'), amount: Math.round(parseFloat(formData.get('amount') as string) * 100), category: expenseCategory, isMonthly: selectedExpenseType === 'monthly', userId: selectedUserId === 'family' ? null : selectedUserId, date: formData.get('date') };
-            editingItem ? updateExpenseMutation.mutate(d) : addExpenseMutation.mutate(d);
-          }} className="space-y-8">
-            <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3 bg-secondary/50 p-1 rounded-xl">
-                    <button type="button" onClick={() => setSelectedExpenseType("extra")} className={cn("h-11 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all", selectedExpenseType === 'extra' ? "bg-primary text-white shadow-lg" : "text-muted-foreground opacity-50")}>Expense</button>
-                    <button type="button" onClick={() => window.dispatchEvent(new CustomEvent('switch-to-income'))} className="h-11 rounded-lg text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50">Income</button>
-                </div>
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Amount</Label><Input name="amount" type="number" step="0.01" required placeholder="0.00" defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 shadow-inner" /></div>
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
-            </div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Category</Label>
-              <CategoryCombobox value={expenseCategory} options={availableExpenseCategories} onChange={(val) => {
-                if (val && !availableExpenseCategories.includes(val)) setAvailableExpenseCategories(prev => [...prev, val]);
-                setExpenseCategory(val);
-              }} />
-            </div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Description</Label><Input name="description" required defaultValue={editingItem?.description || ""} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
-            <div className="flex gap-4 pt-6">
-              <Button type="submit" disabled={addExpenseMutation.isPending || updateExpenseMutation.isPending} className="h-14 flex-1 rounded-xl font-black uppercase tracking-[0.2em] bg-foreground text-background shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">Save</Button>
-            </div>
-          </form>
-        </SheetContent>
-      </Sheet>
+      <TransactionSheet
+        mode="expense"
+        open={expenseSheetOpen}
+        onOpenChange={setExpenseSheetOpen}
+        editingItem={editingItem?.type === "expense" ? editingItem : null}
+        users={data.users}
+        selectedUserId={selectedUserId}
+        setSelectedUserId={setSelectedUserId}
+        category={expenseCategory}
+        setCategory={setExpenseCategory}
+        availableCategories={availableExpenseCategories}
+        setAvailableCategories={setAvailableExpenseCategories}
+        onSubmit={(d) => {
+          const payload = {
+            ...d,
+            userId: d.userId,
+            isMonthly: d.isMonthly ?? false,
+          };
+          editingItem?.type === "expense" ? updateExpenseMutation.mutate(payload) : addExpenseMutation.mutate(payload);
+        }}
+        onDelete={(id) => axios.delete(`/api/expenses/${id}`).then(() => queryClient.invalidateQueries({ queryKey: ['dashboard'] }))}
+        saving={addExpenseMutation.isPending || updateExpenseMutation.isPending}
+      />
 
-      <Sheet open={incomeSheetOpen} onOpenChange={setIncomeSheetOpen}>
-        <SheetContent side="bottom" className="h-[90vh] sm:h-fit sm:side-right border-t sm:border-l rounded-t-2xl sm:rounded-l-2xl p-8 pb-12 shadow-2xl border-none">
-          <SheetHeader className="mb-10 text-left">
-            <SheetTitle className="text-3xl font-black tracking-tighter uppercase italic">{editingItem ? "Edit Income" : "Add Income"}</SheetTitle>
-          </SheetHeader>
-          <form onSubmit={(e) => {
-            e.preventDefault(); const formData = new FormData(e.currentTarget);
-            const d = { id: editingItem?.id, description: formData.get('description'), amount: Math.round(parseFloat(formData.get('amount') as string) * 100), category: incomeCategory, userId: selectedUserId === 'family' ? null : selectedUserId, date: formData.get('date') };
-            editingItem ? updateIncomeMutation.mutate(d) : addIncomeMutation.mutate(d);
-          }} className="space-y-8">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Amount</Label><Input name="amount" type="number" step="0.01" required placeholder="0.00" defaultValue={editingItem ? editingItem.amount / 100 : ""} className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 text-emerald-600 shadow-inner" /></div>
-              <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Date</Label><Input name="date" type="date" required defaultValue={editingItem ? new Date(editingItem.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
-            </div>
-            <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Source</Label>
-              <CategoryCombobox value={incomeCategory} options={availableIncomeCategories} onChange={(val) => {
-                if (val && !availableIncomeCategories.includes(val)) setAvailableIncomeCategories(prev => [...prev, val]);
-                setIncomeCategory(val);
-              }} />
-            </div>
-            <div className="flex gap-4 pt-6">
-              <Button type="submit" disabled={addIncomeMutation.isPending || updateIncomeMutation.isPending} className="h-14 flex-1 rounded-xl font-black uppercase tracking-[0.2em] bg-emerald-600 text-white shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all border-none">Save</Button>
-            </div>
-          </form>
-        </SheetContent>
-      </Sheet>
+      <TransactionSheet
+        mode="income"
+        open={incomeSheetOpen}
+        onOpenChange={setIncomeSheetOpen}
+        editingItem={editingItem?.type === "income" ? editingItem : null}
+        users={data.users}
+        selectedUserId={selectedUserId}
+        setSelectedUserId={setSelectedUserId}
+        category={incomeCategory}
+        setCategory={setIncomeCategory}
+        availableCategories={availableIncomeCategories}
+        setAvailableCategories={setAvailableIncomeCategories}
+        onSubmit={(d) => {
+          editingItem?.type === "income" ? updateIncomeMutation.mutate(d) : addIncomeMutation.mutate(d);
+        }}
+        onDelete={(id) => axios.delete(`/api/incomes/${id}`).then(() => queryClient.invalidateQueries({ queryKey: ['dashboard'] }))}
+        saving={addIncomeMutation.isPending || updateIncomeMutation.isPending}
+      />
     </div>
   );
 }

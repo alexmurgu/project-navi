@@ -12,7 +12,7 @@ export function MobileNav() {
     { to: "/incomes", icon: <ArrowUpCircle className="size-5" />, label: "Income" },
     { to: "fab", icon: null, label: "Add" }, // Placeholder for FAB
     { to: "/expenses", icon: <TrendingDown className="size-5" />, label: "Expenses" },
-    { to: "/settings", icon: <Settings className="size-5" />, label: "User" },
+    { to: "/settings", icon: <Settings className="size-5" />, label: "Settings" },
   ];
 
   const handleFabClick = () => {
