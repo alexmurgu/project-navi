@@ -1,10 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { 
-  TrendingDown, ArrowUpCircle, CircleDollarSign, Search, Filter, Users, 
-  Plus, FileUp, Loader2, Save, ChevronDown, Receipt, ArrowUpDown, Pencil, Trash2,
-  Clock, Plane, LayoutList, Calendar, Wallet, CheckCircle2, PieChart, Activity,
-  ShoppingBag, Coffee, Home as HomeIcon, Car, Zap, Heart, Utensils, User as UserIcon
-} from "lucide-react";
+import { Search, Users, Plus, ArrowUpDown, Pencil, Trash2, User as UserIcon } from "lucide-react";
 import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 import { 
@@ -18,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CategoryCombobox } from "@/components/category-combobox";
+import { CategoryIcon, getCategoryConfig, type CategoryConfig, withAlpha } from "@/lib/category-visuals";
 import axios from 'axios';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
@@ -32,24 +28,12 @@ interface PageProps {
     user: User; users: { id: string, name: string }[];
     expenses: Omit<Transaction, "type">[]; incomes: Omit<Transaction, "type">[];
     expenseCategories: string[]; incomeCategories: string[];
-    categoryConfigs: { name: string, color: string }[];
+    categoryConfigs: CategoryConfig[];
   }
 }
 
 const formatCurrency = (amountCents: number) => {
   return (amountCents / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" });
-};
-
-const getCategoryIcon = (category: string) => {
-  const c = category.toLowerCase();
-  if (c.includes('food') || c.includes('eat') || c.includes('restaurant')) return <Utensils className="size-5" />;
-  if (c.includes('shopping') || c.includes('cloth')) return <ShoppingBag className="size-5" />;
-  if (c.includes('coffee') || c.includes('drink')) return <Coffee className="size-5" />;
-  if (c.includes('housing') || c.includes('rent')) return <HomeIcon className="size-5" />;
-  if (c.includes('transport') || c.includes('car')) return <Car className="size-5" />;
-  if (c.includes('utility') || c.includes('bill')) return <Zap className="size-5" />;
-  if (c.includes('health') || c.includes('med')) return <Heart className="size-5" />;
-  return <LayoutList className="size-5" />;
 };
 
 export function DashboardContent({ data }: PageProps) {
@@ -114,6 +98,14 @@ export function DashboardContent({ data }: PageProps) {
     return Array.from(map.entries()).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [data.expenses]);
 
+  const categoryConfigMap = useMemo(() => {
+    const map: Record<string, CategoryConfig> = {};
+    data.categoryConfigs.forEach((config) => {
+      map[config.name] = config;
+    });
+    return map;
+  }, [data.categoryConfigs]);
+
   const handleEdit = (item: Transaction) => {
     setEditingItem(item); setSelectedUserId(item.userId || "family");
     if (item.type === "expense") { setExpenseCategory(item.category); setSelectedExpenseType(item.isMonthly ? "monthly" : "extra"); setExpenseSheetOpen(true); }
@@ -160,19 +152,33 @@ export function DashboardContent({ data }: PageProps) {
                 <div key={group.title} className="space-y-4">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40 ml-2">{group.title}</h4>
                 <div className="space-y-2">
-                    {group.items.map((tx) => (
+            {group.items.map((tx) => (
                     <div 
                         key={tx.id} 
                         className="flex items-center justify-between p-4 rounded-xl bg-card hover:bg-secondary/30 transition-all cursor-pointer group border border-transparent hover:border-muted/10 shadow-sm md:shadow-none"
                         onClick={() => handleEdit(tx)}
                     >
                         <div className="flex items-center gap-4">
-                        <div className={cn(
-                            "size-12 rounded-lg flex items-center justify-center text-primary-foreground shadow-sm transition-transform group-hover:-rotate-6",
-                            tx.type === 'expense' ? "bg-rose-500/10 text-rose-600" : "bg-emerald-500/10 text-emerald-600"
-                        )}>
-                            {getCategoryIcon(tx.category)}
-                        </div>
+                        {(() => {
+                          const config = getCategoryConfig(categoryConfigMap, tx.category);
+                          const color = config?.color || (tx.type === 'expense' ? "#F43F5E" : "#10B981");
+                          return (
+                            <div
+                              className="size-12 rounded-lg flex items-center justify-center shadow-sm transition-transform group-hover:-rotate-6"
+                              style={{
+                                backgroundColor: withAlpha(color, 0.10),
+                                color
+                              }}
+                            >
+                            <CategoryIcon
+                              category={tx.category}
+                              config={config}
+                              kind={tx.type}
+                              className="size-5"
+                            />
+                            </div>
+                          );
+                        })()}
                         <div className="space-y-0.5">
                             <p className="font-bold text-sm tracking-tight text-foreground">{tx.description}</p>
                             <div className="flex items-center gap-2">

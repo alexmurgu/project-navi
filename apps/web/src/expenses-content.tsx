@@ -1,8 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { 
-  TrendingDown, Search, Plus, Loader2, Receipt, ArrowUpDown, Pencil, Trash2, ChevronDown, Users, Filter, Calendar, Tag, User as UserIcon,
-  ShoppingBag, Coffee, Home as HomeIcon, Car, Zap, Heart, Utensils, LayoutList
-} from "lucide-react";
+import { Search, Plus, Loader2, ArrowUpDown, Pencil, Trash2, ChevronDown, Users, User as UserIcon } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { 
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
@@ -16,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CategoryCombobox } from "@/components/category-combobox";
+import { CategoryIcon, getCategoryConfig, type CategoryConfig, withAlpha } from "@/lib/category-visuals";
 import axios from 'axios';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
@@ -30,7 +28,7 @@ interface PageProps {
     user: User; users: { id: string, name: string }[];
     expenses: Omit<Transaction, "type">[];
     expenseCategories: string[];
-    categoryConfigs: { name: string, color: string }[];
+    categoryConfigs: CategoryConfig[];
   }
 }
 
@@ -38,18 +36,6 @@ const INITIAL_PAGE_SIZE = 20;
 
 const formatCurrency = (amountCents: number) => {
   return (amountCents / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" });
-};
-
-const getCategoryIcon = (category: string) => {
-  const c = category.toLowerCase();
-  if (c.includes('food') || c.includes('eat') || c.includes('restaurant')) return <Utensils className="size-5" />;
-  if (c.includes('shopping') || c.includes('cloth')) return <ShoppingBag className="size-5" />;
-  if (c.includes('coffee') || c.includes('drink')) return <Coffee className="size-5" />;
-  if (c.includes('housing') || c.includes('rent')) return <HomeIcon className="size-5" />;
-  if (c.includes('transport') || c.includes('car')) return <Car className="size-5" />;
-  if (c.includes('utility') || c.includes('bill')) return <Zap className="size-5" />;
-  if (c.includes('health') || c.includes('med')) return <Heart className="size-5" />;
-  return <LayoutList className="size-5" />;
 };
 
 export function ExpensesContent({ data }: PageProps) {
@@ -63,6 +49,13 @@ export function ExpensesContent({ data }: PageProps) {
   const [tableSearch, setTableSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const categoryConfigMap = useMemo(() => {
+    const map: Record<string, CategoryConfig> = {};
+    data.categoryConfigs.forEach((config) => {
+      map[config.name] = config;
+    });
+    return map;
+  }, [data.categoryConfigs]);
 
   const addExpenseMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/expenses', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
   const updateExpenseMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/expenses/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
@@ -149,8 +142,19 @@ export function ExpensesContent({ data }: PageProps) {
             onClick={() => handleEdit(item)}
           >
             <div className="flex items-center gap-5 flex-1 min-w-0">
-              <div className="size-11 rounded-lg bg-rose-500/10 text-rose-600 flex items-center justify-center shadow-sm shrink-0">
-                {getCategoryIcon(item.category)}
+              <div
+                className="size-11 rounded-lg flex items-center justify-center shadow-sm shrink-0"
+                style={{
+                  backgroundColor: withAlpha(getCategoryConfig(categoryConfigMap, item.category)?.color || "#F43F5E", 0.10),
+                  color: getCategoryConfig(categoryConfigMap, item.category)?.color || "#F43F5E"
+                }}
+              >
+                <CategoryIcon
+                  category={item.category}
+                  config={getCategoryConfig(categoryConfigMap, item.category)}
+                  kind="expense"
+                  className="size-5"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="font-bold text-base tracking-tight truncate">{item.description}</h4>

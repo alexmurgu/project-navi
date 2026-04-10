@@ -7,7 +7,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Users, LogOut, Palette, FileUp, Home, Settings, ArrowUpCircle, TrendingDown } from "lucide-react";
+import { LogOut, FileUp, Home, Settings, ArrowUpCircle, TrendingDown } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -42,8 +42,6 @@ export function AppSidebar() {
                 { to: "/incomes", icon: <ArrowUpCircle className="size-5" />, label: "Income" },
                 { to: "/expenses", icon: <TrendingDown className="size-5" />, label: "Expenses" },
                 { to: "/import", icon: <FileUp className="size-5" />, label: "Import" },
-                { to: "/admin/users", icon: <Users className="size-5" />, label: "Members" },
-                { to: "/admin/categories", icon: <Palette className="size-5" />, label: "Categories" },
               ].map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton 
@@ -68,8 +66,15 @@ export function AppSidebar() {
         <div className="px-6 py-10 mt-auto space-y-4">
            <SidebarMenu className="gap-2">
             <SidebarMenuItem>
-              <SidebarMenuButton 
-                className="h-12 px-6 rounded-xl text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all duration-500"
+              <SidebarMenuButton
+                render={<Link to="/settings" />}
+                isActive={pathname === "/settings"}
+                className={cn(
+                  "h-12 px-6 rounded-xl transition-all duration-500",
+                  pathname === "/settings"
+                    ? "bg-foreground text-background shadow-xl translate-x-1"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1"
+                )}
               >
                 <Settings className="size-5 mr-4 opacity-50" />
                 <span className="font-black text-[10px] uppercase tracking-widest">Settings</span>

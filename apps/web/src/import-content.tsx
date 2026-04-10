@@ -10,6 +10,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { CategoryCombobox } from "@/components/category-combobox";
+import type { CategoryConfig } from "@/lib/category-visuals";
 
 interface Transaction {
   id: string; date: string; description: string; amount: number;
@@ -20,7 +21,7 @@ interface PageProps {
   users: { id: string; name: string }[]; 
   expenseCategories: string[];
   incomeCategories: string[];
-  categoryConfigs: { name: string, color: string }[]; currentUserId: string;
+  categoryConfigs: CategoryConfig[]; currentUserId: string;
 }
 
 export function ImportContent({ users, expenseCategories, incomeCategories, categoryConfigs, currentUserId }: PageProps) {

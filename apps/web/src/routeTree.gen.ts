@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IncomesRouteImport } from './routes/incomes'
 import { Route as ImportRouteImport } from './routes/import'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/users': typeof AdminUsersRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/users': typeof AdminUsersRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/users': typeof AdminUsersRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
+    | '/settings'
     | '/admin/categories'
     | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
+    | '/settings'
     | '/admin/categories'
     | '/admin/users'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
+    | '/settings'
     | '/admin/categories'
     | '/admin/users'
   fileRoutesById: FileRoutesById
@@ -117,12 +129,20 @@ export interface RootRouteChildren {
   ImportRoute: typeof ImportRoute
   IncomesRoute: typeof IncomesRoute
   LoginRoute: typeof LoginRoute
+  SettingsRoute: typeof SettingsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminUsersRoute: typeof AdminUsersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImportRoute: ImportRoute,
   IncomesRoute: IncomesRoute,
   LoginRoute: LoginRoute,
+  SettingsRoute: SettingsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminUsersRoute: AdminUsersRoute,
 }

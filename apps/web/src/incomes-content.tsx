@@ -1,8 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { 
-  ArrowUpCircle, Search, Plus, Loader2, Receipt, ArrowUpDown, Pencil, Trash2, ChevronDown, Users, Calendar, Tag, User as UserIcon,
-  LayoutList, Briefcase, Landmark, HandCoins, ArrowDownCircle
-} from "lucide-react";
+import { Search, Plus, Loader2, ArrowUpDown, Pencil, Trash2, ChevronDown, Users, User as UserIcon } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { 
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
@@ -16,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CategoryCombobox } from "@/components/category-combobox";
+import { CategoryIcon, getCategoryConfig, type CategoryConfig, withAlpha } from "@/lib/category-visuals";
 import axios from 'axios';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
@@ -30,7 +28,7 @@ interface PageProps {
     user: User; users: { id: string, name: string }[];
     incomes: Omit<Transaction, "type">[];
     incomeCategories: string[];
-    categoryConfigs: { name: string, color: string }[];
+    categoryConfigs: CategoryConfig[];
   }
 }
 
@@ -38,14 +36,6 @@ const INITIAL_PAGE_SIZE = 20;
 
 const formatCurrency = (amountCents: number) => {
   return (amountCents / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" });
-};
-
-const getCategoryIcon = (category: string) => {
-  const c = category.toLowerCase();
-  if (c.includes('salary') || c.includes('wage') || c.includes('work')) return <Briefcase className="size-5" />;
-  if (c.includes('investment') || c.includes('dividend')) return <Landmark className="size-5" />;
-  if (c.includes('gift') || c.includes('present')) return <HandCoins className="size-5" />;
-  return <ArrowDownCircle className="size-5" />;
 };
 
 export function IncomesContent({ data }: PageProps) {
@@ -58,6 +48,13 @@ export function IncomesContent({ data }: PageProps) {
   const [tableSearch, setTableSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const categoryConfigMap = useMemo(() => {
+    const map: Record<string, CategoryConfig> = {};
+    data.categoryConfigs.forEach((config) => {
+      map[config.name] = config;
+    });
+    return map;
+  }, [data.categoryConfigs]);
 
   const addIncomeMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/incomes', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
   const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
@@ -144,8 +141,19 @@ export function IncomesContent({ data }: PageProps) {
             onClick={() => handleEdit(item)}
           >
             <div className="flex items-center gap-5 flex-1 min-w-0">
-              <div className="size-11 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shadow-sm shrink-0">
-                {getCategoryIcon(item.category)}
+              <div
+                className="size-11 rounded-lg flex items-center justify-center shadow-sm shrink-0"
+                style={{
+                  backgroundColor: withAlpha(getCategoryConfig(categoryConfigMap, item.category)?.color || "#10B981", 0.10),
+                  color: getCategoryConfig(categoryConfigMap, item.category)?.color || "#10B981"
+                }}
+              >
+                <CategoryIcon
+                  category={item.category}
+                  config={getCategoryConfig(categoryConfigMap, item.category)}
+                  kind="income"
+                  className="size-5"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="font-bold text-base tracking-tight truncate">{item.description}</h4>

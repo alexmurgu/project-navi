@@ -247,14 +247,22 @@ app.delete('/api/admin/users/:id', async (c) => {
 // Admin - Categories
 app.post('/api/admin/categories', zValidator('json', z.object({
   name: z.string(),
-  color: z.string()
+  color: z.string(),
+  icon: z.string().nullable().optional()
 })), async (c) => {
   const session = await getSession(c);
   if (!session || session.user.email !== ADMIN_EMAIL) return c.json({ error: 'Unauthorized' }, 401);
   const data = c.req.valid('json');
-  await db.insert(categoryConfig).values(data).onConflictDoUpdate({
+  await db.insert(categoryConfig).values({
+    name: data.name,
+    color: data.color,
+    icon: data.icon ?? null
+  }).onConflictDoUpdate({
     target: categoryConfig.name,
-    set: { color: data.color }
+    set: {
+      color: data.color,
+      icon: data.icon ?? null
+    }
   });
   return c.json({ success: true });
 });

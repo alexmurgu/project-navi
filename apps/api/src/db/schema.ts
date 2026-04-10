@@ -98,7 +98,8 @@ export const categoryConfig = sqliteTable('category_config', {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull().unique(),
-  color: text('color').notNull().default('#F59E0B') // Default Amber
+  color: text('color').notNull().default('#F59E0B'), // Default Amber
+  icon: text('icon')
 });
 
 export const expense = sqliteTable('expense', {
