@@ -126,60 +126,71 @@ export function IncomesContent({ data }: PageProps) {
       </div>
 
       {/* Redesigned List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex flex-col gap-2">
+        {/* Table Header (Desktop Only) */}
+        <div className="hidden md:flex items-center px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-30">
+          <div className="w-12 mr-5"></div>
+          <div className="flex-1">Description</div>
+          <div className="w-32">Member</div>
+          <div className="w-40">Date</div>
+          <div className="w-32 text-right">Amount</div>
+          <div className="w-24 ml-4"></div>
+        </div>
+
         {paginatedHistory.map((item) => (
           <div 
             key={item.id} 
-            className="group flex flex-col p-6 rounded-2xl bg-card hover:bg-secondary/20 transition-all cursor-pointer border border-transparent hover:border-muted/10 shadow-sm"
+            className="group flex items-center p-4 rounded-xl bg-card hover:bg-secondary/20 transition-all cursor-pointer border border-transparent hover:border-muted/10 shadow-sm"
             onClick={() => handleEdit(item)}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-5">
-                <div className="size-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shadow-sm">
-                  {getCategoryIcon(item.category)}
-                </div>
-                <div className="space-y-0.5">
-                  <h4 className="font-bold text-base tracking-tight">{item.description}</h4>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 opacity-40">{item.category}</span>
-                    <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-emerald-600/80 tracking-tighter bg-emerald-500/5 px-2 py-0.5 rounded-md">
-                        <UserIcon className="size-2.5 opacity-50" />
-                        <span>{item.userName || "Family"}</span>
-                    </div>
-                  </div>
-                </div>
+            <div className="flex items-center gap-5 flex-1 min-w-0">
+              <div className="size-11 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shadow-sm shrink-0">
+                {getCategoryIcon(item.category)}
               </div>
-              <div className="text-right">
-                <p className="font-black text-lg tracking-tight text-emerald-600">
-                  +{formatCurrency(item.amount)}
-                </p>
-                <p className="text-[9px] font-black uppercase text-muted-foreground opacity-20 mt-1">{format(new Date(item.date), "MMM dd, yyyy")}</p>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-base tracking-tight truncate">{item.description}</h4>
+                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 opacity-40 block md:inline">{item.category}</span>
               </div>
             </div>
 
-            <div className="flex items-center justify-end pt-4 border-t border-muted/5 opacity-0 group-hover:opacity-100 transition-opacity mt-4">
-                <div className="flex items-center gap-2">
-                    <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="size-10 rounded-lg bg-muted/10 flex items-center justify-center hover:bg-muted/20">
-                        <Pencil className="size-4 opacity-40" />
+            <div className="hidden md:flex w-32 items-center gap-1.5 text-[9px] font-black uppercase text-emerald-600/80 tracking-tighter bg-emerald-500/5 px-2 py-0.5 rounded-md shrink-0 mx-2">
+                <UserIcon className="size-2.5 opacity-50" />
+                <span className="truncate">{item.userName || "Family"}</span>
+            </div>
+
+            <div className="hidden md:block w-40 text-[9px] font-black uppercase text-muted-foreground opacity-40 shrink-0 mx-2">
+                {format(new Date(item.date), "MMM dd, yyyy")}
+            </div>
+
+            <div className="text-right w-32 shrink-0">
+              <p className="font-black text-lg tracking-tight text-emerald-600">
+                +{formatCurrency(item.amount)}
+              </p>
+              <p className="md:hidden text-[9px] font-black uppercase text-muted-foreground opacity-20 mt-0.5">{format(new Date(item.date), "MMM dd")}</p>
+            </div>
+
+            {/* Actions visible on hover */}
+            <div className="hidden md:flex items-center gap-1 ml-4 w-24 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={(e) => { e.stopPropagation(); handleEdit(item); }} className="size-9 rounded-lg bg-muted/10 flex items-center justify-center hover:bg-muted/20">
+                    <Pencil className="size-4 opacity-40" />
+                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger render={
+                    <button onClick={(e) => e.stopPropagation()} className="size-9 rounded-lg bg-rose-500/5 text-rose-600 flex items-center justify-center hover:bg-rose-500/15">
+                      <Trash2 className="size-4 opacity-40" />
                     </button>
-                    <AlertDialog>
-                      <AlertDialogTrigger render={
-                        <button onClick={(e) => e.stopPropagation()} className="size-10 rounded-lg bg-rose-500/5 text-rose-600 flex items-center justify-center hover:bg-rose-500/15">
-                          <Trash2 className="size-4 opacity-40" />
-                        </button>
-                      } />
-                      <AlertDialogContent className="rounded-2xl p-10 border-none shadow-2xl">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-2xl font-black tracking-tight uppercase italic">Delete Record</AlertDialogTitle>
-                          <AlertDialogDescription className="text-xs font-bold opacity-50 mt-2 uppercase">This action cannot be undone.</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="mt-8 gap-3">
-                          <AlertDialogCancel className="h-12 rounded-xl font-black text-[10px] uppercase tracking-widest border-none bg-muted/10">Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => deleteIncomeMutation.mutate(item.id)} className="h-12 rounded-xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest border-none">Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                </div>
+                  } />
+                  <AlertDialogContent className="rounded-2xl p-10 border-none shadow-2xl">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-2xl font-black tracking-tight uppercase italic">Delete Record</AlertDialogTitle>
+                      <AlertDialogDescription className="text-xs font-bold opacity-50 mt-2 uppercase">This action cannot be undone.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-8 gap-3">
+                      <AlertDialogCancel className="h-12 rounded-xl font-black text-[10px] uppercase tracking-widest border-none bg-muted/10">Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => deleteIncomeMutation.mutate(item.id)} className="h-12 rounded-xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest border-none">Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
             </div>
           </div>
         ))}
