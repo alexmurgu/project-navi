@@ -17,20 +17,6 @@ out/
 # apps specific
 .tanstack/
 
-# database
-local.db
-local.db-journal
-local.db-shm
-local.db-wal
-*.db
-*.db-journal
-
-# env files
-.env
-.env.local
-.env.*.local
-*.env
-
 # misc
 .DS_Store
 *.pem

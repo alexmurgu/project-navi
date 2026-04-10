@@ -3,6 +3,14 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
 import * as schema from "./db/schema";
 
+const getBetterAuthBaseURL = () => {
+    if (process.env.NODE_ENV === "production") {
+        return process.env.PUBLIC_BETTER_AUTH_URL || process.env.BETTER_AUTH_URL;
+    }
+
+    return process.env.BETTER_AUTH_URL;
+};
+
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "sqlite",
@@ -17,5 +25,5 @@ export const auth = betterAuth({
         enabled: true
     },
     secret: process.env.BETTER_AUTH_SECRET,
-    baseURL: process.env.BETTER_AUTH_URL
+    baseURL: getBetterAuthBaseURL()
 });
