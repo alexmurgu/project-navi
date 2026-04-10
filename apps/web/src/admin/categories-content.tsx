@@ -233,34 +233,34 @@ export function CategoriesContent({ expenseCategories, incomeCategories, configM
                             </div>
 
                             <div className="border-t pt-4">
-                                <div className="grid grid-cols-[1fr_1fr_1.15fr] gap-3">
+                                <div className="grid grid-cols-3 gap-2 sm:grid-cols-[1fr_1fr_1.15fr] sm:gap-3">
                                     <Button
                                         type="button"
                                         variant="outline"
-                                        className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em]"
+                                        className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em] px-0 sm:px-4"
                                         onClick={() => setIsPickerOpen(false)}
                                     >
                                         <X className="size-4" />
-                                        <span>Cancel</span>
+                                        <span className="hidden sm:inline">Cancel</span>
                                     </Button>
                                     <Button
                                         type="button"
-                                        className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em]"
+                                        className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em] px-0 sm:px-4"
                                         onClick={handleSave}
                                         disabled={upsertMutation.isPending}
                                     >
                                         <Save className="size-4" />
-                                        <span>Save</span>
+                                        <span className="hidden sm:inline">Save</span>
                                     </Button>
                                     <Button
                                         type="button"
                                         variant="destructive"
-                                        className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em]"
+                                        className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em] px-0 sm:px-4"
                                         onClick={handleDelete}
                                         disabled={upsertMutation.isPending || deleteMutation.isPending || !configMap[activeCategory || ""]?.id}
                                     >
                                         <Trash2 className="size-4" />
-                                        <span>Delete</span>
+                                        <span className="hidden sm:inline">Delete</span>
                                     </Button>
                                 </div>
                             </div>

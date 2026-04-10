@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Search, Plus, Loader2, ArrowUpDown, Pencil, Trash2, ChevronDown, Users, User as UserIcon } from "lucide-react";
+import { Search, Plus, Loader2, ArrowUpDown, Pencil, Trash2, ChevronDown, Users, User as UserIcon, Save } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { 
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
@@ -58,7 +58,7 @@ export function IncomesContent({ data }: PageProps) {
 
   const addIncomeMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/incomes', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
   const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
-  const deleteIncomeMutation = useMutation({ mutationFn: (id: string) => axios.delete(`/api/incomes/${id}`), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dashboard'] }) });
+  const deleteIncomeMutation = useMutation({ mutationFn: (id: string) => axios.delete(`/api/incomes/${id}`), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
 
   const filteredHistory = useMemo(() => {
     return data.incomes
@@ -84,6 +84,13 @@ export function IncomesContent({ data }: PageProps) {
     setEditingItem(tx); setSelectedUserId(tx.userId || "family");
     setIncomeCategory(tx.category);
     setIncomeSheetOpen(true);
+  };
+
+  const handleRowKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, item: any) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleEdit(item);
+    }
   };
 
   return (
@@ -139,6 +146,9 @@ export function IncomesContent({ data }: PageProps) {
             key={item.id} 
             className="group flex items-center p-4 rounded-xl bg-card hover:bg-secondary/20 transition-all cursor-pointer border border-transparent hover:border-muted/10 shadow-sm"
             onClick={() => handleEdit(item)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => handleRowKeyDown(event, item)}
           >
             <div className="flex items-center gap-5 flex-1 min-w-0">
               <div
@@ -242,8 +252,50 @@ export function IncomesContent({ data }: PageProps) {
                 setIncomeCategory(val);
               }} />
             </div>
-            <div className="flex gap-4 pt-6">
-              <Button type="submit" disabled={addIncomeMutation.isPending || updateIncomeMutation.isPending} className="h-14 flex-1 rounded-xl font-black bg-emerald-600 text-white shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all border-none uppercase tracking-[0.2em] text-[10px]">Save</Button>
+            <div className={cn("pt-6", editingItem ? "grid grid-cols-2 gap-4" : "flex")}>
+              {editingItem && (
+                <AlertDialog>
+                  <AlertDialogTrigger
+                    render={
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="h-14 w-full rounded-xl font-black bg-rose-600 text-white shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest border-none px-0 sm:px-4"
+                      >
+                        <Trash2 className="size-4" />
+                        <span className="hidden sm:inline">Delete</span>
+                      </Button>
+                    }
+                  />
+                  <AlertDialogContent className="rounded-2xl p-8 border-none shadow-2xl">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-2xl font-black tracking-tight uppercase italic">Delete Income</AlertDialogTitle>
+                      <AlertDialogDescription className="text-xs font-bold opacity-50 mt-2 uppercase">
+                        Are you sure you want to delete this income?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-8 gap-3">
+                      <AlertDialogCancel className="h-12 rounded-xl font-black text-[10px] uppercase tracking-widest border-none bg-muted/10">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => editingItem && deleteIncomeMutation.mutate(editingItem.id)}
+                        className="h-12 rounded-xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest border-none"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              <Button
+                type="submit"
+                disabled={addIncomeMutation.isPending || updateIncomeMutation.isPending}
+                className="h-14 flex-1 rounded-xl font-black bg-emerald-600 text-white shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all border-none uppercase tracking-[0.2em] text-[10px] px-0 sm:px-4"
+              >
+                <Save className="size-4" />
+                <span className="hidden sm:inline">Save</span>
+              </Button>
             </div>
           </form>
         </SheetContent>
