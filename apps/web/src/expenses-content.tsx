@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search, Plus, Loader2, ArrowUpDown, Pencil, Trash2, ChevronDown, Users, User as UserIcon, Save } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { 
@@ -93,6 +93,18 @@ export function ExpensesContent({ data }: PageProps) {
       handleEdit(item);
     }
   };
+
+  useEffect(() => {
+    const handleQuickAdd = () => {
+      setEditingItem(null);
+      setSelectedUserId("family");
+      setExpenseCategory("");
+      setExpenseSheetOpen(true);
+    };
+
+    window.addEventListener("open-quick-add", handleQuickAdd);
+    return () => window.removeEventListener("open-quick-add", handleQuickAdd);
+  }, []);
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-background antialiased p-6 md:p-12 pb-32">
