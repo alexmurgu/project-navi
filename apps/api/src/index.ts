@@ -24,6 +24,14 @@ const __dirname = path.dirname(__filename);
 const app = new Hono();
 
 app.use('*', cors());
+app.use('/api/*', async (c, next) => {
+  await next();
+  c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+});
+app.use('/api/auth/*', async (c, next) => {
+  await next();
+  c.header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+});
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
 

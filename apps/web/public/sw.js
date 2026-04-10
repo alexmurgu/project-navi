@@ -1,7 +1,6 @@
 const BUILD_ID = new URL(self.location.href).searchParams.get("v") || "v1";
 const CACHE_NAME = `project-navi-pwa-${BUILD_ID}`;
-const APP_SHELL = [
-  "/",
+const STATIC_ASSETS = [
   "/manifest.webmanifest",
   "/icon.svg",
   "/navi-touch-icon.png",
@@ -22,7 +21,7 @@ const APP_SHELL = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)).then(() => self.skipWaiting())
   );
 });
 
@@ -39,20 +38,26 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
 
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/auth/")) {
+    event.respondWith(
+      fetch(event.request, { cache: "no-store" }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("/", copy)).catch(() => {});
-          return response;
-        })
-        .catch(() => caches.match("/"))
+      fetch(event.request, { cache: "no-store" })
     );
     return;
   }
 
   if (url.origin === self.location.origin) {
+    if (!url.pathname.startsWith("/assets/") && !STATIC_ASSETS.includes(url.pathname)) {
+      event.respondWith(fetch(event.request, { cache: "no-store" }));
+      return;
+    }
+
     event.respondWith(
       caches.match(event.request).then((cached) => {
         if (cached) return cached;
