@@ -19,15 +19,15 @@ export function UsersContent({ allUsers, adminEmail, currentUserEmail }: UsersCo
 
     const createUserMutation = useMutation({
         mutationFn: (data: any) => axios.post('/api/admin/users', data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+        onSuccess: async () => {
+            await queryClient.refetchQueries({ queryKey: ['admin-users'], type: 'active' });
         }
     });
 
     const deleteUserMutation = useMutation({
         mutationFn: (id: string) => axios.delete(`/api/admin/users/${id}`),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+        onSuccess: async () => {
+            await queryClient.refetchQueries({ queryKey: ['admin-users'], type: 'active' });
         }
     });
 

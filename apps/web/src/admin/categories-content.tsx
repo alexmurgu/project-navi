@@ -30,15 +30,15 @@ export function CategoriesContent({ expenseCategories, incomeCategories, configM
 
     const upsertMutation = useMutation({
         mutationFn: (data: { name: string, color: string, icon: string | null }) => axios.post('/api/admin/categories', data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        onSuccess: async () => {
+            await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' });
             setIsPickerOpen(false);
         }
     });
 
     const deleteMutation = useMutation({
         mutationFn: (id: string) => axios.delete(`/api/admin/categories/${id}`),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+        onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); }
     });
 
     useEffect(() => {

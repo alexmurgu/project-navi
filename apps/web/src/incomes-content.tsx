@@ -56,9 +56,9 @@ export function IncomesContent({ data }: PageProps) {
     return map;
   }, [data.categoryConfigs]);
 
-  const addIncomeMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/incomes', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
-  const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
-  const deleteIncomeMutation = useMutation({ mutationFn: (id: string) => axios.delete(`/api/incomes/${id}`), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
+  const addIncomeMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/incomes', d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setIncomeSheetOpen(false); } });
+  const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setIncomeSheetOpen(false); } });
+  const deleteIncomeMutation = useMutation({ mutationFn: (id: string) => axios.delete(`/api/incomes/${id}`), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setIncomeSheetOpen(false); } });
 
   const filteredHistory = useMemo(() => {
     return data.incomes

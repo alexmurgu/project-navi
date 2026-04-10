@@ -67,10 +67,10 @@ export function DashboardContent({ data }: PageProps) {
     };
   }, []);
   
-  const addExpenseMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/expenses', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
-  const updateExpenseMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/expenses/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
-  const addIncomeMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/incomes', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
-  const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setIncomeSheetOpen(false); } });
+  const addExpenseMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/expenses', d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setExpenseSheetOpen(false); } });
+  const updateExpenseMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/expenses/${d.id}`, d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setExpenseSheetOpen(false); } });
+  const addIncomeMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/incomes', d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setIncomeSheetOpen(false); } });
+  const updateIncomeMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/incomes/${d.id}`, d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setIncomeSheetOpen(false); } });
 
   const allItems = useMemo(() => [
     ...data.expenses.map((e) => ({ ...e, type: "expense" as const })),
@@ -259,7 +259,7 @@ export function DashboardContent({ data }: PageProps) {
           };
           editingItem?.type === "expense" ? updateExpenseMutation.mutate(payload) : addExpenseMutation.mutate(payload);
         }}
-        onDelete={(id) => axios.delete(`/api/expenses/${id}`).then(() => queryClient.invalidateQueries({ queryKey: ['dashboard'] }))}
+        onDelete={(id) => axios.delete(`/api/expenses/${id}`).then(() => queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }))}
         saving={addExpenseMutation.isPending || updateExpenseMutation.isPending}
       />
 
@@ -278,7 +278,7 @@ export function DashboardContent({ data }: PageProps) {
         onSubmit={(d) => {
           editingItem?.type === "income" ? updateIncomeMutation.mutate(d) : addIncomeMutation.mutate(d);
         }}
-        onDelete={(id) => axios.delete(`/api/incomes/${id}`).then(() => queryClient.invalidateQueries({ queryKey: ['dashboard'] }))}
+        onDelete={(id) => axios.delete(`/api/incomes/${id}`).then(() => queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }))}
         saving={addIncomeMutation.isPending || updateIncomeMutation.isPending}
       />
     </div>

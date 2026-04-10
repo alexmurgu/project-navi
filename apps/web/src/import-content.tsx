@@ -30,7 +30,7 @@ export function ImportContent({ users, expenseCategories, incomeCategories, cate
   
   const importMutation = useMutation({
     mutationFn: (data: any[]) => axios.post('/api/import', data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); navigate({ to: "/" }); }
+    onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); navigate({ to: "/" }); }
   });
 
   const getCategoryColor = (name: string, defaultColor: string) => {

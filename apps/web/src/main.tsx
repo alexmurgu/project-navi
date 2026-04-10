@@ -6,7 +6,18 @@ import './globals.css'
 
 import { routeTree } from './routeTree.gen'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: 'always',
+      refetchOnReconnect: 'always',
+      refetchInterval: 30000,
+      refetchIntervalInBackground: true,
+    },
+  },
+})
 
 const router = createRouter({
   routeTree,

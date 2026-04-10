@@ -57,9 +57,9 @@ export function ExpensesContent({ data }: PageProps) {
     return map;
   }, [data.categoryConfigs]);
 
-  const addExpenseMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/expenses', d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
-  const updateExpenseMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/expenses/${d.id}`, d), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
-  const deleteExpenseMutation = useMutation({ mutationFn: (id: string) => axios.delete(`/api/expenses/${id}`), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['dashboard'] }); setExpenseSheetOpen(false); } });
+  const addExpenseMutation = useMutation({ mutationFn: (d: any) => axios.post('/api/expenses', d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setExpenseSheetOpen(false); } });
+  const updateExpenseMutation = useMutation({ mutationFn: (d: any) => axios.put(`/api/expenses/${d.id}`, d), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setExpenseSheetOpen(false); } });
+  const deleteExpenseMutation = useMutation({ mutationFn: (id: string) => axios.delete(`/api/expenses/${id}`), onSuccess: async () => { await queryClient.refetchQueries({ queryKey: ['dashboard'], type: 'active' }); setExpenseSheetOpen(false); } });
 
   const filteredHistory = useMemo(() => {
     return data.expenses
