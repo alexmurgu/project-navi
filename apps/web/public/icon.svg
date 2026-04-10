@@ -1,13 +1,29 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="2" y="2" width="28" height="28" rx="6" fill="#F59E0B" fill-opacity="0.1" stroke="#F59E0B" stroke-width="2"/>
-  <text 
-    x="50%" 
-    y="52%" 
-    dominant-baseline="central" 
-    text-anchor="middle" 
-    fill="#F59E0B" 
-    font-family="system-ui, sans-serif" 
-    font-weight="900" 
-    font-size="18"
-  >N</text>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#083B3A"/>
+      <stop offset="1" stop-color="#0B4E58"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="160" y1="132" x2="360" y2="392" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7DE7D6"/>
+      <stop offset="1" stop-color="#34D3FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="32" y="32" width="448" height="448" rx="104" fill="url(#bg)"/>
+  <rect x="32" y="32" width="448" height="448" rx="104" fill="url(#accent)" fill-opacity="0.10"/>
+  <circle cx="382" cy="146" r="34" fill="#F7C948" fill-opacity="0.18"/>
+  <circle cx="370" cy="134" r="12" fill="#F7C948"/>
+  <path
+    d="M168 340V174C168 158.536 181.536 146 197 146H227C234.822 146 242.303 149.12 247.803 154.66L295 202L344.197 154.66C349.697 149.12 357.178 146 365 146H315C330.464 146 344 158.536 344 174V340C344 355.464 330.464 368 315 368H285C277.178 368 269.697 364.88 264.197 359.34L217 312L167.803 359.34C162.303 364.88 154.822 368 147 368H197C181.536 368 168 355.464 168 340Z"
+    fill="#F8FBFB"
+  />
+  <path
+    d="M168 340V174C168 158.536 181.536 146 197 146H227C234.822 146 242.303 149.12 247.803 154.66L295 202L344.197 154.66C349.697 149.12 357.178 146 365 146H315C330.464 146 344 158.536 344 174V340C344 355.464 330.464 368 315 368H285C277.178 368 269.697 364.88 264.197 359.34L217 312L167.803 359.34C162.303 364.88 154.822 368 147 368H197C181.536 368 168 355.464 168 340Z"
+    fill="#F8FBFB"
+    fill-opacity="0.08"
+  />
+  <rect x="184" y="178" width="32" height="156" rx="16" fill="url(#accent)"/>
+  <rect x="296" y="178" width="32" height="156" rx="16" fill="url(#accent)"/>
+  <path d="M216 184L280 328" stroke="#F8FBFB" stroke-width="32" stroke-linecap="round"/>
+  <circle cx="256" cy="396" r="18" fill="#F7C948"/>
 </svg>

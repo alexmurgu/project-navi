@@ -1,114 +1,149 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { type FormEvent, useReducer } from 'react'
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react'
+import { authClient } from '@/lib/auth-client'
+import { useAuthStore } from '../store/useAuthStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2 } from 'lucide-react'
-import { authClient } from '@/lib/auth-client'
-import { useAuthStore } from '../store/useAuthStore'
 
 export const Route = createFileRoute('/login')({
   component: Login,
 })
 
 function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const navigate = useNavigate()
   const { fetchSession } = useAuthStore()
+  const [state, setState] = useReducer(
+    (
+      current: {
+        email: string
+        password: string
+        loading: boolean
+        error: string
+        showPassword: boolean
+      },
+      updates: Partial<{
+        email: string
+        password: string
+        loading: boolean
+        error: string
+        showPassword: boolean
+      }>
+    ) => ({ ...current, ...updates }),
+    {
+      email: '',
+      password: '',
+      loading: false,
+      error: '',
+      showPassword: false,
+    }
+  )
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setLoading(true)
-    setError('')
+    setState({ loading: true, error: '' })
 
     try {
       const { error: authError } = await authClient.signIn.email({
-        email,
-        password,
+        email: state.email,
+        password: state.password,
       })
 
       if (authError) {
-        setError(authError.message || 'Invalid email or password')
-        setLoading(false)
+        setState({ error: authError.message || 'Invalid email or password', loading: false })
       } else {
         await fetchSession()
         navigate({ to: '/' })
       }
     } catch {
-      setError('An unexpected error occurred')
-      setLoading(false)
+      setState({ error: 'An unexpected error occurred', loading: false })
     }
   }
 
   return (
-    <div className="flex min-h-screen flex-col justify-center px-4 py-12 sm:px-6 lg:px-8 bg-background text-foreground antialiased">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="flex h-12 w-12 items-center justify-center bg-primary text-primary-foreground rounded-xl shadow-sm">
-            <span className="text-2xl font-bold">N</span>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.14),transparent_28%),linear-gradient(180deg,rgba(248,251,251,1)_0%,rgba(241,249,248,1)_100%)] px-4 py-10 text-foreground">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-[-8rem] top-[-8rem] h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute right-[-6rem] bottom-[-8rem] h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
+      </div>
+
+      <div className="relative w-full max-w-md rounded-[2rem] border border-border/70 bg-white/80 p-6 shadow-[0_30px_80px_-45px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:p-8">
+        <div className="mb-8 flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-[#083B3A] shadow-sm">
+            <img src="/icon.svg" alt="Navi" className="h-9 w-9" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-semibold tracking-tight text-foreground">
-          Project Navi
-        </h2>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Card className="rounded-2xl shadow-sm border bg-card p-2">
-          <CardHeader>
-            <CardTitle className="sr-only">Login</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSignIn} className="space-y-5">
-              <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                  Email address
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 rounded-lg shadow-sm"
-                />
-              </div>
+        <div className="mb-6 text-center">
+          <h1 className="text-3xl font-black tracking-tight text-foreground">Sign in</h1>
+        </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 rounded-lg shadow-sm"
-                />
-              </div>
+        <form onSubmit={handleSignIn} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-foreground">
+              Email
+            </Label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="email"
+                type="email"
+                required
+                autoComplete="email"
+                value={state.email}
+                onChange={(e) => setState({ email: e.target.value })}
+                className="h-12 rounded-2xl border-border/80 bg-white/90 pl-10 shadow-none"
+                placeholder="you@company.com"
+              />
+            </div>
+          </div>
 
-              {error && (
-                <div className="text-sm font-medium text-destructive bg-destructive/10 p-3 rounded-lg border border-destructive/20">
-                  {error}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-10 rounded-lg shadow-sm font-medium transition-all"
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              Password
+            </Label>
+            <div className="relative">
+              <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="password"
+                type={state.showPassword ? 'text' : 'password'}
+                required
+                autoComplete="current-password"
+                value={state.password}
+                onChange={(e) => setState({ password: e.target.value })}
+                className="h-12 rounded-2xl border-border/80 bg-white/90 pl-10 pr-12 shadow-none"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setState({ showPassword: !state.showPassword })}
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label={state.showPassword ? 'Hide password' : 'Show password'}
               >
-                {loading ? <Loader2 className="animate-spin" /> : "Sign In"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                {state.showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
+          </div>
+
+          {state.error && (
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/8 px-4 py-3 text-sm font-medium text-destructive">
+              {state.error}
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={state.loading}
+            className="mt-2 h-12 w-full rounded-2xl text-base shadow-[0_18px_40px_-24px_rgba(8,59,58,0.45)]"
+          >
+            <span className="flex items-center gap-2">
+              {state.loading ? 'Signing in' : 'Sign in'}
+              {!state.loading && <ArrowRight className="size-4" />}
+            </span>
+          </Button>
+        </form>
       </div>
-    </div>
+    </main>
   )
 }
