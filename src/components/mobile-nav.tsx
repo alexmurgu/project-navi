@@ -16,7 +16,7 @@ export function MobileNav() {
   ];
 
   const handleFabClick = () => {
-    window.dispatchEvent(new CustomEvent('open-quick-add-choice'));
+    window.dispatchEvent(new CustomEvent("open-quick-add-choice"));
   };
 
   return (
@@ -45,11 +45,15 @@ export function MobileNav() {
                 to={item.to as any}
                 className={cn(
                   "flex flex-col items-center justify-center h-14 rounded-xl transition-all duration-500 touch-manipulation",
-                  isActive ? "text-primary bg-primary/5" : "text-muted-foreground opacity-40 hover:opacity-100"
+                  isActive
+                    ? "text-primary bg-primary/5"
+                    : "text-muted-foreground opacity-40 hover:opacity-100",
                 )}
               >
                 {item.icon}
-                <span className="mt-0.5 text-[10px] font-black uppercase tracking-tighter">{item.label}</span>
+                <span className="mt-0.5 text-[10px] font-black uppercase tracking-tighter">
+                  {item.label}
+                </span>
               </Link>
             );
           })}

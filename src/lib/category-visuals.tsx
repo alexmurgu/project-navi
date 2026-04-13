@@ -24,7 +24,7 @@ import {
   Tag,
   Utensils,
   Wallet,
-  Zap
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -66,11 +66,11 @@ export const CATEGORY_ICON_OPTIONS: CategoryIconOption[] = [
   { value: "CreditCard", label: "Card", icon: CreditCard },
   { value: "ShieldCheck", label: "Bills", icon: ShieldCheck },
   { value: "Shirt", label: "Style", icon: Shirt },
-  { value: "Zap", label: "Utilities", icon: Zap }
+  { value: "Zap", label: "Utilities", icon: Zap },
 ];
 
 const CATEGORY_ICON_MAP = Object.fromEntries(
-  CATEGORY_ICON_OPTIONS.map((option) => [option.value, option.icon])
+  CATEGORY_ICON_OPTIONS.map((option) => [option.value, option.icon]),
 ) as Record<string, LucideIcon>;
 
 const DEFAULT_EXPENSE_ICON: LucideIcon = LayoutList;
@@ -81,7 +81,10 @@ const stripHex = (color: string) => color.replace("#", "");
 export const withAlpha = (color: string, alpha: number) => {
   const hex = stripHex(color).trim();
   if (/^[0-9a-fA-F]{3}$/.test(hex)) {
-    const expanded = hex.split("").map((char) => char + char).join("");
+    const expanded = hex
+      .split("")
+      .map((char) => char + char)
+      .join("");
     return `rgba(${parseInt(expanded.slice(0, 2), 16)}, ${parseInt(expanded.slice(2, 4), 16)}, ${parseInt(expanded.slice(4, 6), 16)}, ${alpha})`;
   }
   if (/^[0-9a-fA-F]{6}$/.test(hex)) {
@@ -92,7 +95,7 @@ export const withAlpha = (color: string, alpha: number) => {
 
 export const getCategoryConfig = (
   configMap: Record<string, CategoryConfig | undefined>,
-  category: string
+  category: string,
 ) => configMap[category] ?? configMap[category.toLowerCase()] ?? configMap[category.trim()];
 
 export const getCategoryIconComponent = (iconName?: string | null, kind?: CategoryKind) => {
@@ -125,7 +128,7 @@ export const CategoryIcon = ({
   kind,
   className = "size-5",
   fallbackClassName = "size-5",
-  color
+  color,
 }: {
   category: string;
   config?: CategoryConfig;
@@ -134,6 +137,13 @@ export const CategoryIcon = ({
   fallbackClassName?: string;
   color?: string;
 }) => {
-  const Icon = config?.icon ? getCategoryIconComponent(config.icon, kind) : getCategoryFallbackIcon(category, kind);
-  return <Icon className={cn(className, !config?.icon && fallbackClassName)} style={{ color: color || config?.color || "currentColor" }} />;
+  const Icon = config?.icon
+    ? getCategoryIconComponent(config.icon, kind)
+    : getCategoryFallbackIcon(category, kind);
+  return (
+    <Icon
+      className={cn(className, !config?.icon && fallbackClassName)}
+      style={{ color: color || config?.color || "currentColor" }}
+    />
+  );
 };

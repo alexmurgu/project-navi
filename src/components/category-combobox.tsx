@@ -12,11 +12,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface CategoryComboboxProps {
   value: string;
@@ -42,8 +38,7 @@ export function CategoryCombobox({
   const [searchValue, setSearchValue] = React.useState("");
 
   const showAddNew =
-    searchValue !== "" &&
-    !options.some((c) => c.toLowerCase() === searchValue.toLowerCase());
+    searchValue !== "" && !options.some((c) => c.toLowerCase() === searchValue.toLowerCase());
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -57,11 +52,17 @@ export function CategoryCombobox({
             aria-expanded={open}
             className={cn(
               "flex h-14 w-full items-center justify-between rounded-xl border-none bg-secondary/30 px-6 text-base font-black shadow-inner focus:ring-primary/20",
-              className
+              className,
             )}
             style={style}
           >
-            <span className={cn(value ? "text-foreground" : "text-muted-foreground opacity-30 uppercase text-[10px] tracking-widest font-black")}>
+            <span
+              className={cn(
+                value
+                  ? "text-foreground"
+                  : "text-muted-foreground opacity-30 uppercase text-[10px] tracking-widest font-black",
+              )}
+            >
               {value || placeholder}
             </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-30" />
@@ -71,11 +72,11 @@ export function CategoryCombobox({
       <PopoverContent
         className="glass-panel w-(--radix-popover-trigger-width) rounded-xl border-muted/20 p-2 shadow-2xl bg-card/80 backdrop-blur-xl"
         align="start"
-        >
-          <Command className="bg-transparent">
-            <CommandInput
-              placeholder="Search categories..."
-              value={searchValue}
+      >
+        <Command className="bg-transparent">
+          <CommandInput
+            placeholder="Search categories..."
+            value={searchValue}
             onValueChange={setSearchValue}
             className="h-10 border-none bg-transparent text-sm font-bold"
           />
@@ -95,16 +96,16 @@ export function CategoryCombobox({
                   }}
                   className={cn(
                     "cursor-pointer bg-transparent rounded-lg px-4 py-2 text-left text-sm font-bold transition-all",
-                    kind === "income" 
-                      ? "hover:bg-emerald-500/10 data-selected:bg-emerald-500/10 data-selected:text-emerald-700" 
-                      : "hover:bg-muted/60 data-selected:bg-muted/60"
+                    kind === "income"
+                      ? "hover:bg-emerald-500/10 data-selected:bg-emerald-500/10 data-selected:text-emerald-700"
+                      : "hover:bg-muted/60 data-selected:bg-muted/60",
                   )}
                 >
                   <Check
                     className={cn(
                       "mr-3 h-4 w-4",
                       value === cat ? "opacity-100" : "opacity-0",
-                      kind === "income" && value === cat && "text-emerald-600"
+                      kind === "income" && value === cat && "text-emerald-600",
                     )}
                   />
                   {cat}
@@ -112,7 +113,10 @@ export function CategoryCombobox({
               ))}
             </CommandGroup>
             {showAddNew && (
-              <CommandGroup heading="New Category" className="text-left py-2 border-t border-muted/10 mt-2 **:[[cmdk-group-items]]:space-y-1">
+              <CommandGroup
+                heading="New Category"
+                className="text-left py-2 border-t border-muted/10 mt-2 **:[[cmdk-group-items]]:space-y-1"
+              >
                 <CommandItem
                   value={searchValue}
                   onSelect={(val) => {
@@ -124,7 +128,7 @@ export function CategoryCombobox({
                     "cursor-pointer bg-transparent rounded-lg px-4 py-2 text-left font-black text-[10px] uppercase tracking-[0.2em]",
                     kind === "income"
                       ? "text-emerald-600 hover:bg-emerald-500/10 data-selected:bg-emerald-500/10"
-                      : "text-primary hover:bg-primary/5 data-selected:bg-primary/5"
+                      : "text-primary hover:bg-primary/5 data-selected:bg-primary/5",
                   )}
                 >
                   <PlusCircle className="mr-3 h-4 w-4" />
