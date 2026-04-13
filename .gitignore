@@ -39,3 +39,11 @@ next-env.d.ts
 .fleet/
 .sublime-project
 .sublime-workspace
+
+# Databases
+local.db
+local.db-journal
+local.db-shm
+local.db-wal
+*.db
+*.sqlite

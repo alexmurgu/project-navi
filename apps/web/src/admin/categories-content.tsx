@@ -82,19 +82,21 @@ export function CategoriesContent({ expenseCategories, incomeCategories, configM
                             return (
                                 <TableRow
                                     key={name}
-                                    className="group cursor-pointer transition-colors hover:bg-muted/50"
+                                    className="group cursor-pointer transition-colors"
                                     onClick={() => { setActiveCategory(name); setIsPickerOpen(true); }}
+                                    style={{
+                                        backgroundColor: config?.color ? withAlpha(config.color, 0.05) : "transparent"
+                                    }}
                                 >
                                     <TableCell className="pl-6">
                                         <div className="flex items-center gap-4 py-1.5">
-                                            <div
-                                                className="size-11 rounded-xl shadow-sm flex items-center justify-center shrink-0"
-                                                style={{
-                                                    backgroundColor: config?.color ? withAlpha(config.color, 0.12) : "#E5E7EB",
-                                                    color: config?.color || "#6B7280"
-                                                }}
-                                            >
-                                                <CategoryIcon category={name} config={config} className="size-5" />
+                                            <div className="size-11 rounded-xl flex items-center justify-center shrink-0">
+                                                <CategoryIcon 
+                                                    category={name} 
+                                                    config={config} 
+                                                    className="size-5" 
+                                                    color={config?.color}
+                                                />
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="font-semibold text-sm tracking-tight text-foreground truncate">{name}</p>

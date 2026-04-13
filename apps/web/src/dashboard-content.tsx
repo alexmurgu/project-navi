@@ -163,54 +163,49 @@ export function DashboardContent({ data }: PageProps) {
                 <div key={group.title} className="space-y-4">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40 ml-2">{group.title}</h4>
                 <div className="space-y-2">
-            {group.items.map((tx) => (
-                    <div 
-                        key={tx.id} 
-                        className="flex items-center justify-between p-4 rounded-xl bg-card hover:bg-secondary/30 transition-all cursor-pointer group border border-transparent hover:border-muted/10 shadow-sm md:shadow-none"
-                        onClick={() => handleEdit(tx)}
-                    >
-                        <div className="flex items-center gap-4">
-                        {(() => {
-                          const config = getCategoryConfig(categoryConfigMap, tx.category);
-                          const color = config?.color || (tx.type === 'expense' ? "#F43F5E" : "#10B981");
-                          return (
-                            <div
-                              className="size-12 rounded-lg flex items-center justify-center shadow-sm transition-transform group-hover:-rotate-6"
-                              style={{
-                                backgroundColor: withAlpha(color, 0.10),
-                                color
-                              }}
-                            >
-                            <CategoryIcon
-                              category={tx.category}
-                              config={config}
-                              kind={tx.type}
-                              className="size-5"
-                            />
-                            </div>
-                          );
-                        })()}
-                        <div className="space-y-0.5">
-                            <p className="font-bold text-sm tracking-tight text-foreground">{tx.description}</p>
-                            <div className="flex items-center gap-2">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">{tx.category}</p>
-                                <div className="flex items-center gap-1 text-[8px] font-black uppercase text-muted-foreground/40 bg-muted/5 px-1.5 py-0.5 rounded">
-                                    <UserIcon className="size-2 opacity-50" />
-                                    <span>{tx.userName || "Family"}</span>
+                    {group.items.map((tx) => {
+                      const config = getCategoryConfig(categoryConfigMap, tx.category);
+                      const color = config?.color || (tx.type === 'expense' ? "#F43F5E" : "#10B981");
+                      const bgColor = withAlpha(color, 0.05);
+                      return (
+                        <div 
+                            key={tx.id} 
+                            className="flex items-center justify-between p-4 rounded-xl transition-all cursor-pointer group border border-transparent hover:border-muted/10 shadow-sm md:shadow-none"
+                            style={{ backgroundColor: bgColor }}
+                            onClick={() => handleEdit(tx)}
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="size-12 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6">
+                                    <CategoryIcon
+                                      category={tx.category}
+                                      config={config}
+                                      kind={tx.type}
+                                      className="size-6"
+                                      color={color}
+                                    />
+                                </div>
+                                <div className="space-y-0.5">
+                                    <p className="font-bold text-sm tracking-tight text-foreground">{tx.description}</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">{tx.category}</p>
+                                        <div className="flex items-center gap-1 text-[8px] font-black uppercase text-muted-foreground/40 bg-muted/5 px-1.5 py-0.5 rounded">
+                                            <UserIcon className="size-2 opacity-50" />
+                                            <span>{tx.userName || "Family"}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            <div className="text-right">
+                                <p className={cn(
+                                    "font-black text-sm tracking-tight",
+                                    tx.type === 'expense' ? "text-rose-600" : "text-emerald-600"
+                                )}>
+                                    {tx.type === 'expense' ? "-" : "+"}{formatCurrency(tx.amount)}
+                                </p>
+                            </div>
                         </div>
-                        </div>
-                        <div className="text-right">
-                        <p className={cn(
-                            "font-black text-sm tracking-tight",
-                            tx.type === 'expense' ? "text-rose-600" : "text-emerald-600"
-                        )}>
-                            {tx.type === 'expense' ? "-" : "+"}{formatCurrency(tx.amount)}
-                        </p>
-                        </div>
-                    </div>
-                    ))}
+                      );
+                    })}
                 </div>
                 </div>
             ))}
