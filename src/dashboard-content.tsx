@@ -262,24 +262,24 @@ export function DashboardContent({ data }: PageProps) {
                 return (
                   <div
                     key={item.name}
-                    className="flex flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group"
-                    style={{ backgroundColor: bgColor }}
+                    className="relative flex flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group overflow-hidden"
+                    style={{
+                      backgroundImage: `linear-gradient(90deg, ${withAlpha(color, 0.22)} 0%, ${withAlpha(
+                        color,
+                        0.22,
+                      )} ${share}%, ${bgColor} ${share}%, ${bgColor} 100%)`,
+                    }}
                   >
-                    <div className="flex items-center justify-between gap-4 min-w-0">
+                    <div className="relative z-10 flex items-center justify-between gap-4 min-w-0">
                       <div className="flex items-center gap-4 min-w-0">
-                        <div className="size-12 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6 shrink-0">
-                          <div
-                            className="size-11 rounded-xl flex items-center justify-center"
-                            style={{ backgroundColor: withAlpha(color, 0.12) }}
-                          >
-                            <CategoryIcon
-                              category={item.name}
-                              config={config}
-                              kind="expense"
-                              className="size-6"
-                              color={color}
-                            />
-                          </div>
+                        <div className="size-11 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6 shrink-0">
+                          <CategoryIcon
+                            category={item.name}
+                            config={config}
+                            kind="expense"
+                            className="size-6"
+                            color={color}
+                          />
                         </div>
                         <div className="space-y-0.5 min-w-0">
                           <p className="font-bold text-sm tracking-tight text-foreground truncate">
@@ -301,15 +301,6 @@ export function DashboardContent({ data }: PageProps) {
                           {formatCurrency(item.amount)}
                         </p>
                       </div>
-                    </div>
-                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted/20">
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${share}%`,
-                          backgroundColor: color,
-                        }}
-                      />
                     </div>
                   </div>
                 );
