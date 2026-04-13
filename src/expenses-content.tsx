@@ -11,6 +11,7 @@ import {
   Save,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useNavigate } from "@tanstack/react-router";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -77,6 +78,7 @@ const formatCurrency = (amountCents: number) => {
 
 export function ExpensesContent({ data }: PageProps) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [expenseSheetOpen, setExpenseSheetOpen] = useState(false);
   const [availableCategories, setAvailableCategories] = useState<string[]>(data.expenseCategories);
   const [selectedUserId, setSelectedUserId] = useState<string>("family");
@@ -155,6 +157,20 @@ export function ExpensesContent({ data }: PageProps) {
       event.preventDefault();
       handleEdit(item);
     }
+  };
+
+  const openMemberOverview = (memberId: string | null) => {
+    navigate({
+      to: "/members/$memberId",
+      params: { memberId: memberId || "family" },
+    });
+  };
+
+  const openCategoryOverview = (category: string) => {
+    navigate({
+      to: "/categories/$category",
+      params: { category },
+    });
   };
 
   useEffect(() => {
@@ -262,15 +278,31 @@ export function ExpensesContent({ data }: PageProps) {
                   <h4 className="font-bold text-base tracking-tight truncate">
                     {item.description}
                   </h4>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-30 block md:inline">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openCategoryOverview(item.category);
+                    }}
+                    className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 block md:inline hover:text-primary transition-colors"
+                  >
                     {item.category}
-                  </span>
+                  </button>
                 </div>
               </div>
 
-              <div className="hidden md:flex w-32 items-center gap-1.5 text-[9px] font-black uppercase text-primary tracking-tighter bg-primary/5 px-2 py-0.5 rounded-md shrink-0 mx-2">
-                <UserIcon className="size-2.5 opacity-50" />
-                <span className="truncate">{item.userName || "Family"}</span>
+              <div className="hidden md:flex w-32 shrink-0 mx-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openMemberOverview(item.userId);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase text-primary tracking-tighter px-0 py-0 bg-transparent hover:underline underline-offset-4"
+                >
+                  <UserIcon className="size-2.5 opacity-50" />
+                  <span className="truncate">{item.userName || "Family"}</span>
+                </button>
               </div>
 
               <div className="hidden md:block w-40 text-[9px] font-black uppercase text-muted-foreground opacity-40 shrink-0 mx-2">
