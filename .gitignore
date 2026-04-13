@@ -11,10 +11,7 @@ dist/
 build/
 .next/
 out/
-/apps/web/dist
-/apps/api/dist
-
-# apps specific
+.output/
 .tanstack/
 
 # misc
