@@ -267,7 +267,7 @@ export function ExpensesContent({ data }: PageProps) {
             </div>
             <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Description</Label><Input name="description" required defaultValue={editingItem?.description || ""} className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner" /></div>
             <div className="space-y-3"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Category</Label>
-              <CategoryCombobox value={expenseCategory} options={availableCategories} onChange={(val) => {
+              <CategoryCombobox kind="expense" value={expenseCategory} options={availableCategories} onChange={(val) => {
                 if (val && !availableCategories.includes(val)) setAvailableCategories(prev => [...prev, val]);
                 setExpenseCategory(val);
               }} />

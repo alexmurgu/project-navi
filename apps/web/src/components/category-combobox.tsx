@@ -25,6 +25,7 @@ interface CategoryComboboxProps {
   className?: string;
   placeholder?: string;
   style?: React.CSSProperties;
+  kind?: "expense" | "income";
 }
 
 export function CategoryCombobox({
@@ -34,6 +35,7 @@ export function CategoryCombobox({
   className,
   placeholder = "Select category...",
   style,
+  kind = "expense",
 }: CategoryComboboxProps) {
   const listboxId = React.useId();
   const [open, setOpen] = React.useState(false);
@@ -81,7 +83,7 @@ export function CategoryCombobox({
             <CommandEmpty className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">
               {!showAddNew && "No results"}
             </CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className="**:[[cmdk-group-items]]:space-y-1">
               {options.map((cat) => (
                 <CommandItem
                   key={cat}
@@ -91,12 +93,18 @@ export function CategoryCombobox({
                     setOpen(false);
                     setSearchValue("");
                   }}
-                  className="cursor-pointer rounded-lg px-4 py-3 text-left text-sm font-bold hover:bg-muted/50 aria-selected:bg-muted/50 transition-colors"
+                  className={cn(
+                    "cursor-pointer bg-transparent rounded-lg px-4 py-2 text-left text-sm font-bold transition-all",
+                    kind === "income" 
+                      ? "hover:bg-emerald-500/10 data-selected:bg-emerald-500/10 data-selected:text-emerald-700" 
+                      : "hover:bg-muted/60 data-selected:bg-muted/60"
+                  )}
                 >
                   <Check
                     className={cn(
                       "mr-3 h-4 w-4",
-                      value === cat ? "opacity-100" : "opacity-0"
+                      value === cat ? "opacity-100" : "opacity-0",
+                      kind === "income" && value === cat && "text-emerald-600"
                     )}
                   />
                   {cat}
@@ -104,7 +112,7 @@ export function CategoryCombobox({
               ))}
             </CommandGroup>
             {showAddNew && (
-              <CommandGroup heading="New Category" className="text-left py-2 border-t border-muted/10 mt-2">
+              <CommandGroup heading="New Category" className="text-left py-2 border-t border-muted/10 mt-2 **:[[cmdk-group-items]]:space-y-1">
                 <CommandItem
                   value={searchValue}
                   onSelect={(val) => {
@@ -112,7 +120,12 @@ export function CategoryCombobox({
                     setOpen(false);
                     setSearchValue("");
                   }}
-                  className="cursor-pointer rounded-lg px-4 py-3 text-left font-black text-primary text-[10px] uppercase tracking-[0.2em] hover:bg-primary/5 aria-selected:bg-primary/5"
+                  className={cn(
+                    "cursor-pointer bg-transparent rounded-lg px-4 py-2 text-left font-black text-[10px] uppercase tracking-[0.2em]",
+                    kind === "income"
+                      ? "text-emerald-600 hover:bg-emerald-500/10 data-selected:bg-emerald-500/10"
+                      : "text-primary hover:bg-primary/5 data-selected:bg-primary/5"
+                  )}
                 >
                   <PlusCircle className="mr-3 h-4 w-4" />
                   Add &quot;{searchValue}&quot;
