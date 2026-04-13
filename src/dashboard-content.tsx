@@ -260,15 +260,17 @@ export function DashboardContent({ data }: PageProps) {
                   : 0;
 
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={item.name}
-                    className="relative flex flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group overflow-hidden"
+                    className="relative flex w-full flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group overflow-hidden text-left cursor-pointer"
                     style={{
                       backgroundImage: `linear-gradient(90deg, ${withAlpha(color, 0.22)} 0%, ${withAlpha(
                         color,
                         0.22,
                       )} ${share}%, ${bgColor} ${share}%, ${bgColor} 100%)`,
                     }}
+                    onClick={() => navigate({ to: "/categories/$category", params: { category: item.name } })}
                   >
                     <div className="relative z-10 flex items-center justify-between gap-4 min-w-0">
                       <div className="flex items-center gap-4 min-w-0">
@@ -302,7 +304,7 @@ export function DashboardContent({ data }: PageProps) {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })
             )}
