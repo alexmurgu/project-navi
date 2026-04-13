@@ -2,15 +2,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import { User as UserIcon } from "lucide-react";
 import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  Bar,
-  BarChart,
-  XAxis,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
-
 
 import { cn } from "@/lib/utils";
 import {
@@ -171,14 +162,29 @@ export function DashboardContent({ data }: PageProps) {
     return groups;
   }, [allItems]);
 
-  const categoryData = useMemo(() => {
-    const map = new Map<string, number>();
-    data.expenses.forEach((exp) =>
-      map.set(exp.category, (map.get(exp.category) || 0) + exp.amount / 100),
-    );
-    return Array.from(map.entries())
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
+  const currentMonthCategoryData = useMemo(() => {
+    const now = new Date();
+    const start = startOfMonth(now);
+    const end = endOfMonth(now);
+    const map = new Map<string, { amount: number; count: number }>();
+
+    data.expenses
+      .filter((exp) => isWithinInterval(new Date(exp.date), { start, end }))
+      .forEach((exp) => {
+        const current = map.get(exp.category) || { amount: 0, count: 0 };
+        map.set(exp.category, {
+          amount: current.amount + exp.amount,
+          count: current.count + 1,
+        });
+      });
+
+    const items = Array.from(map.entries())
+      .map(([name, values]) => ({ name, ...values }))
+      .sort((a, b) => b.amount - a.amount);
+
+    const total = items.reduce((acc, item) => acc + item.amount, 0);
+
+    return { items, total };
   }, [data.expenses]);
 
   const categoryConfigMap = useMemo(() => {
@@ -238,6 +244,80 @@ export function DashboardContent({ data }: PageProps) {
       </section>
 
       <div className="p-6 md:p-12 space-y-12">
+        <section className="space-y-3">
+          <div className="space-y-3">
+            {currentMonthCategoryData.items.length === 0 ? (
+              <div className="rounded-2xl border border-muted/10 bg-secondary/20 px-5 py-6 text-sm text-muted-foreground">
+                No expenses recorded for this month yet.
+              </div>
+            ) : (
+              currentMonthCategoryData.items.map((item) => {
+                const config = getCategoryConfig(categoryConfigMap, item.name);
+                const color = config?.color || "#14B8A6";
+                const bgColor = withAlpha(color, 0.05);
+                const share = currentMonthCategoryData.total
+                  ? Math.max(4, (item.amount / currentMonthCategoryData.total) * 100)
+                  : 0;
+
+                return (
+                  <div
+                    key={item.name}
+                    className="flex flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group"
+                    style={{ backgroundColor: bgColor }}
+                  >
+                    <div className="flex items-center justify-between gap-4 min-w-0">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="size-12 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6 shrink-0">
+                          <div
+                            className="size-11 rounded-xl flex items-center justify-center"
+                            style={{ backgroundColor: withAlpha(color, 0.12) }}
+                          >
+                            <CategoryIcon
+                              category={item.name}
+                              config={config}
+                              kind="expense"
+                              className="size-6"
+                              color={color}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-0.5 min-w-0">
+                          <p className="font-bold text-sm tracking-tight text-foreground truncate">
+                            {item.name}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">
+                              {item.count} {item.count === 1 ? "transaction" : "transactions"}
+                            </p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                              {Math.round((item.amount / currentMonthCategoryData.total) * 100) || 0}%
+                              of month
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="font-black text-sm tracking-tight text-foreground">
+                          {formatCurrency(item.amount)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted/20">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${share}%`,
+                          backgroundColor: color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </section>
+
         {/* Recent Transactions List */}
         <section className="space-y-8">
           <div className="flex items-center justify-between px-2">
@@ -313,34 +393,6 @@ export function DashboardContent({ data }: PageProps) {
           </div>
         </section>
 
-        {/* Analytics Sneak Peek */}
-        <section className="space-y-6 pt-10 border-t border-muted-foreground/10">
-          <h3 className="text-lg font-black tracking-tight italic uppercase px-2">Flow Analysis</h3>
-          <div className="h-64 rounded-2xl p-6 bg-secondary/20 shadow-inner">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryData.slice(0, 5)}>
-                <XAxis dataKey="name" hide />
-                <RechartsTooltip
-                  cursor={{ fill: "rgba(0,0,0,0.02)" }}
-                  contentStyle={{
-                    borderRadius: "1rem",
-                    border: "none",
-                    boxShadow: "0 20px 50px rgba(0,0,0,0.05)",
-                    background: "white",
-                  }}
-                />
-                <Bar dataKey="value" radius={[6, 6, 6, 6]} barSize={24}>
-                  {categoryData.slice(0, 5).map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={index === 0 ? "oklch(0.6 0.12 190)" : "oklch(0.8 0.05 190)"}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
       </div>
 
       <TransactionSheet
