@@ -11,6 +11,9 @@ export default defineConfig({
   define: {
     __APP_BUILD_ID__: JSON.stringify(buildId),
   },
+  preview: {
+    allowedHosts: ['navi.aftermind.xyz'],
+  },
   plugins: [
     tanstackStart({
       server: {
