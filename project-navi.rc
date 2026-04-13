@@ -1,6 +1,6 @@
 #!/sbin/openrc-run
 
-# Aftermind Finance (NAVI) - Alpine Linux OpenRC Service (BUN Monorepo)
+# Aftermind Finance (NAVI) - Alpine Linux OpenRC Service (TanStack Start Unified)
 # Installation:
 # 1. Copy this file to /etc/init.d/aftermind-finance
 # 2. chmod +x /etc/init.d/aftermind-finance
@@ -8,7 +8,7 @@
 # 4. rc-service aftermind-finance start
 
 name="aftermind-finance"
-description="Aftermind Finance (NAVI) - Advanced Monorepo Service (Bun)"
+description="Aftermind Finance (NAVI) - Modern Unified TanStack Start Service (Bun)"
 
 # Use supervise-daemon for automatic restarts
 supervisor="supervise-daemon"
@@ -18,9 +18,9 @@ respawn_max=10
 # Directory where the monorepo root is located
 directory="/opt/project-navi"
 
-# Start command using Bun workspaces
-# This triggers the root 'start' script which filters for the API package
-# The API then natively serves the built frontend from apps/web/dist
+# Start command using Bun
+# This triggers the 'start' script which runs 'vite preview' or the production server
+# The application natively serves both the API and the built frontend from dist/
 command="bun"
 command_args="run start"
 
@@ -49,9 +49,9 @@ start_pre() {
         return 1
     fi
 
-    # Check for built frontend (required for the API to serve it)
-    if [ ! -d "$directory/apps/web/dist" ]; then
-        ewarn "Warning: 'apps/web/dist' not found. Frontend will not be accessible until you run 'bun run build'."
+    # Check for built resources (required for the server to run)
+    if [ ! -d "$directory/dist" ]; then
+        ewarn "Warning: 'dist' not found. The application will not be accessible until you run 'bun run build'."
     fi
 
     # Ensure log files exist and are writable
