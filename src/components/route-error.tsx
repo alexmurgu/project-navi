@@ -30,7 +30,7 @@ export function RouteError({ error, reset }: RouteErrorProps) {
       <div className="relative flex w-full max-w-[500px] flex-col items-center text-center">
         {/* Icon */}
         <div className="relative mb-8">
-          <div className="absolute inset-0 animate-pulse rounded-full bg-destructive/20 duration-[2000ms]" />
+          <div className="absolute inset-0 animate-pulse rounded-full bg-destructive/20 duration-2000" />
           <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-2xl backdrop-blur-sm">
             <AlertCircle className="size-10 text-destructive" strokeWidth={1.5} />
           </div>

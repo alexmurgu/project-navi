@@ -19,7 +19,6 @@ import { MobileNav } from "@/components/mobile-nav";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 import { NotFound } from "@/components/not-found";
 import { RouteError } from "@/components/route-error";
 import { fetchSession } from "@/actions";
