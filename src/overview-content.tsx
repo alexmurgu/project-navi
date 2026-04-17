@@ -40,22 +40,14 @@ type DashboardData = {
   categoryConfigs: CategoryConfig[];
 };
 
-type OverviewMode =
-  | { type: "member"; memberId: string }
-  | { type: "category"; category: string };
+type OverviewMode = { type: "member"; memberId: string } | { type: "category"; category: string };
 
 type CategoryKind = "expense" | "income";
 
 const formatCurrency = (amountCents: number) =>
   (amountCents / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" });
 
-export function OverviewContent({
-  data,
-  mode,
-}: {
-  data: DashboardData;
-  mode: OverviewMode;
-}) {
+export function OverviewContent({ data, mode }: { data: DashboardData; mode: OverviewMode }) {
   const navigate = useNavigate();
 
   const categoryConfigMap = useMemo(() => {
@@ -230,7 +222,12 @@ export function OverviewContent({
           <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/40">
             Balance
           </p>
-          <p className={cn("mt-2 text-3xl font-black tracking-tight", stats.balance >= 0 ? "text-foreground" : "text-rose-600")}>
+          <p
+            className={cn(
+              "mt-2 text-3xl font-black tracking-tight",
+              stats.balance >= 0 ? "text-foreground" : "text-rose-600",
+            )}
+          >
             {formatCurrency(stats.balance)}
           </p>
         </div>
@@ -268,7 +265,9 @@ export function OverviewContent({
                         </p>
                       </div>
                     </div>
-                    <p className="font-black text-sm tracking-tight">{formatCurrency(item.amount)}</p>
+                    <p className="font-black text-sm tracking-tight">
+                      {formatCurrency(item.amount)}
+                    </p>
                   </div>
                 </div>
               );
@@ -293,7 +292,10 @@ export function OverviewContent({
                       categoryKind === "income"
                         ? ["#10B981", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5"]
                         : ["#2DD4BF", "#F472B6", "#60A5FA", "#F59E0B", "#A78BFA"];
-                    const total = categoryMemberExpenseSummary.reduce((acc, curr) => acc + curr.amount, 0);
+                    const total = categoryMemberExpenseSummary.reduce(
+                      (acc, curr) => acc + curr.amount,
+                      0,
+                    );
                     const width = total ? (item.amount / total) * 100 : 0;
                     return (
                       <div
@@ -314,10 +316,16 @@ export function OverviewContent({
                       categoryKind === "income"
                         ? ["#10B981", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5"]
                         : ["#2DD4BF", "#F472B6", "#60A5FA", "#F59E0B", "#A78BFA"];
-                    const total = categoryMemberExpenseSummary.reduce((acc, curr) => acc + curr.amount, 0);
+                    const total = categoryMemberExpenseSummary.reduce(
+                      (acc, curr) => acc + curr.amount,
+                      0,
+                    );
                     const share = total ? Math.round((item.amount / total) * 100) : 0;
                     return (
-                      <div key={item.memberId} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                      <div
+                        key={item.memberId}
+                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40"
+                      >
                         <span
                           className="size-2.5 rounded-full"
                           style={{ backgroundColor: palette[index % palette.length] }}
@@ -371,7 +379,9 @@ export function OverviewContent({
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-sm tracking-tight truncate">{item.description}</p>
+                      <p className="font-bold text-sm tracking-tight truncate">
+                        {item.description}
+                      </p>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
                         <span>{item.category}</span>
                         <span>•</span>

@@ -270,7 +270,9 @@ export function DashboardContent({ data }: PageProps) {
                         0.22,
                       )} ${share}%, ${bgColor} ${share}%, ${bgColor} 100%)`,
                     }}
-                    onClick={() => navigate({ to: "/categories/$category", params: { category: item.name } })}
+                    onClick={() =>
+                      navigate({ to: "/categories/$category", params: { category: item.name } })
+                    }
                   >
                     <div className="relative z-10 flex items-center justify-between gap-4 min-w-0">
                       <div className="flex items-center gap-4 min-w-0">
@@ -292,8 +294,9 @@ export function DashboardContent({ data }: PageProps) {
                               {item.count} {item.count === 1 ? "transaction" : "transactions"}
                             </p>
                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-                              {Math.round((item.amount / currentMonthCategoryData.total) * 100) || 0}%
-                              of month
+                              {Math.round((item.amount / currentMonthCategoryData.total) * 100) ||
+                                0}
+                              % of month
                             </p>
                           </div>
                         </div>
@@ -385,7 +388,6 @@ export function DashboardContent({ data }: PageProps) {
             ))}
           </div>
         </section>
-
       </div>
 
       <TransactionSheet

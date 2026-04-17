@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
 
 const router = createRouter({
   routeTree,
-  context: { queryClient },
+  context: { queryClient, user: undefined, session: undefined },
 });
 
 declare module "@tanstack/react-router" {
@@ -43,6 +43,37 @@ if ("serviceWorker" in navigator && supportsSecureServiceWorker) {
       .register(`/sw.js?v=${__APP_BUILD_ID__}`, {
         scope: "/",
         updateViaCache: "none",
+      })
+      .then((registration) => {
+        const notifyUpdateAvailable = () => {
+          if (!navigator.serviceWorker.controller) return;
+          window.dispatchEvent(
+            new CustomEvent("pwa-update-available", {
+              detail: { registration },
+            }),
+          );
+        };
+
+        const handleWaitingWorker = () => notifyUpdateAvailable();
+
+        if (registration.waiting) {
+          notifyUpdateAvailable();
+        }
+
+        registration.addEventListener("updatefound", () => {
+          const installingWorker = registration.installing;
+          if (!installingWorker) return;
+
+          installingWorker.addEventListener("statechange", () => {
+            if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+              handleWaitingWorker();
+            }
+          });
+        });
+
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          window.dispatchEvent(new CustomEvent("pwa-controller-changed"));
+        });
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === "SecurityError") {

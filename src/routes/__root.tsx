@@ -5,6 +5,7 @@ import {
   Scripts,
   useNavigate,
   useRouterState,
+  redirect,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,6 +19,8 @@ import { MobileNav } from "@/components/mobile-nav";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { NotFound } from "@/components/not-found";
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
@@ -37,6 +40,8 @@ function RootDocument({ children }: { children: ReactNode }) {
 
 interface MyRouterContext {
   queryClient: QueryClient;
+  user?: any;
+  session?: any;
 }
 
 function RootLayout() {
@@ -46,6 +51,11 @@ function RootLayout() {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [pwaUpdateAvailable, setPwaUpdateAvailable] = useState(false);
+  const [pendingRegistration, setPendingRegistration] = useState<ServiceWorkerRegistration | null>(
+    null,
+  );
+  const [refreshingForUpdate, setRefreshingForUpdate] = useState(false);
 
   useEffect(() => {
     fetchSession();
@@ -53,11 +63,30 @@ function RootLayout() {
 
   useEffect(() => {
     const handleOpenQuickAddChoice = () => setQuickAddOpen(true);
-    if (typeof window !== "undefined") {
-      window.addEventListener("open-quick-add-choice", handleOpenQuickAddChoice);
-      return () => window.removeEventListener("open-quick-add-choice", handleOpenQuickAddChoice);
-    }
-  }, []);
+    const handleUpdateAvailable = (event: Event) => {
+      const customEvent = event as CustomEvent<{
+        registration: ServiceWorkerRegistration;
+      }>;
+      setPendingRegistration(customEvent.detail.registration);
+      setPwaUpdateAvailable(true);
+    };
+    const handleControllerChange = () => {
+      if (refreshingForUpdate) {
+        window.location.reload();
+      }
+    };
+    if (typeof window === "undefined") return;
+
+    window.addEventListener("open-quick-add-choice", handleOpenQuickAddChoice);
+    window.addEventListener("pwa-update-available", handleUpdateAvailable as EventListener);
+    window.addEventListener("pwa-controller-changed", handleControllerChange);
+
+    return () => {
+      window.removeEventListener("open-quick-add-choice", handleOpenQuickAddChoice);
+      window.removeEventListener("pwa-update-available", handleUpdateAvailable as EventListener);
+      window.removeEventListener("pwa-controller-changed", handleControllerChange);
+    };
+  }, [refreshingForUpdate]);
 
   const showDevtools = typeof window !== "undefined" && window.location.hostname === "localhost";
   const openQuickAdd = (mode: "expense" | "income") => {
@@ -75,6 +104,12 @@ function RootLayout() {
     );
   };
 
+  const updateApp = () => {
+    if (!pendingRegistration?.waiting) return;
+    setRefreshingForUpdate(true);
+    pendingRegistration.waiting.postMessage({ type: "SKIP_WAITING" });
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
@@ -86,6 +121,37 @@ function RootLayout() {
               </div>
               <div className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">
                 Loading
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {pwaUpdateAvailable ? (
+          <div className="fixed bottom-6 left-1/2 z-210 w-[min(92vw,520px)] -translate-x-1/2 rounded-2xl border border-muted/10 bg-white/95 p-4 shadow-2xl backdrop-blur">
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/50">
+                  Update available
+                </p>
+                <p className="truncate text-sm font-bold text-foreground">
+                  A newer version is ready. Reload to get the latest changes.
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-10 rounded-xl px-4 font-black uppercase tracking-widest text-[10px]"
+                  onClick={() => setPwaUpdateAvailable(false)}
+                >
+                  Later
+                </Button>
+                <Button
+                  type="button"
+                  className="h-10 rounded-xl bg-foreground px-4 font-black uppercase tracking-widest text-[10px] text-background"
+                  onClick={updateApp}
+                >
+                  Reload
+                </Button>
               </div>
             </div>
           </div>
@@ -154,9 +220,31 @@ function RootLayout() {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async ({ location }) => {
+    if (location.pathname === "/login") {
+      return;
+    }
+
+    const { data: sessionData } = await authClient.getSession();
+
+    if (!sessionData) {
+      throw redirect({
+        to: "/login",
+        search: {
+          redirect: location.href,
+        },
+      });
+    }
+
+    return {
+      user: sessionData.user,
+      session: sessionData.session,
+    };
+  },
   component: () => (
     <RootDocument>
       <RootLayout />
     </RootDocument>
   ),
+  notFoundComponent: NotFound,
 });

@@ -16,7 +16,6 @@ export function AppSidebar() {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
 
-
   const handleLogout = async () => {
     try {
       await authClient.signOut();
