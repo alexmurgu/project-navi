@@ -14,6 +14,10 @@ const getSession = async () => {
   });
 };
 
+export const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
+  return await getSession();
+});
+
 export const getDashboardData = createServerFn({ method: "GET" }).handler(async () => {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");

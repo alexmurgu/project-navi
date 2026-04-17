@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { authClient } from "@/lib/auth-client";
+import { fetchSession } from "@/actions";
 
 interface AuthState {
   user: any | null;
@@ -14,12 +14,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: true,
   fetchSession: async () => {
     try {
-      const { data } = await authClient.getSession();
-      if (data) {
-        set({ user: data.user, session: data.session, loading: false });
-      } else {
-        set({ user: null, session: null, loading: false });
-      }
+      const data = await fetchSession();
+      set({ 
+        user: data?.user ?? null, 
+        session: data?.session ?? null, 
+        loading: false 
+      });
     } catch {
       set({ user: null, session: null, loading: false });
     }

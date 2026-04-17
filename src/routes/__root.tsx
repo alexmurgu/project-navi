@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { NotFound } from "@/components/not-found";
+import { RouteError } from "@/components/route-error";
+import { fetchSession } from "@/actions";
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
@@ -225,7 +227,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       return;
     }
 
-    const { data: sessionData } = await authClient.getSession();
+    const sessionData = await fetchSession();
 
     if (!sessionData) {
       throw redirect({
@@ -246,5 +248,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       <RootLayout />
     </RootDocument>
   ),
-  notFoundComponent: NotFound,
+  notFoundComponent: () => (
+    <RootDocument>
+      <NotFound />
+    </RootDocument>
+  ),
+  errorComponent: (props) => (
+    <RootDocument>
+      <RouteError {...props} />
+    </RootDocument>
+  ),
 });
