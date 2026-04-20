@@ -28,6 +28,7 @@ export type TransactionEditorItem = {
   userId?: string | null;
   date?: string | Date;
   isMonthly?: boolean;
+  status?: "pending" | "paid";
 };
 
 type UserOption = {
@@ -55,6 +56,7 @@ interface TransactionSheetProps {
     userId: string | null;
     date: string | Date;
     isMonthly?: boolean;
+    status: "pending" | "paid";
   }) => void;
   onDelete?: (id: string) => void;
   saving?: boolean;
@@ -76,6 +78,16 @@ export function TransactionSheet({
   onDelete,
   saving,
 }: TransactionSheetProps) {
+  const [isMonthly, setIsMonthly] = React.useState(false);
+  const [status, setStatus] = React.useState<"pending" | "paid">("paid");
+
+  React.useEffect(() => {
+    if (open) {
+      setIsMonthly(editingItem?.isMonthly || false);
+      setStatus(editingItem?.status || "paid");
+    }
+  }, [open, editingItem]);
+
   const title = editingItem
     ? `Edit ${mode === "expense" ? "Expense" : "Income"}`
     : `Add ${mode === "expense" ? "Expense" : "Income"}`;
@@ -93,7 +105,8 @@ export function TransactionSheet({
       category,
       userId: selectedUserId === "family" ? null : selectedUserId,
       date: String(formData.get("date") || ""),
-      isMonthly: editingItem?.isMonthly,
+      isMonthly: mode === "expense" ? isMonthly : false,
+      status: status,
     });
   };
 
@@ -212,6 +225,62 @@ export function TransactionSheet({
                 setCategory(value);
               }}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {isMonthly && (
+              <div className="space-y-3">
+                <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
+                  Status
+                </Label>
+                <div className="flex bg-secondary/40 rounded-xl p-1">
+                  <button
+                    type="button"
+                    onClick={() => setStatus("paid")}
+                    className={cn(
+                      "flex-1 h-10 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                      status === "paid" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground opacity-40"
+                    )}
+                  >
+                    Paid
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStatus("pending")}
+                    className={cn(
+                      "flex-1 h-10 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                      status === "pending" ? "bg-background shadow-sm text-amber-600" : "text-muted-foreground opacity-40"
+                    )}
+                  >
+                    Pending
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {mode === "expense" && (
+              <div className={cn("space-y-3", !isMonthly && "col-span-2")}>
+                <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
+                  Recurring
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextValue = !isMonthly;
+                    setIsMonthly(nextValue);
+                    if (!nextValue) setStatus("paid"); // Reset status to paid if switched to one-time
+                  }}
+                  className={cn(
+                    "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
+                    isMonthly 
+                      ? "bg-foreground text-background border-foreground shadow-lg" 
+                      : "bg-secondary/40 text-muted-foreground border-transparent opacity-40"
+                  )}
+                >
+                  {isMonthly ? "Every Month" : "One-time"}
+                </button>
+              </div>
+            )}
           </div>
 
           <div className={cn("pt-6", showDelete ? "grid grid-cols-2 gap-4" : "flex")}>

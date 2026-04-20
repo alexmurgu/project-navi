@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { User as UserIcon } from "lucide-react";
+import { User as UserIcon, Check } from "lucide-react";
 import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -19,6 +19,7 @@ import {
   addIncome,
   updateIncome,
   deleteIncome,
+  updateTransactionStatus,
 } from "./actions";
 
 interface User {
@@ -36,6 +37,7 @@ interface Transaction {
   userName: string;
   type: "expense" | "income";
   isMonthly?: boolean;
+  status?: "pending" | "paid";
 }
 interface PageProps {
   data: {
@@ -126,6 +128,14 @@ export function DashboardContent({ data }: PageProps) {
     },
   });
 
+  const updateStatusMutation = useMutation({
+    mutationFn: (d: { id: string; type: "expense" | "income"; status: "pending" | "paid" }) =>
+      updateTransactionStatus({ data: d }),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+    },
+  });
+
   const allItems = useMemo(
     () => [
       ...data.expenses.map((e) => ({ ...e, type: "expense" as const })),
@@ -169,7 +179,10 @@ export function DashboardContent({ data }: PageProps) {
     const map = new Map<string, { amount: number; count: number }>();
 
     data.expenses
-      .filter((exp) => isWithinInterval(new Date(exp.date), { start, end }))
+      .filter(
+        (exp) =>
+          (exp as any).status !== "pending" && isWithinInterval(new Date(exp.date), { start, end }),
+      )
       .forEach((exp) => {
         const current = map.get(exp.category) || { amount: 0, count: 0 };
         map.set(exp.category, {
@@ -355,9 +368,16 @@ export function DashboardContent({ data }: PageProps) {
                             />
                           </div>
                           <div className="space-y-0.5">
-                            <p className="font-bold text-sm tracking-tight text-foreground">
-                              {tx.description}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-sm tracking-tight text-foreground">
+                                {tx.description}
+                              </p>
+                              {tx.status === "pending" && (
+                                <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 text-[8px] font-black uppercase tracking-widest">
+                                  Pending
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-2">
                               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">
                                 {tx.category}
@@ -369,16 +389,37 @@ export function DashboardContent({ data }: PageProps) {
                             </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p
-                            className={cn(
-                              "font-black text-sm tracking-tight",
-                              tx.type === "expense" ? "text-rose-600" : "text-emerald-600",
-                            )}
-                          >
-                            {tx.type === "expense" ? "-" : "+"}
-                            {formatCurrency(tx.amount)}
-                          </p>
+                        <div className="text-right flex items-center gap-3 shrink-0">
+                          <div>
+                            <p
+                              className={cn(
+                                "font-black text-sm tracking-tight",
+                                tx.status === "pending"
+                                  ? "text-muted-foreground opacity-40"
+                                  : tx.type === "expense"
+                                    ? "text-rose-600"
+                                    : "text-emerald-600",
+                              )}
+                            >
+                              {tx.type === "expense" ? "-" : "+"}
+                              {formatCurrency(tx.amount)}
+                            </p>
+                          </div>
+                          {tx.status === "pending" && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateStatusMutation.mutate({
+                                  id: tx.id,
+                                  type: tx.type,
+                                  status: "paid",
+                                });
+                              }}
+                              className="size-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center hover:bg-emerald-500/20 transition-all shadow-sm"
+                            >
+                              <Check className="size-4" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );

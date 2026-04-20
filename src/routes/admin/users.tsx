@@ -24,5 +24,5 @@ function AdminUsersPage() {
 
   const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
 
-  return <UsersContent allUsers={users} adminEmail={adminEmail} currentUserEmail={user.email} />;
+  return <UsersContent allUsers={users} adminEmail={adminEmail} />;
 }

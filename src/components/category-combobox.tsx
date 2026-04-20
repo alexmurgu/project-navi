@@ -78,7 +78,7 @@ export function CategoryCombobox({
             placeholder="Search categories..."
             value={searchValue}
             onValueChange={setSearchValue}
-            className="h-10 border-none bg-transparent text-sm font-bold"
+            className="h-10 border-none bg-transparent text-base font-bold"
           />
           <CommandList id={listboxId} className="max-h-[300px] overflow-y-auto text-left">
             <CommandEmpty className="px-6 py-4 text-left text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">

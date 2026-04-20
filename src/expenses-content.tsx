@@ -9,6 +9,7 @@ import {
   Users,
   User as UserIcon,
   Save,
+  Check,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
@@ -30,6 +31,7 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CategoryCombobox } from "@/components/category-combobox";
+import { TransactionSheet } from "@/components/transaction-sheet";
 import {
   CategoryIcon,
   getCategoryConfig,
@@ -37,7 +39,7 @@ import {
   withAlpha,
 } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { addExpense, updateExpense, deleteExpense } from "./actions";
+import { addExpense, updateExpense, deleteExpense, updateTransactionStatus } from "./actions";
 
 interface User {
   id: string;
@@ -54,6 +56,7 @@ interface Transaction {
   userName: string;
   type: "expense" | "income";
   isMonthly?: boolean;
+  status?: "pending" | "paid";
 }
 interface PageProps {
   data: {
@@ -110,6 +113,14 @@ export function ExpensesContent({ data }: PageProps) {
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
       setExpenseSheetOpen(false);
+    },
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: (d: { id: string; type: "expense" | "income"; status: "pending" | "paid" }) =>
+      updateTransactionStatus({ data: d }),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
     },
   });
 
@@ -304,13 +315,37 @@ export function ExpensesContent({ data }: PageProps) {
                 {format(new Date(item.date), "MMM dd, yyyy")}
               </div>
 
-              <div className="text-right w-32 shrink-0">
-                <p className="font-black text-lg tracking-tight text-rose-600">
-                  -{formatCurrency(item.amount)}
-                </p>
-                <p className="md:hidden text-[9px] font-black uppercase text-muted-foreground opacity-20 mt-0.5">
-                  {format(new Date(item.date), "MMM dd")}
-                </p>
+              <div className="text-right w-32 shrink-0 flex items-center gap-3 justify-end">
+                <div>
+                  <p
+                    className={cn(
+                      "font-black text-lg tracking-tight",
+                      item.status === "pending"
+                        ? "text-muted-foreground opacity-40"
+                        : "text-rose-600",
+                    )}
+                  >
+                    -{formatCurrency(item.amount)}
+                  </p>
+                  <p className="md:hidden text-[9px] font-black uppercase text-muted-foreground opacity-20 mt-0.5">
+                    {format(new Date(item.date), "MMM dd")}
+                  </p>
+                </div>
+                {item.status === "pending" && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      updateStatusMutation.mutate({
+                        id: item.id,
+                        type: "expense",
+                        status: "paid",
+                      });
+                    }}
+                    className="size-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center hover:bg-emerald-500/20 transition-all shadow-sm"
+                  >
+                    <Check className="size-4" />
+                  </button>
+                )}
               </div>
 
               {/* Actions visible on hover */}
@@ -375,178 +410,28 @@ export function ExpensesContent({ data }: PageProps) {
         </div>
       )}
 
-      <Sheet open={expenseSheetOpen} onOpenChange={setExpenseSheetOpen}>
-        <SheetContent
-          side="bottom"
-          className="h-[90vh] sm:h-fit sm:side-right border-t sm:border-l rounded-t-2xl sm:rounded-l-2xl p-8 pb-12 shadow-2xl border-none"
-        >
-          <SheetHeader className="mb-10 text-left">
-            <SheetTitle className="text-3xl font-black tracking-tighter uppercase italic">
-              {editingItem ? "Edit Expense" : "Add Expense"}
-            </SheetTitle>
-          </SheetHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const d = {
-                id: editingItem?.id,
-                description: formData.get("description"),
-                amount: Math.round(parseFloat(formData.get("amount") as string) * 100),
-                category: expenseCategory,
-                isMonthly: selectedExpenseType === "monthly",
-                userId: selectedUserId === "family" ? null : selectedUserId,
-                date: formData.get("date"),
-              };
-              if (editingItem) {
-                updateExpenseMutation.mutate(d);
-              } else {
-                addExpenseMutation.mutate(d);
-              }
-            }}
-            className="space-y-8"
-          >
-            <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-1">
-                Member
-              </Label>
-              <div className="flex flex-wrap gap-3">
-                {data.users.map((u) => (
-                  <button
-                    key={u.id}
-                    type="button"
-                    onClick={() => setSelectedUserId(u.id)}
-                    className={cn(
-                      "size-12 rounded-xl border flex items-center justify-center text-sm font-black transition-all",
-                      selectedUserId === u.id
-                        ? "bg-foreground text-background border-foreground shadow-lg"
-                        : "bg-muted/10 text-muted-foreground border-transparent hover:bg-muted/20",
-                    )}
-                  >
-                    {u.name[0]}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => setSelectedUserId("family")}
-                  className={cn(
-                    "size-12 rounded-xl border flex items-center justify-center transition-all",
-                    selectedUserId === "family"
-                      ? "bg-foreground text-background border-foreground shadow-lg"
-                      : "bg-muted/10 text-muted-foreground border-transparent hover:bg-muted/20",
-                  )}
-                >
-                  <Users className="size-5" />
-                </button>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">
-                  Amount (EUR)
-                </Label>
-                <Input
-                  name="amount"
-                  type="number"
-                  step="0.01"
-                  required
-                  defaultValue={editingItem ? editingItem.amount / 100 : ""}
-                  className="h-14 rounded-xl bg-secondary/40 border-none font-black text-2xl px-6 focus-visible:ring-primary/20 shadow-inner"
-                />
-              </div>
-              <div className="space-y-3">
-                <Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">
-                  Date
-                </Label>
-                <Input
-                  name="date"
-                  type="date"
-                  required
-                  defaultValue={
-                    editingItem
-                      ? new Date(editingItem.date).toISOString().split("T")[0]
-                      : new Date().toISOString().split("T")[0]
-                  }
-                  className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner"
-                />
-              </div>
-            </div>
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">
-                Description
-              </Label>
-              <Input
-                name="description"
-                required
-                defaultValue={editingItem?.description || ""}
-                className="h-14 rounded-xl bg-secondary/40 border-none px-6 font-bold shadow-inner"
-              />
-            </div>
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">
-                Category
-              </Label>
-              <CategoryCombobox
-                kind="expense"
-                value={expenseCategory}
-                options={availableCategories}
-                onChange={(val) => {
-                  if (val && !availableCategories.includes(val))
-                    setAvailableCategories((prev) => [...prev, val]);
-                  setExpenseCategory(val);
-                }}
-              />
-            </div>
-            <div className={cn("pt-6", editingItem ? "grid grid-cols-2 gap-4" : "flex")}>
-              {editingItem && (
-                <AlertDialog>
-                  <AlertDialogTrigger
-                    render={
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        className="h-14 w-full rounded-xl font-black bg-rose-600 text-white shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest border-none px-0 sm:px-4"
-                      >
-                        <Trash2 className="size-4" />
-                        <span className="hidden sm:inline">Delete</span>
-                      </Button>
-                    }
-                  />
-                  <AlertDialogContent className="rounded-2xl p-8 border-none shadow-2xl">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-2xl font-black tracking-tight uppercase italic">
-                        Delete Expense
-                      </AlertDialogTitle>
-                      <AlertDialogDescription className="text-xs font-bold opacity-50 mt-2 uppercase">
-                        Are you sure you want to delete this expense?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="mt-8 gap-3">
-                      <AlertDialogCancel className="h-12 rounded-xl font-black text-[10px] uppercase tracking-widest border-none bg-muted/10">
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => editingItem && deleteExpenseMutation.mutate(editingItem.id)}
-                        className="h-12 rounded-xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest border-none"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              )}
-              <Button
-                type="submit"
-                disabled={addExpenseMutation.isPending || updateExpenseMutation.isPending}
-                className="h-14 flex-1 rounded-xl font-black bg-foreground text-background shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all text-[10px] uppercase tracking-widest border-none px-0 sm:px-4"
-              >
-                <Save className="size-4" />
-                <span className="hidden sm:inline">Save</span>
-              </Button>
-            </div>
-          </form>
-        </SheetContent>
-      </Sheet>
+      <TransactionSheet
+        mode="expense"
+        open={expenseSheetOpen}
+        onOpenChange={setExpenseSheetOpen}
+        editingItem={editingItem}
+        users={data.users}
+        selectedUserId={selectedUserId}
+        setSelectedUserId={setSelectedUserId}
+        category={expenseCategory}
+        setCategory={setExpenseCategory}
+        availableCategories={availableCategories}
+        setAvailableCategories={setAvailableCategories}
+        onSubmit={(d) => {
+          if (editingItem) {
+            updateExpenseMutation.mutate(d);
+          } else {
+            addExpenseMutation.mutate(d);
+          }
+        }}
+        onDelete={(id) => deleteExpenseMutation.mutate(id)}
+        saving={addExpenseMutation.isPending || updateExpenseMutation.isPending}
+      />
     </div>
   );
 }

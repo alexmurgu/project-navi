@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "./db";
 import { expense, income, user as userSchema, categoryConfig } from "./db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and, isNotNull, desc } from "drizzle-orm";
 import { auth } from "./auth";
 import { getRequest } from "@tanstack/react-start/server";
+import { addMonths, isBefore, startOfMonth } from "date-fns";
 
 // Middleware-like session helper for server functions
 const getSession = async () => {
@@ -14,6 +15,62 @@ const getSession = async () => {
   });
 };
 
+const syncRecurringExpenses = async () => {
+  // Find all expenses that are recurring
+  const recurringTemplates = await db
+    .select()
+    .from(expense)
+    .where(and(eq(expense.isMonthly, true), isNotNull(expense.recurrenceId)));
+
+  const now = new Date();
+  const currentMonthStart = startOfMonth(now);
+
+  for (const template of recurringTemplates) {
+    // Find the latest instance for this recurrenceId
+    const [latestInstance] = await db
+      .select()
+      .from(expense)
+      .where(eq(expense.recurrenceId, template.recurrenceId!))
+      .orderBy(desc(expense.date))
+      .limit(1);
+
+    if (!latestInstance) continue;
+
+    let nextDate = addMonths(new Date(latestInstance.date), 1);
+
+    // Generate instances up to the current month
+    while (isBefore(startOfMonth(nextDate), currentMonthStart) || 
+           startOfMonth(nextDate).getTime() === currentMonthStart.getTime()) {
+      
+      // Check if we already created it (extra safety)
+      const [exists] = await db
+        .select()
+        .from(expense)
+        .where(and(
+          eq(expense.recurrenceId, template.recurrenceId!),
+          sql`strftime('%m-%Y', ${expense.date} / 1000, 'unixepoch') = ${sql.placeholder('monthYear')}`
+        ))
+        .limit(1)
+        .prepare()
+        .execute({ monthYear: `${nextDate.getMonth() + 1}-${nextDate.getFullYear()}` });
+
+      if (!exists) {
+        await db.insert(expense).values({
+          userId: template.userId,
+          description: template.description,
+          amount: template.amount,
+          category: template.category,
+          date: nextDate,
+          isMonthly: true,
+          status: "pending",
+          recurrenceId: template.recurrenceId,
+        });
+      }
+      nextDate = addMonths(nextDate, 1);
+    }
+  }
+};
+
 export const fetchSession = createServerFn({ method: "GET" }).handler(async () => {
   return await getSession();
 });
@@ -21,6 +78,8 @@ export const fetchSession = createServerFn({ method: "GET" }).handler(async () =
 export const getDashboardData = createServerFn({ method: "GET" }).handler(async () => {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
+
+  await syncRecurringExpenses();
 
   const expenses = await db
     .select({
@@ -30,6 +89,8 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
       category: expense.category,
       date: expense.date,
       isMonthly: expense.isMonthly,
+      status: expense.status,
+      recurrenceId: expense.recurrenceId,
       userId: expense.userId,
       userName: sql<string>`COALESCE(${userSchema.name}, 'Family Wide')`,
     })
@@ -43,6 +104,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
       amount: income.amount,
       category: income.category,
       date: income.date,
+      status: income.status,
       userId: income.userId,
       userName: sql<string>`COALESCE(${userSchema.name}, 'Family Wide')`,
     })
@@ -72,6 +134,8 @@ export const addExpense = createServerFn({ method: "POST" })
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
 
+    const recurrenceId = data.isMonthly ? crypto.randomUUID() : null;
+
     await db.insert(expense).values({
       userId: data.userId === "family" ? null : data.userId || session.user.id,
       description: data.description,
@@ -79,6 +143,8 @@ export const addExpense = createServerFn({ method: "POST" })
       category: data.category,
       isMonthly: data.isMonthly || false,
       date: data.date ? new Date(data.date) : new Date(),
+      status: data.status || "paid",
+      recurrenceId,
     });
     return { success: true };
   });
@@ -90,6 +156,16 @@ export const updateExpense = createServerFn({ method: "POST" }) // Start uses PO
     if (!session) throw new Error("Unauthorized");
 
     const { id, ...updateData } = data;
+    
+    // If it's turning into a monthly expense and didn't have a recurrenceId, give it one
+    const [existing] = await db.select().from(expense).where(eq(expense.id, id)).limit(1);
+    let recurrenceId = existing.recurrenceId;
+    if (updateData.isMonthly && !recurrenceId) {
+      recurrenceId = crypto.randomUUID();
+    } else if (!updateData.isMonthly) {
+      recurrenceId = null;
+    }
+
     await db
       .update(expense)
       .set({
@@ -99,11 +175,23 @@ export const updateExpense = createServerFn({ method: "POST" }) // Start uses PO
         category: updateData.category,
         isMonthly: updateData.isMonthly || false,
         date: updateData.date ? new Date(updateData.date) : new Date(),
+        status: updateData.status || "paid",
+        recurrenceId,
       })
       .where(eq(expense.id, id));
     return { success: true };
   });
 
+export const updateTransactionStatus = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; type: "expense" | "income"; status: "pending" | "paid" }) => data)
+  .handler(async ({ data }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    const table = data.type === "expense" ? expense : income;
+    await db.update(table).set({ status: data.status }).where(eq(table.id, data.id));
+    return { success: true };
+  });
 export const deleteExpense = createServerFn({ method: "POST" })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
@@ -125,6 +213,7 @@ export const addIncome = createServerFn({ method: "POST" })
       amount: Math.round(data.amount),
       category: data.category,
       date: data.date ? new Date(data.date) : new Date(),
+      status: data.status || "paid",
     });
     return { success: true };
   });
@@ -144,6 +233,7 @@ export const updateIncome = createServerFn({ method: "POST" })
         amount: Math.round(updateData.amount),
         category: updateData.category,
         date: updateData.date ? new Date(updateData.date) : new Date(),
+        status: updateData.status || "paid",
       })
       .where(eq(income.id, id));
     return { success: true };
@@ -186,6 +276,7 @@ export const bulkImportTransactions = createServerFn({ method: "POST" })
           category: tx.category,
           isMonthly: tx.isMonthly || false,
           date: new Date(tx.date),
+          status: tx.status || "paid",
         });
       } else {
         await db.insert(income).values({
@@ -194,6 +285,7 @@ export const bulkImportTransactions = createServerFn({ method: "POST" })
           amount: Math.round(tx.amount),
           category: tx.category,
           date: new Date(tx.date),
+          status: tx.status || "paid",
         });
       }
     }

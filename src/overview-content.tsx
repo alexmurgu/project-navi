@@ -28,6 +28,7 @@ interface Transaction {
   userName: string;
   type: "expense" | "income";
   isMonthly?: boolean;
+  status?: "pending" | "paid";
 }
 
 type DashboardData = {
@@ -102,10 +103,11 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
   }, [allItems, categoryKind, mode]);
 
   const stats = useMemo(() => {
-    const totalIncome = filteredTransactions
+    const paidItems = filteredTransactions.filter((item) => (item as any).status !== "pending");
+    const totalIncome = paidItems
       .filter((item) => item.type === "income")
       .reduce((acc, curr) => acc + curr.amount, 0);
-    const totalExpense = filteredTransactions
+    const totalExpense = paidItems
       .filter((item) => item.type === "expense")
       .reduce((acc, curr) => acc + curr.amount, 0);
     return {
@@ -124,6 +126,7 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
 
     data.expenses
       .filter((exp) => {
+        if ((exp as any).status === "pending") return false;
         const matchesMonth = isWithinInterval(new Date(exp.date), { start, end });
         if (!matchesMonth) return false;
         if (mode.type === "member") {
@@ -152,7 +155,7 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
       categoryKind === "income" ? data.incomes : categoryKind === "expense" ? data.expenses : [];
 
     relevantItems
-      .filter((item) => item.category === mode.category)
+      .filter((item) => item.category === mode.category && (item as any).status !== "pending")
       .forEach((item) => {
         const key = item.userId || "family";
         const current = map.get(key) || {
@@ -379,9 +382,16 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-sm tracking-tight truncate">
-                        {item.description}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-sm tracking-tight truncate">
+                          {item.description}
+                        </p>
+                        {item.status === "pending" && (
+                          <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 text-[8px] font-black uppercase tracking-widest shrink-0">
+                            Pending
+                          </span>
+                        )}
+                      </div>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
                         <span>{item.category}</span>
                         <span>•</span>
@@ -394,7 +404,11 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
                   <p
                     className={cn(
                       "font-black text-sm tracking-tight shrink-0",
-                      item.type === "expense" ? "text-rose-600" : "text-emerald-600",
+                      item.status === "pending"
+                        ? "text-muted-foreground opacity-40"
+                        : item.type === "expense"
+                          ? "text-rose-600"
+                          : "text-emerald-600",
                     )}
                   >
                     {item.type === "expense" ? "-" : "+"}

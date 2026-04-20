@@ -114,6 +114,8 @@ export const expense = sqliteTable("expense", {
     .notNull()
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
   isMonthly: integer("is_monthly", { mode: "boolean" }).notNull().default(false),
+  status: text("status", { enum: ["pending", "paid"] }).notNull().default("paid"),
+  recurrenceId: text("recurrence_id"),
 });
 
 export const income = sqliteTable("income", {
@@ -127,6 +129,7 @@ export const income = sqliteTable("income", {
   date: integer("date", { mode: "timestamp" })
     .notNull()
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`),
+  status: text("status", { enum: ["pending", "paid"] }).notNull().default("paid"),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
