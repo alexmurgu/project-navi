@@ -5,13 +5,13 @@ import { useRequireAuth } from "@/hooks/use-auth-guard";
 import { getDashboardData } from "../actions";
 
 export const Route = createFileRoute("/expenses")({
+  loader: () => getDashboardData(),
   head: () => ({
     meta: [
       { title: "Expenses | Aftermind" },
       { name: "description", content: "Track and manage your outgoing expenses." },
     ],
   }),
-  loader: () => getDashboardData(),
   component: ExpensesPage,
 });
 
