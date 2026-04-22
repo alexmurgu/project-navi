@@ -61,6 +61,7 @@ export function DashboardContent({ data }: PageProps) {
 
   const [expenseSheetOpen, setExpenseSheetOpen] = useState(false);
   const [incomeSheetOpen, setIncomeSheetOpen] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const [availableExpenseCategories, setAvailableExpenseCategories] = useState<string[]>(
     data.expenseCategories,
   );
@@ -264,65 +265,81 @@ export function DashboardContent({ data }: PageProps) {
                 No expenses recorded for this month yet.
               </div>
             ) : (
-              currentMonthCategoryData.items.map((item) => {
-                const config = getCategoryConfig(categoryConfigMap, item.name);
-                const color = config?.color || "#14B8A6";
-                const bgColor = withAlpha(color, 0.05);
-                const share = currentMonthCategoryData.total
-                  ? Math.max(4, (item.amount / currentMonthCategoryData.total) * 100)
-                  : 0;
+              <>
+                {(showAllCategories
+                  ? currentMonthCategoryData.items
+                  : currentMonthCategoryData.items.slice(0, 3)
+                ).map((item) => {
+                  const config = getCategoryConfig(categoryConfigMap, item.name);
+                  const color = config?.color || "#14B8A6";
+                  const bgColor = withAlpha(color, 0.05);
+                  const share = currentMonthCategoryData.total
+                    ? Math.max(4, (item.amount / currentMonthCategoryData.total) * 100)
+                    : 0;
 
-                return (
-                  <button
-                    type="button"
-                    key={item.name}
-                    className="relative flex w-full flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group overflow-hidden text-left cursor-pointer"
-                    style={{
-                      backgroundImage: `linear-gradient(90deg, ${withAlpha(color, 0.22)} 0%, ${withAlpha(
-                        color,
-                        0.22,
-                      )} ${share}%, ${bgColor} ${share}%, ${bgColor} 100%)`,
-                    }}
-                    onClick={() =>
-                      navigate({ to: "/categories/$category", params: { category: item.name } })
-                    }
-                  >
-                    <div className="relative z-10 flex items-center justify-between gap-4 min-w-0">
-                      <div className="flex items-center gap-4 min-w-0">
-                        <div className="size-11 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6 shrink-0">
-                          <CategoryIcon
-                            category={item.name}
-                            config={config}
-                            kind="expense"
-                            className="size-6"
-                            color={color}
-                          />
-                        </div>
-                        <div className="space-y-0.5 min-w-0">
-                          <p className="font-bold text-sm tracking-tight text-foreground truncate">
-                            {item.name}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">
-                              {item.count} {item.count === 1 ? "transaction" : "transactions"}
+                  return (
+                    <button
+                      type="button"
+                      key={item.name}
+                      className="relative flex w-full flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group overflow-hidden text-left cursor-pointer"
+                      style={{
+                        backgroundImage: `linear-gradient(90deg, ${withAlpha(
+                          color,
+                          0.22,
+                        )} 0%, ${withAlpha(color, 0.22)} ${share}%, ${bgColor} ${share}%, ${bgColor} 100%)`,
+                      }}
+                      onClick={() =>
+                        navigate({ to: "/categories/$category", params: { category: item.name } })
+                      }
+                    >
+                      <div className="relative z-10 flex items-center justify-between gap-4 min-w-0">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="size-11 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6 shrink-0">
+                            <CategoryIcon
+                              category={item.name}
+                              config={config}
+                              kind="expense"
+                              className="size-6"
+                              color={color}
+                            />
+                          </div>
+                          <div className="space-y-0.5 min-w-0">
+                            <p className="font-bold text-sm tracking-tight text-foreground truncate">
+                              {item.name}
                             </p>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-                              {Math.round((item.amount / currentMonthCategoryData.total) * 100) ||
-                                0}
-                              % of month
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">
+                                {item.count} {item.count === 1 ? "transaction" : "transactions"}
+                              </p>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                                {Math.round((item.amount / currentMonthCategoryData.total) * 100) ||
+                                  0}
+                                % of month
+                              </p>
+                            </div>
                           </div>
                         </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-black text-sm tracking-tight text-foreground">
+                            {formatCurrency(item.amount)}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right shrink-0">
-                        <p className="font-black text-sm tracking-tight text-foreground">
-                          {formatCurrency(item.amount)}
-                        </p>
-                      </div>
-                    </div>
+                    </button>
+                  );
+                })}
+                {currentMonthCategoryData.items.length > 3 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllCategories(!showAllCategories)}
+                    className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-primary transition-colors text-center"
+                  >
+                    {showAllCategories
+                      ? "Show less"
+                      : `Show ${currentMonthCategoryData.items.length - 3} more categories`}
                   </button>
-                );
-              })
+                )}
+              </>
             )}
           </div>
         </section>
