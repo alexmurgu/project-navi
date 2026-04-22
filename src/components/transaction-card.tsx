@@ -54,15 +54,21 @@ export function TransactionCard({
       }}
     >
       <div className="flex items-center gap-4 md:gap-5 flex-1 min-w-0">
-        {/* Icon Circle */}
-        <div className="size-12 md:size-14 rounded-full flex items-center justify-center shrink-0 bg-navi-surface">
+        {/* Category Squircle */}
+        <div
+          className="size-12 md:size-14 rounded-[18px] flex items-center justify-center shrink-0 border transition-colors"
+          style={{
+            backgroundColor: withAlpha(color, 0.05),
+            borderColor: withAlpha(color, 0.1),
+          }}
+        >
           <CategoryIcon
             category={transaction.category}
             config={config}
             kind={transaction.type}
             className="size-5 md:size-6"
             color={color}
-            strokeWidth={1.5}
+            strokeWidth={1.2}
           />
         </div>
 
@@ -104,7 +110,7 @@ export function TransactionCard({
           }}
           className="ml-4 size-10 md:size-12 rounded-full bg-navi-teal text-white flex items-center justify-center hover:opacity-90 transition-all shrink-0"
         >
-          <Check className="size-5 md:size-6" strokeWidth={1} />
+          <Check className="size-5 md:size-6" strokeWidth={1.2} />
         </button>
       )}
     </div>
