@@ -1,19 +1,11 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Trash2, UserPlus, ShieldCheck } from "lucide-react";
+import { Trash2, UserPlus, ShieldCheck, Mail, Lock, User as UserIcon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addAdminUser, deleteAdminUser } from "../actions";
+import { cn } from "@/lib/utils";
 
 interface UsersContentProps {
   allUsers: any[];
@@ -49,131 +41,160 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl flex-1 space-y-6 p-4 pt-6 md:p-8 bg-background text-foreground antialiased">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 h-fit rounded-xl shadow-sm border bg-card lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-              <UserPlus className="h-5 w-5 text-muted-foreground" />
-              Add Family Member
-            </CardTitle>
-            <CardDescription>Create a new account for a member of your family.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreateUser} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">
-                  Full Name
-                </Label>
-                <Input
-                  type="text"
-                  name="name"
-                  id="name"
-                  required
-                  placeholder="e.g. Maria"
-                  className="h-10 rounded-lg shadow-sm bg-background border"
-                />
-              </div>
+    <div className="w-full min-h-screen flex flex-col bg-white antialiased">
+      {/* High-Impact Header */}
+      <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
+        <div className="space-y-4 relative z-10">
+          <p className="text-[12px] font-display font-medium uppercase tracking-[0.25em] opacity-50">
+            Access Control
+          </p>
+          <h1 className="text-[64px] md:text-[80px] font-display font-medium leading-[0.9] tracking-[-0.04em]">
+            Members
+          </h1>
+        </div>
+      </section>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email Address
-                </Label>
-                <Input
-                  type="email"
-                  name="email"
-                  id="email"
-                  required
-                  placeholder="maria@example.com"
-                  className="h-10 rounded-lg shadow-sm bg-background border"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Initial Password
-                </Label>
-                <Input
-                  type="password"
-                  name="password"
-                  id="password"
-                  required
-                  minLength={8}
-                  placeholder="Minimum 8 characters"
-                  className="h-10 rounded-lg shadow-sm bg-background border"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={createUserMutation.isPending}
-                className="mt-4 w-full h-10 rounded-lg shadow-sm font-medium transition-all"
-              >
-                {createUserMutation.isPending ? "Creating..." : "Create Account"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-4 rounded-xl shadow-sm border bg-card">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Registered Members</CardTitle>
-            <CardDescription>Family members with access to the protocol.</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {allUsers.map((u) => (
-                    <TableRow key={u.id} className="group transition-colors">
-                      <TableCell className="font-medium text-sm">
-                        <div className="flex items-center gap-2">
-                          {u.email === adminEmail && (
-                            <ShieldCheck className="h-4 w-4 text-primary" />
-                          )}
-                          {u.name}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">{u.email}</TableCell>
-                      <TableCell>
-                        <div
-                          className={`inline-flex items-center border px-2.5 py-0.5 text-xs font-semibold rounded-md transition-colors ${
-                            u.email === adminEmail
-                              ? "border-transparent bg-primary text-primary-foreground"
-                              : "border-border bg-secondary text-secondary-foreground"
-                          }`}
-                        >
-                          {u.email === adminEmail ? "Admin" : "Member"}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {u.email !== adminEmail && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteUserMutation.mutate(u.id)}
-                            disabled={deleteUserMutation.isPending}
-                            className="h-8 w-8 text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+      <div className="p-6 md:p-12 space-y-20 max-w-7xl">
+        <div className="grid gap-16 lg:grid-cols-12 items-start">
+          {/* Add Member Section */}
+          <section className="lg:col-span-5 space-y-8">
+            <div className="flex items-center gap-4 px-2">
+              <div className="h-1.5 w-8 bg-navi-blue rounded-full" />
+              <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+                Add Member
+              </h3>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="bg-navi-surface p-8 rounded-[32px] border border-navi-border/20">
+              <form onSubmit={handleCreateUser} className="space-y-6">
+                <div className="space-y-3">
+                  <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                    Full Name
+                  </Label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+                    <Input
+                      type="text"
+                      name="name"
+                      required
+                      placeholder="e.g. Maria"
+                      className="h-14 rounded-2xl border-none bg-white px-12 font-display font-medium text-navi-dark shadow-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                    Email Address
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+                    <Input
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="maria@example.com"
+                      className="h-14 rounded-2xl border-none bg-white px-12 font-display font-medium text-navi-dark shadow-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                    Access Key
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+                    <Input
+                      type="password"
+                      name="password"
+                      required
+                      minLength={8}
+                      placeholder="••••••••"
+                      className="h-14 rounded-2xl border-none bg-white px-12 font-display font-medium text-navi-dark shadow-sm"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={createUserMutation.isPending}
+                  className="w-full h-16 rounded-full bg-navi-dark text-white font-display font-medium uppercase tracking-[0.2em] hover:opacity-90 active:scale-[0.98] transition-all"
+                >
+                  <UserPlus className="size-5 mr-2" strokeWidth={1} />
+                  {createUserMutation.isPending ? "Syncing..." : "Create Account"}
+                </Button>
+              </form>
+            </div>
+          </section>
+
+          {/* Members List Section */}
+          <section className="lg:col-span-7 space-y-8">
+            <div className="flex items-center gap-4 px-2">
+              <div className="h-1.5 w-8 bg-navi-teal rounded-full" />
+              <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+                Registered
+              </h3>
+            </div>
+
+            <div className="grid gap-4">
+              {allUsers.map((user) => {
+                const isAdmin = user.email === adminEmail;
+                return (
+                  <div
+                    key={user.id}
+                    className="group relative flex items-center justify-between p-6 rounded-[24px] bg-navi-surface transition-all active:scale-[0.995]"
+                  >
+                    <div className="flex items-center gap-6">
+                      <div 
+                        className={cn(
+                          "size-14 rounded-full flex items-center justify-center bg-white shadow-sm",
+                          isAdmin ? "text-navi-blue" : "text-navi-dark"
+                        )}
+                      >
+                        <UserIcon className="size-6" strokeWidth={1} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-3">
+                          <h4 className="text-[18px] font-display font-medium text-navi-dark tracking-tight truncate">
+                            {user.name}
+                          </h4>
+                          {isAdmin && (
+                            <span className="px-2 py-0.5 rounded-full bg-navi-blue/10 text-navi-blue text-[9px] font-display font-medium uppercase tracking-widest">
+                              Admin
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] font-display font-medium uppercase tracking-widest text-navi-gray/60 mt-1 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      {isAdmin ? (
+                        <div className="size-10 rounded-full flex items-center justify-center text-navi-blue bg-navi-blue/5">
+                          <ShieldCheck className="size-5" strokeWidth={1} />
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            if (confirm(`Remove access for ${user.name}?`)) {
+                              deleteUserMutation.mutate(user.id);
+                            }
+                          }}
+                          className="size-10 rounded-full bg-white flex items-center justify-center text-navi-danger opacity-0 group-hover:opacity-100 transition-opacity hover:bg-navi-danger hover:text-white"
+                        >
+                          <Trash2 className="size-4" strokeWidth={1} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );
