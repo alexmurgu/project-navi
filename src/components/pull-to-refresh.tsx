@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useReducer } from "react";
 import { RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,11 +10,31 @@ interface PullToRefreshProps {
 }
 
 export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [state, dispatch] = useReducer(
+    (
+      state: { pullDistance: number; isRefreshing: boolean; isEnabled: boolean },
+      action: { type: string; payload?: any }
+    ) => {
+      switch (action.type) {
+        case "SET_ENABLED":
+          return { ...state, isEnabled: action.payload };
+        case "SET_PULL_DISTANCE":
+          return { ...state, pullDistance: action.payload };
+        case "START_REFRESH":
+          return { ...state, isRefreshing: true, pullDistance: action.payload };
+        case "STOP_REFRESH":
+          return { ...state, isRefreshing: false, pullDistance: 0 };
+        default:
+          return state;
+      }
+    },
+    { pullDistance: 0, isRefreshing: false, isEnabled: true }
+  );
+
+  const { pullDistance, isRefreshing, isEnabled } = state;
+
   const startY = useRef(0);
   const isPulling = useRef(false);
-  const [isEnabled, setIsEnabled] = useState(true);
 
   const PULL_THRESHOLD = 70;
   const MAX_PULL = 120;
@@ -23,10 +43,10 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
     const handleTouchStart = (e: TouchEvent) => {
       // Only trigger if we are at the top of the page
       if (window.scrollY > 5) {
-        setIsEnabled(false);
+        dispatch({ type: "SET_ENABLED", payload: false });
         return;
       }
-      setIsEnabled(true);
+      dispatch({ type: "SET_ENABLED", payload: true });
       startY.current = e.touches[0].pageY;
       isPulling.current = true;
     };
@@ -40,7 +60,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
       if (diff > 0) {
         // Apply resistance
         const distance = Math.min(diff * 0.4, MAX_PULL);
-        setPullDistance(distance);
+        dispatch({ type: "SET_PULL_DISTANCE", payload: distance });
         
         // Prevent browser's native pull-to-refresh if we are handling it
         if (diff > 10 && e.cancelable) {
@@ -48,7 +68,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
         }
       } else {
         isPulling.current = false;
-        setPullDistance(0);
+        dispatch({ type: "SET_PULL_DISTANCE", payload: 0 });
       }
     };
 
@@ -57,18 +77,16 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
       isPulling.current = false;
 
       if (pullDistance >= PULL_THRESHOLD) {
-        setIsRefreshing(true);
-        setPullDistance(PULL_THRESHOLD);
+        dispatch({ type: "START_REFRESH", payload: PULL_THRESHOLD });
         try {
           await onRefresh();
         } catch (error) {
           console.error("Refresh failed:", error);
         } finally {
-          setIsRefreshing(false);
-          setPullDistance(0);
+          dispatch({ type: "STOP_REFRESH" });
         }
       } else {
-        setPullDistance(0);
+        dispatch({ type: "SET_PULL_DISTANCE", payload: 0 });
       }
     };
 

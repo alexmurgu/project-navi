@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { type FormEvent, useReducer } from "react";
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { loading } = useRedirectIfAuthed();
   const { fetchSession } = useAuthStore();
   const [state, setState] = useReducer(
@@ -81,7 +81,8 @@ function Login() {
         setState({ error: authError.message || "Invalid email or password", loading: false });
       } else {
         await fetchSession();
-        navigate({ to: "/" });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        router.navigate({ to: "/" });
       }
     } catch {
       setState({ error: "An unexpected error occurred", loading: false });

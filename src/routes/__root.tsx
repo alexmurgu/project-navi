@@ -48,28 +48,36 @@ interface MyRouterContext {
 function RootLayout() {
   const { queryClient } = Route.useRouteContext();
   const { fetchSession, loading, user } = useAuthStore();
-  const [quickAddOpen, setQuickAddOpen] = useState(false);
-  const [pwaUpdateAvailable, setPwaUpdateAvailable] = useState(false);
-  const [pendingRegistration, setPendingRegistration] = useState<ServiceWorkerRegistration | null>(
-    null,
-  );
-  const [refreshingForUpdate, setRefreshingForUpdate] = useState(false);
+  const [uiState, setUiState] = useState<{
+    quickAddOpen: boolean;
+    pwaUpdateAvailable: boolean;
+    refreshingForUpdate: boolean;
+    pendingRegistration: ServiceWorkerRegistration | null;
+  }>({
+    quickAddOpen: false,
+    pwaUpdateAvailable: false,
+    refreshingForUpdate: false,
+    pendingRegistration: null,
+  });
 
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
 
   useEffect(() => {
-    const handleOpenQuickAddChoice = () => setQuickAddOpen(true);
+    const handleOpenQuickAddChoice = () => setUiState((prev) => ({ ...prev, quickAddOpen: true }));
     const handleUpdateAvailable = (event: Event) => {
       const customEvent = event as CustomEvent<{
         registration: ServiceWorkerRegistration;
       }>;
-      setPendingRegistration(customEvent.detail.registration);
-      setPwaUpdateAvailable(true);
+      setUiState((prev) => ({ 
+        ...prev, 
+        pendingRegistration: customEvent.detail.registration,
+        pwaUpdateAvailable: true 
+      }));
     };
     const handleControllerChange = () => {
-      if (refreshingForUpdate) {
+      if (uiState.refreshingForUpdate) {
         window.location.reload();
       }
     };
@@ -84,20 +92,20 @@ function RootLayout() {
       window.removeEventListener("pwa-update-available", handleUpdateAvailable as EventListener);
       window.removeEventListener("pwa-controller-changed", handleControllerChange);
     };
-  }, [refreshingForUpdate]);
+  }, [uiState.refreshingForUpdate]);
 
   const showDevtools = typeof window !== "undefined" && window.location.hostname === "localhost";
   const openQuickAdd = (mode: "expense" | "income") => {
-    setQuickAddOpen(false);
+    setUiState((prev) => ({ ...prev, quickAddOpen: false }));
     window.dispatchEvent(
       new CustomEvent(mode === "expense" ? "open-quick-add-expense" : "open-quick-add-income"),
     );
   };
 
   const updateApp = () => {
-    if (!pendingRegistration?.waiting) return;
-    setRefreshingForUpdate(true);
-    pendingRegistration.waiting.postMessage({ type: "SKIP_WAITING" });
+    if (!uiState.pendingRegistration?.waiting) return;
+    setUiState((prev) => ({ ...prev, refreshingForUpdate: true }));
+    uiState.pendingRegistration.waiting.postMessage({ type: "SKIP_WAITING" });
   };
 
   return (
@@ -115,7 +123,7 @@ function RootLayout() {
             </div>
           </div>
         ) : null}
-        {pwaUpdateAvailable ? (
+        {uiState.pwaUpdateAvailable ? (
           <div className="fixed bottom-6 left-1/2 z-210 w-[min(92vw,520px)] -translate-x-1/2 rounded-2xl border border-muted/10 bg-white/95 p-4 shadow-2xl backdrop-blur">
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
@@ -131,7 +139,7 @@ function RootLayout() {
                   type="button"
                   variant="ghost"
                   className="h-10 rounded-xl px-4 font-black uppercase tracking-widest text-[10px]"
-                  onClick={() => setPwaUpdateAvailable(false)}
+                  onClick={() => setUiState((prev) => ({ ...prev, pwaUpdateAvailable: false }))}
                 >
                   Later
                 </Button>
@@ -175,7 +183,7 @@ function RootLayout() {
             )}
           </SidebarInset>
         </SidebarProvider>
-        <Sheet open={quickAddOpen} onOpenChange={setQuickAddOpen}>
+        <Sheet open={uiState.quickAddOpen} onOpenChange={(open) => setUiState((prev) => ({ ...prev, quickAddOpen: open }))}>
           <SheetContent
             side="bottom"
             className="h-auto rounded-t-[40px] border-none p-8 pb-12 shadow-none bg-white"

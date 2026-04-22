@@ -31,13 +31,15 @@ interface CategoryComboboxProps {
   id?: string;
 }
 
+const EMPTY_CONFIGS: CategoryConfig[] = [];
+
 export function CategoryCombobox({
   value,
   options: legacyOptions,
   categories,
   onChange: legacyOnChange,
   onValueChange,
-  categoryConfigs = [],
+  categoryConfigs = EMPTY_CONFIGS,
   className,
   placeholder = "Select category...",
   style,

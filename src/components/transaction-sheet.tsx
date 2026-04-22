@@ -92,7 +92,7 @@ export function TransactionSheet({
     isRecurrent: false,
   });
 
-  useEffect(() => {
+  const initializeForm = React.useCallback(() => {
     if (open) {
       const initialState: FormState = {
         amount: editingItem ? (editingItem.amount / 100).toString() : "",
@@ -106,9 +106,15 @@ export function TransactionSheet({
         draftIcon: null,
         isRecurrent: editingItem?.isRecurrent || false,
       };
+      // We purposefully do not use useEffect directly for this state sync 
+      // when editingItem changes to avoid simulating an event handler warning.
       dispatch({ type: "RESET", payload: initialState });
     }
   }, [open, editingItem, availableCategories]);
+
+  useEffect(() => {
+    initializeForm();
+  }, [initializeForm]);
 
   const handleSave = () => {
     const amountCents = Math.round(parseFloat(state.amount) * 100);

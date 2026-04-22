@@ -68,11 +68,12 @@ export function ImportContent({
   };
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [availableExpenseCategories, setAvailableExpenseCategories] =
-    useState<string[]>(expenseCategories);
-  const [availableIncomeCategories, setAvailableIncomeCategories] =
-    useState<string[]>(incomeCategories);
+  const [newExpenseCategories, setNewExpenseCategories] = useState<string[]>([]);
+  const [newIncomeCategories, setNewIncomeCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const availableExpenseCategories = [...expenseCategories, ...newExpenseCategories];
+  const availableIncomeCategories = [...incomeCategories, ...newIncomeCategories];
 
   useEffect(() => {
     const pending = sessionStorage.getItem("pending_import");
@@ -137,9 +138,9 @@ export function ImportContent({
 
     if (field === "category" && typeof value === "string") {
       if (tx.type === "expense" && !availableExpenseCategories.includes(value)) {
-        setAvailableExpenseCategories((prev) => [...prev, value]);
+        setNewExpenseCategories((prev) => [...prev, value]);
       } else if (tx.type === "income" && !availableIncomeCategories.includes(value)) {
-        setAvailableIncomeCategories((prev) => [...prev, value]);
+        setNewIncomeCategories((prev) => [...prev, value]);
       }
     }
     setTransactions((prev) => prev.map((tx) => (tx.id === id ? { ...tx, [field]: value } : tx)));
