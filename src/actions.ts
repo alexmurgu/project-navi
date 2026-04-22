@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "./db";
 import { expense, income, user as userSchema, categoryConfig } from "./db/schema";
-import { eq, sql, and, isNotNull, desc, like, or } from "drizzle-orm";
+import { eq, sql, and, isNotNull, desc, like } from "drizzle-orm";
 import { auth } from "./auth";
 import { getRequest } from "@tanstack/react-start/server";
 import { addMonths, isBefore, startOfMonth } from "date-fns";

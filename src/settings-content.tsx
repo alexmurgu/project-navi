@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Palette, Users, ShieldCheck, Bell, Smartphone } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const adminTiles = [
   {

@@ -3,34 +3,14 @@ import {
   Search,
   Plus,
   ArrowUpDown,
-  Pencil,
-  Trash2,
   ChevronDown,
-  Users,
   User as UserIcon,
-  Save,
   Check,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
-import { CategoryCombobox } from "@/components/category-combobox";
+import { Button } from "@/components/ui/button";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import {
   CategoryIcon,
@@ -39,7 +19,8 @@ import {
   withAlpha,
 } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { addIncome, updateIncome, deleteIncome, updateTransactionStatus, addExpense, updateExpense } from "./actions";
+import { addIncome, updateIncome, deleteIncome, updateTransactionStatus, addExpense } from "./actions";
+import { cn } from "./lib/utils";
 
 interface User {
   id: string;
@@ -82,6 +63,7 @@ export function IncomesContent({ data }: PageProps) {
   const [availableCategories, setAvailableCategories] = useState<string[]>(data.incomeCategories);
   const [selectedUserId, setSelectedUserId] = useState<string>("family");
   const [incomeCategory, setIncomeCategory] = useState("");
+  // oxlint-disable-next-line no-unused-vars
   const [expenseCategory, setExpenseCategory] = useState("");
   const [editingItem, setEditingItem] = useState<Transaction | null>(null);
   const [tableSearch, setTableSearch] = useState("");
@@ -127,14 +109,6 @@ export function IncomesContent({ data }: PageProps) {
 
   const addExpenseMutation = useMutation({
     mutationFn: (d: any) => addExpense({ data: d }),
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setExpenseSheetOpen(false);
-    },
-  });
-
-  const updateExpenseMutation = useMutation({
-    mutationFn: (d: any) => updateExpense({ data: d }),
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
       setExpenseSheetOpen(false);
@@ -273,7 +247,7 @@ export function IncomesContent({ data }: PageProps) {
           return (
             <div
               key={item.id}
-              className="relative group flex items-center p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden bg-navi-surface"
+              className="relative group flex items-center p-5 rounded-card transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden bg-navi-surface"
               onClick={() => handleEdit(item)}
               role="button"
               tabIndex={0}
