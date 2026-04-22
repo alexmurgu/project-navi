@@ -39,7 +39,7 @@ import {
   withAlpha,
 } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { addIncome, updateIncome, deleteIncome, updateTransactionStatus } from "./actions";
+import { addIncome, updateIncome, deleteIncome, updateTransactionStatus, addExpense, updateExpense } from "./actions";
 
 interface User {
   id: string;
@@ -78,9 +78,11 @@ export function IncomesContent({ data }: PageProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [incomeSheetOpen, setIncomeSheetOpen] = useState(false);
+  const [expenseSheetOpen, setExpenseSheetOpen] = useState(false);
   const [availableCategories, setAvailableCategories] = useState<string[]>(data.incomeCategories);
   const [selectedUserId, setSelectedUserId] = useState<string>("family");
   const [incomeCategory, setIncomeCategory] = useState("");
+  const [expenseCategory, setExpenseCategory] = useState("");
   const [editingItem, setEditingItem] = useState<Transaction | null>(null);
   const [tableSearch, setTableSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
@@ -120,6 +122,22 @@ export function IncomesContent({ data }: PageProps) {
       updateTransactionStatus({ data: d }),
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+    },
+  });
+
+  const addExpenseMutation = useMutation({
+    mutationFn: (d: any) => addExpense({ data: d }),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+      setExpenseSheetOpen(false);
+    },
+  });
+
+  const updateExpenseMutation = useMutation({
+    mutationFn: (d: any) => updateExpense({ data: d }),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+      setExpenseSheetOpen(false);
     },
   });
 
@@ -178,6 +196,12 @@ export function IncomesContent({ data }: PageProps) {
   };
 
   useEffect(() => {
+    const handleQuickAddExpense = () => {
+      setEditingItem(null);
+      setSelectedUserId("family");
+      setExpenseCategory("");
+      setExpenseSheetOpen(true);
+    };
     const handleQuickAddIncome = () => {
       setEditingItem(null);
       setSelectedUserId("family");
@@ -185,14 +209,12 @@ export function IncomesContent({ data }: PageProps) {
       setIncomeSheetOpen(true);
     };
 
-    const pendingQuickAdd = sessionStorage.getItem("pendingQuickAdd");
-    if (pendingQuickAdd === "income") {
-      handleQuickAddIncome();
-      sessionStorage.removeItem("pendingQuickAdd");
-    }
-
+    window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
     window.addEventListener("open-quick-add-income", handleQuickAddIncome);
-    return () => window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
+    return () => {
+      window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
+      window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
+    };
   }, []);
 
   return (
@@ -435,6 +457,23 @@ export function IncomesContent({ data }: PageProps) {
         }}
         onDelete={(id) => deleteIncomeMutation.mutate(id)}
         saving={addIncomeMutation.isPending || updateIncomeMutation.isPending}
+      />
+
+      <TransactionSheet
+        mode="expense"
+        open={expenseSheetOpen}
+        onOpenChange={setExpenseSheetOpen}
+        editingItem={null}
+        users={data.users}
+        selectedUserId={selectedUserId}
+        setSelectedUserId={setSelectedUserId}
+        category={""}
+        setCategory={() => {}}
+        availableCategories={[]}
+        setAvailableCategories={() => {}}
+        categoryConfigs={data.categoryConfigs}
+        onSubmit={(d) => addExpenseMutation.mutate(d)}
+        saving={addExpenseMutation.isPending}
       />
     </div>
   );

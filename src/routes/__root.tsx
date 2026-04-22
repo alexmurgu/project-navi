@@ -3,8 +3,7 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  useNavigate,
-  useRouterState,
+
   redirect,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -48,9 +47,6 @@ interface MyRouterContext {
 function RootLayout() {
   const { queryClient } = Route.useRouteContext();
   const { fetchSession, loading, user } = useAuthStore();
-  const navigate = useNavigate();
-  const routerState = useRouterState();
-  const pathname = routerState.location.pathname;
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [pwaUpdateAvailable, setPwaUpdateAvailable] = useState(false);
   const [pendingRegistration, setPendingRegistration] = useState<ServiceWorkerRegistration | null>(
@@ -91,15 +87,7 @@ function RootLayout() {
 
   const showDevtools = typeof window !== "undefined" && window.location.hostname === "localhost";
   const openQuickAdd = (mode: "expense" | "income") => {
-    const targetPath = mode === "expense" ? "/expenses" : "/incomes";
     setQuickAddOpen(false);
-
-    if (pathname !== targetPath) {
-      sessionStorage.setItem("pendingQuickAdd", mode);
-      navigate({ to: targetPath });
-      return;
-    }
-
     window.dispatchEvent(
       new CustomEvent(mode === "expense" ? "open-quick-add-expense" : "open-quick-add-income"),
     );

@@ -6,9 +6,7 @@ import {
   Pencil,
   Trash2,
   ChevronDown,
-  Users,
   User as UserIcon,
-  Save,
   Check,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -27,10 +25,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { CategoryCombobox } from "@/components/category-combobox";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import {
   CategoryIcon,
@@ -39,7 +34,7 @@ import {
   withAlpha,
 } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { addExpense, updateExpense, deleteExpense, updateTransactionStatus } from "./actions";
+import { addExpense, updateExpense, deleteExpense, updateTransactionStatus, addIncome } from "./actions";
 
 interface User {
   id: string;
@@ -78,6 +73,7 @@ export function ExpensesContent({ data }: PageProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [expenseSheetOpen, setExpenseSheetOpen] = useState(false);
+  const [incomeSheetOpen, setIncomeSheetOpen] = useState(false);
   const [availableCategories, setAvailableCategories] = useState<string[]>(data.expenseCategories);
   const [selectedUserId, setSelectedUserId] = useState<string>("family");
   const [expenseCategory, setExpenseCategory] = useState("");
@@ -123,6 +119,15 @@ export function ExpensesContent({ data }: PageProps) {
       await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
     },
   });
+
+  const addIncomeMutation = useMutation({
+    mutationFn: (d: any) => addIncome({ data: d }),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+      setIncomeSheetOpen(false);
+    },
+  });
+
 
   const filteredHistory = useMemo(() => {
     return data.expenses
@@ -186,15 +191,19 @@ export function ExpensesContent({ data }: PageProps) {
       setExpenseCategory("");
       setExpenseSheetOpen(true);
     };
-
-    const pendingQuickAdd = sessionStorage.getItem("pendingQuickAdd");
-    if (pendingQuickAdd === "expense") {
-      handleQuickAddExpense();
-      sessionStorage.removeItem("pendingQuickAdd");
-    }
+    const handleQuickAddIncome = () => {
+      setEditingItem(null);
+      setSelectedUserId("family");
+      setExpenseCategory("");
+      setIncomeSheetOpen(true);
+    };
 
     window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
-    return () => window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
+    window.addEventListener("open-quick-add-income", handleQuickAddIncome);
+    return () => {
+      window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
+      window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
+    };
   }, []);
 
   return (
@@ -432,6 +441,23 @@ export function ExpensesContent({ data }: PageProps) {
         }}
         onDelete={(id) => deleteExpenseMutation.mutate(id)}
         saving={addExpenseMutation.isPending || updateExpenseMutation.isPending}
+      />
+
+      <TransactionSheet
+        mode="income"
+        open={incomeSheetOpen}
+        onOpenChange={setIncomeSheetOpen}
+        editingItem={null}
+        users={data.users}
+        selectedUserId={selectedUserId}
+        setSelectedUserId={setSelectedUserId}
+        category={""}
+        setCategory={() => {}}
+        availableCategories={[]}
+        setAvailableCategories={() => {}}
+        categoryConfigs={data.categoryConfigs}
+        onSubmit={(d) => addIncomeMutation.mutate(d)}
+        saving={addIncomeMutation.isPending}
       />
     </div>
   );
