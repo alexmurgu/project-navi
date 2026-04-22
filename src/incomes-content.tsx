@@ -280,12 +280,12 @@ export function IncomesContent({ data }: PageProps) {
               tabIndex={0}
               onKeyDown={(event) => handleRowKeyDown(event, item)}
             >
-              <div className="absolute -left-2 top-1/2 -translate-y-1/2 opacity-[0.12] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+              <div className="absolute -left-2 top-1/2 -translate-y-1/2 opacity-[0.12] pointer-events-none transition-transform duration-700">
                 <CategoryIcon
                   category={item.category}
                   config={config}
                   kind="income"
-                  className="size-32 -rotate-12"
+                  className="size-24 -rotate-12"
                   color={color}
                   strokeWidth={1}
                 />

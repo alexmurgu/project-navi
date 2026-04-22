@@ -137,7 +137,7 @@ export function CategoriesContent({
                 setIsPickerOpen(true);
               }}
             >
-              <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+              <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none transition-transform duration-700">
                 <CategoryIcon
                   category={name}
                   config={config}
