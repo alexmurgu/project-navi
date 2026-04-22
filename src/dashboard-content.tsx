@@ -380,7 +380,7 @@ export function DashboardContent({ data }: PageProps) {
                 <div className="grid gap-4">
                   {group.items.map((tx) => {
                     const config = getCategoryConfig(categoryConfigMap, tx.category);
-                    const color = tx.type === "expense" ? config?.color || "#191c1f" : "#00a87e";
+                    const color = config?.color || "#494fdf";
 
                     return (
                       <div
@@ -389,12 +389,12 @@ export function DashboardContent({ data }: PageProps) {
                         style={{ backgroundColor: withAlpha(color, 0.05) }}
                         onClick={() => handleEdit(tx)}
                       >
-                        <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                        <div className="absolute -left-2 top-1/2 -translate-y-1/2 opacity-[0.12] pointer-events-none group-hover:scale-110 transition-transform duration-700">
                           <CategoryIcon
                             category={tx.category}
                             config={config}
                             kind={tx.type}
-                            className="size-24 -rotate-12"
+                            className="size-32 -rotate-12"
                             color={color}
                             strokeWidth={1}
                           />
