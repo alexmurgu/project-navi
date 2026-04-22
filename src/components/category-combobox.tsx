@@ -71,7 +71,7 @@ export function CategoryCombobox({
           <Button
             id={id}
             type="button"
-            variant="outline"
+            variant="secondary"
             role="combobox"
             aria-controls={listboxId}
             aria-expanded={open}

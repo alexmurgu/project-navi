@@ -47,7 +47,7 @@ export function TransactionForm({
             placeholder="0.00"
             value={amount}
             onChange={(e) => onAmountChange(e.target.value)}
-            className="h-20 rounded-[28px] border-none bg-navi-surface pl-16 pr-8 text-4xl font-display font-medium text-navi-dark placeholder:text-navi-gray/20 focus-visible:ring-2 focus-visible:ring-navi-dark/5 shadow-sm"
+            className="h-20 py-0 rounded-premium border-none bg-navi-surface pl-[88px] pr-8 text-4xl font-display font-medium text-navi-dark placeholder:text-navi-gray/20 focus-visible:ring-2 focus-visible:ring-navi-dark/5 shadow-sm"
           />
         </div>
       </div>
