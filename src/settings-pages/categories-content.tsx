@@ -25,9 +25,14 @@ interface CategoriesContentProps {
 }
 
 const PRESET_COLORS = [
-  "#F87171", "#FB923C", "#FBBF24", "#34D399", "#22D3EE", "#38BDF8", "#818CF8", "#A78BFA", "#F472B6",
-  "#EF4444", "#F97316", "#F59E0B", "#10B981", "#06B6D4", "#0EA5E9", "#6366F1", "#8B5CF6", "#EC4899",
-  "#B91C1C", "#C2410C", "#B45309", "#047857", "#0E7490", "#0369A1", "#4338CA", "#6D28D9", "#BE185D",
+  // Row 1: Vibrant & Warm
+  "#FF5F5F", "#FF914D", "#FFC233", "#26C281", "#10AC84", "#417BFF", "#8B5CF6",
+  // Row 2: Deep & Rich
+  "#EF4444", "#F97316", "#FACC15", "#22C55E", "#06B6D4", "#3B82F6", "#A855F7",
+  // Row 3: Soft & Pastel
+  "#FB7185", "#FB923C", "#A3E635", "#2DD4BF", "#60A5FA", "#C084FC", "#F472B6",
+  // Row 4: Navi & Modern
+  "#191C1F", "#475569", "#868E96", "#6366F1", "#00D2D3", "#54A0FF", "#FF9FF3",
 ];
 
 export function CategoriesContent({
