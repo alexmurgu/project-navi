@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Save, Trash2, Users } from "lucide-react";
+import { Save, Trash2, Users, Check, LayoutList, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,8 +17,21 @@ import {
 } from "@/components/ui/alert-dialog";
 import { CategoryCombobox } from "@/components/category-combobox";
 import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addAdminCategory } from "@/actions";
+import {
+  CATEGORY_ICON_OPTIONS,
+  CategoryIcon,
+  type CategoryConfig,
+} from "@/lib/category-visuals";
 
 export type TransactionMode = "expense" | "income";
+
+const PRESET_COLORS = [
+  "#F87171", "#FB923C", "#FBBF24", "#34D399", "#22D3EE", "#38BDF8", "#818CF8", "#A78BFA", "#F472B6",
+  "#EF4444", "#F97316", "#F59E0B", "#10B981", "#06B6D4", "#0EA5E9", "#6366F1", "#8B5CF6", "#EC4899",
+  "#B91C1C", "#C2410C", "#B45309", "#047857", "#0E7490", "#0369A1", "#4338CA", "#6D28D9", "#BE185D",
+];
 
 export type TransactionEditorItem = {
   id?: string;
@@ -48,6 +61,7 @@ interface TransactionSheetProps {
   setCategory: React.Dispatch<React.SetStateAction<string>>;
   availableCategories: string[];
   setAvailableCategories: React.Dispatch<React.SetStateAction<string[]>>;
+  categoryConfigs?: CategoryConfig[];
   onSubmit: (payload: {
     id?: string;
     description: string;
@@ -74,19 +88,56 @@ export function TransactionSheet({
   setCategory,
   availableCategories,
   setAvailableCategories,
+  categoryConfigs = [],
   onSubmit,
   onDelete,
   saving,
 }: TransactionSheetProps) {
+  const queryClient = useQueryClient();
   const [isMonthly, setIsMonthly] = React.useState(false);
   const [status, setStatus] = React.useState<"pending" | "paid">("paid");
+  const [isCustomizing, setIsCustomizing] = React.useState(false);
+  
+  const [draftColor, setDraftColor] = React.useState("#F59E0B");
+  const [draftIcon, setDraftIcon] = React.useState<string | null>(null);
+
+  const categoryConfigMap = React.useMemo(() => {
+    const map: Record<string, CategoryConfig> = {};
+    categoryConfigs.forEach((c) => (map[c.name] = c));
+    return map;
+  }, [categoryConfigs]);
+
+  const upsertCategoryMutation = useMutation({
+    mutationFn: (data: { name: string; color: string; icon: string | null }) =>
+      addAdminCategory({ data }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
 
   React.useEffect(() => {
     if (open) {
       setIsMonthly(editingItem?.isMonthly || false);
       setStatus(editingItem?.status || "paid");
+      setIsCustomizing(false);
+      
+      const activeCat = editingItem?.category || category;
+      if (activeCat) {
+        const config = categoryConfigMap[activeCat];
+        setDraftColor(config?.color || "#F59E0B");
+        setDraftIcon(config?.icon || null);
+      }
     }
-  }, [open, editingItem]);
+  }, [open, editingItem, category, categoryConfigMap]);
+
+  // Update draft when category changes
+  React.useEffect(() => {
+    if (category) {
+      const config = categoryConfigMap[category];
+      setDraftColor(config?.color || "#F59E0B");
+      setDraftIcon(config?.icon || null);
+    }
+  }, [category, categoryConfigMap]);
 
   const title = editingItem
     ? `Edit ${mode === "expense" ? "Expense" : "Income"}`
@@ -94,9 +145,17 @@ export function TransactionSheet({
   const submitColor =
     mode === "expense" ? "bg-foreground text-background" : "bg-emerald-600 text-white";
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+
+    if (isCustomizing && category) {
+      await upsertCategoryMutation.mutateAsync({
+        name: category,
+        color: draftColor,
+        icon: draftIcon,
+      });
+    }
 
     onSubmit({
       id: editingItem?.id,
@@ -117,15 +176,15 @@ export function TransactionSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-[90vh] sm:h-fit sm:side-right border-t sm:border-l rounded-t-2xl sm:rounded-l-2xl p-8 pb-12 shadow-2xl border-none"
+        className="h-[95vh] sm:h-fit sm:max-h-[95vh] sm:side-right border-t sm:border-l rounded-t-2xl sm:rounded-l-2xl p-0 shadow-2xl border-none overflow-hidden flex flex-col"
       >
-        <SheetHeader className="mb-10 text-left">
+        <SheetHeader className="p-8 pb-4 text-left shrink-0">
           <SheetTitle className="text-3xl font-black tracking-tighter uppercase italic">
             {title}
           </SheetTitle>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 pb-12 space-y-8">
           <div className="space-y-4">
             <Label className="ml-1 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
               Member
@@ -212,9 +271,26 @@ export function TransactionSheet({
           </div>
 
           <div className="space-y-3">
-            <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
-              {mode === "expense" ? "Category" : "Source"}
-            </Label>
+            <div className="flex items-center justify-between px-1">
+              <Label className="text-[10px] font-black uppercase tracking-widest opacity-40">
+                {mode === "expense" ? "Category" : "Source"}
+              </Label>
+              {category && (
+                <button
+                  type="button"
+                  onClick={() => setIsCustomizing(!isCustomizing)}
+                  className={cn(
+                    "text-[8px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 px-2 py-1 rounded-md",
+                    isCustomizing 
+                      ? "bg-primary text-primary-foreground" 
+                      : "bg-muted/10 text-muted-foreground hover:bg-muted/20"
+                  )}
+                >
+                  <Palette className="size-2.5" />
+                  Customize
+                </button>
+              )}
+            </div>
             <CategoryCombobox
               value={category}
               options={availableCategories}
@@ -225,6 +301,68 @@ export function TransactionSheet({
                 setCategory(value);
               }}
             />
+
+            {isCustomizing && category && (
+              <div className="mt-4 p-6 rounded-2xl bg-secondary/20 border border-muted/10 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Color</p>
+                    <span className="text-[8px] font-mono opacity-40">{draftColor}</span>
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
+                    {PRESET_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setDraftColor(color)}
+                        className={cn(
+                          "size-8 rounded-full transition-all flex items-center justify-center",
+                          draftColor === color ? "ring-2 ring-foreground ring-offset-2 scale-110" : "hover:scale-105"
+                        )}
+                        style={{ backgroundColor: color }}
+                      >
+                        {draftColor === color && <Check className="size-3 text-white mix-blend-difference" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Icon</p>
+                    <span className="text-[8px] font-mono opacity-40">{draftIcon || "Default"}</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2 max-h-[160px] overflow-y-auto pr-1">
+                    <button
+                      type="button"
+                      onClick={() => setDraftIcon(null)}
+                      className={cn(
+                        "flex flex-col items-center gap-2 p-3 rounded-xl border transition-all",
+                        draftIcon === null ? "bg-foreground text-background border-foreground" : "bg-background/50 border-transparent hover:bg-muted/20"
+                      )}
+                    >
+                      <LayoutList className="size-4" />
+                    </button>
+                    {CATEGORY_ICON_OPTIONS.filter(o => o.value !== "LayoutList").map((opt) => {
+                      const Icon = opt.icon;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setDraftIcon(opt.value)}
+                          className={cn(
+                            "flex flex-col items-center gap-2 p-3 rounded-xl border transition-all",
+                            draftIcon === opt.value ? "bg-foreground text-background border-foreground" : "bg-background/50 border-transparent hover:bg-muted/20"
+                          )}
+                        >
+                          <Icon className="size-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -327,7 +465,7 @@ export function TransactionSheet({
 
             <Button
               type="submit"
-              disabled={saving}
+              disabled={saving || upsertCategoryMutation.isPending}
               className={cn(
                 "h-14 flex-1 rounded-xl border-none px-0 font-black uppercase tracking-[0.2em] shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] sm:px-4",
                 submitColor,

@@ -422,6 +422,7 @@ export function ExpensesContent({ data }: PageProps) {
         setCategory={setExpenseCategory}
         availableCategories={availableCategories}
         setAvailableCategories={setAvailableCategories}
+        categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => {
           if (editingItem) {
             updateExpenseMutation.mutate(d);

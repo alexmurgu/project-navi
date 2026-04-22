@@ -460,6 +460,7 @@ export function DashboardContent({ data }: PageProps) {
         setCategory={setExpenseCategory}
         availableCategories={availableExpenseCategories}
         setAvailableCategories={setAvailableExpenseCategories}
+        categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => {
           const payload = {
             ...d,
@@ -492,6 +493,7 @@ export function DashboardContent({ data }: PageProps) {
         setCategory={setIncomeCategory}
         availableCategories={availableIncomeCategories}
         setAvailableCategories={setAvailableIncomeCategories}
+        categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => {
           if (editingItem?.type === "income") {
             updateIncomeMutation.mutate(d);

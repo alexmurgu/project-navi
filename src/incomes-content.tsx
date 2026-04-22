@@ -425,6 +425,7 @@ export function IncomesContent({ data }: PageProps) {
         setCategory={setIncomeCategory}
         availableCategories={availableCategories}
         setAvailableCategories={setAvailableCategories}
+        categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => {
           if (editingItem) {
             updateIncomeMutation.mutate(d);
