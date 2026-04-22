@@ -67,6 +67,7 @@
     @apply font-sans;
     font-feature-settings: "cv02", "cv03", "cv04", "ss01";
     letter-spacing: 0.24px;
+    overscroll-behavior-y: none;
   }
 
   h1, h2, h3, h4, h5, h6 {

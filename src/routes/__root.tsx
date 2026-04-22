@@ -21,6 +21,7 @@ import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { NotFound } from "@/components/not-found";
 import { RouteError } from "@/components/route-error";
 import { fetchSession } from "@/actions";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
@@ -154,9 +155,17 @@ function RootLayout() {
           )}
 
           <SidebarInset className="bg-background">
-            <main className="pb-32 lg:pb-0">
-              <Outlet />
-            </main>
+            <PullToRefresh onRefresh={async () => {
+              // Ensure at least 800ms of visual feedback
+              await Promise.all([
+                queryClient.invalidateQueries(),
+                new Promise(resolve => setTimeout(resolve, 800))
+              ]);
+            }}>
+              <main className="pb-32 lg:pb-0">
+                <Outlet />
+              </main>
+            </PullToRefresh>
 
             {/* Mobile Bottom Nav - Hidden on Desktop */}
             {user && (
