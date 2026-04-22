@@ -21,7 +21,6 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { addAdminCategory, getTransactionSuggestions } from "@/actions";
 import {
   CATEGORY_ICON_OPTIONS,
-  CategoryIcon,
   type CategoryConfig,
 } from "@/lib/category-visuals";
 
@@ -157,8 +156,6 @@ export function TransactionSheet({
   const title = editingItem
     ? `Edit ${mode === "expense" ? "Expense" : "Income"}`
     : `Add ${mode === "expense" ? "Expense" : "Income"}`;
-  const submitColor =
-    mode === "expense" ? "bg-foreground text-background" : "bg-emerald-600 text-white";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
