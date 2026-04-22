@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { TransactionSheet } from "@/components/transaction-sheet";
+import { TransactionCard } from "@/components/transaction-card";
 import {
   CategoryIcon,
   getCategoryConfig,
@@ -240,110 +241,25 @@ export function ExpensesContent({ data }: PageProps) {
 
       {/* Redesigned List */}
       <div className="flex flex-col gap-4">
-        {paginatedHistory.map((item) => {
-          const config = getCategoryConfig(categoryConfigMap, item.category);
-          const color = config?.color || "#494fdf";
-          
-          return (
-            <div
-              key={item.id}
-              className="relative group flex items-center p-5 rounded-card transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden bg-navi-surface"
-              onClick={() => handleEdit(item)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(event) => handleRowKeyDown(event, item)}
-            >
-              <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
-                <div
-                  className="size-12 rounded-full flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
-                >
-                  <CategoryIcon
-                    category={item.category}
-                    config={config}
-                    kind="expense"
-                    className="size-5"
-                    color={color}
-                    strokeWidth={1}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3">
-                    <h4 className="font-display font-medium text-[16px] text-navi-dark truncate">
-                      {item.description}
-                    </h4>
-                    {item.status === "pending" && (
-                      <span className="px-2 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[9px] font-display font-medium uppercase tracking-widest">
-                        Pending
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3 mt-1">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openCategoryOverview(item.category);
-                      }}
-                      className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60 hover:text-navi-dark transition-colors"
-                    >
-                      {item.category}
-                    </button>
-                    <div className="size-1 rounded-full bg-navi-border/50 hidden md:block" />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openMemberOverview(item.userId);
-                      }}
-                      className="hidden md:inline-flex items-center gap-1.5 text-[10px] font-display font-medium uppercase text-navi-blue tracking-widest hover:underline"
-                    >
-                      <UserIcon className="size-2.5 opacity-50" strokeWidth={1} />
-                      <span>{item.userName || "Family"}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="hidden md:block w-40 text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/40 shrink-0 mx-4">
-                {format(new Date(item.date), "MMM dd, yyyy")}
-              </div>
-
-              <div className="text-right w-32 shrink-0 flex items-center gap-4 justify-end">
-                <div>
-                  <p
-                    className={cn(
-                      "font-display font-medium text-[18px]",
-                      item.status === "pending"
-                        ? "text-navi-gray/40"
-                        : "text-navi-dark",
-                    )}
-                  >
-                    -{formatCurrency(item.amount)}
-                  </p>
-                  <p className="md:hidden text-[9px] font-display font-medium uppercase tracking-widest text-navi-gray/40 mt-0.5">
-                    {format(new Date(item.date), "MMM dd")}
-                  </p>
-                </div>
-                {item.status === "pending" && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      updateStatusMutation.mutate({
-                        id: item.id,
-                        type: "expense",
-                        status: "paid",
-                      });
-                    }}
-                    className="size-10 rounded-full bg-navi-teal text-white flex items-center justify-center hover:opacity-90 transition-all"
-                  >
-                    <Check className="size-5" strokeWidth={1} />
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {paginatedHistory.map((item) => (
+          <TransactionCard
+            key={item.id}
+            transaction={{ ...item, type: "expense" }}
+            categoryConfigMap={categoryConfigMap}
+            onClick={() => handleEdit(item)}
+            onStatusUpdate={
+              item.status === "pending"
+                ? (status) =>
+                    updateStatusMutation.mutate({
+                      id: item.id,
+                      type: "expense",
+                      status,
+                    })
+                : undefined
+            }
+            formatCurrency={formatCurrency}
+          />
+        ))}
       </div>
 
       {hasMore && (

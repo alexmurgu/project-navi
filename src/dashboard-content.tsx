@@ -21,6 +21,7 @@ import {
   updateTransactionStatus,
 } from "./actions";
 import { TransactionSheet } from "@/components/transaction-sheet";
+import { TransactionCard } from "@/components/transaction-card";
 import { Button } from "./components/ui/button";
 
 interface User {
@@ -381,86 +382,25 @@ export function DashboardContent({ data }: PageProps) {
                   {group.title}
                 </h4>
                 <div className="grid gap-4">
-                  {group.items.map((tx) => {
-                    const config = getCategoryConfig(categoryConfigMap, tx.category);
-                    const color = config?.color || "#494fdf";
-
-                    return (
-                      <div
-                        key={tx.id}
-                        className="relative flex items-center justify-between p-5 rounded-card transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden bg-navi-surface"
-                        onClick={() => handleEdit(tx)}
-                      >
-                        <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
-                          <div
-                            className="size-12 rounded-full flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
-                          >
-                            <CategoryIcon
-                              category={tx.category}
-                              config={config}
-                              kind={tx.type}
-                              className="size-5"
-                              color={color}
-                              strokeWidth={1}
-                            />
-                          </div>
-                          <div className="space-y-1 min-w-0">
-                            <div className="flex items-center gap-3">
-                              <p className="font-display font-medium text-[16px] text-navi-dark truncate">
-                                {tx.description}
-                              </p>
-                              {tx.status === "pending" && (
-                                <span className="px-2 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[9px] font-display font-medium uppercase tracking-widest">
-                                  Pending
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3 text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60">
-                              <p>{tx.category}</p>
-                              <div className="size-1 rounded-full bg-navi-border/50" />
-                              <div className="flex items-center gap-1.5">
-                                <UserIcon className="size-2.5 opacity-40" strokeWidth={1} />
-                                <span>{tx.userName || "Family"}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right flex items-center gap-4 shrink-0 relative z-10">
-                          <div>
-                            <p
-                              className={cn(
-                                "font-display font-medium text-[18px]",
-                                tx.status === "pending"
-                                  ? "text-navi-gray/40"
-                                  : tx.type === "expense"
-                                    ? "text-navi-dark"
-                                    : "text-navi-teal",
-                              )}
-                            >
-                              {tx.type === "expense" ? "-" : "+"}
-                              {formatCurrency(tx.amount)}
-                            </p>
-                          </div>
-                          {tx.status === "pending" && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateStatusMutation.mutate({
-                                  id: tx.id,
-                                  type: tx.type,
-                                  status: "paid",
-                                });
-                              }}
-                              className="size-10 rounded-full bg-navi-teal text-white flex items-center justify-center hover:opacity-90 transition-all"
-                            >
-                              <Check className="size-5" strokeWidth={1} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {group.items.map((tx) => (
+                    <TransactionCard
+                      key={tx.id}
+                      transaction={tx}
+                      categoryConfigMap={categoryConfigMap}
+                      onClick={() => handleEdit(tx)}
+                      onStatusUpdate={
+                        tx.status === "pending"
+                          ? (status) =>
+                              updateStatusMutation.mutate({
+                                id: tx.id,
+                                type: tx.type,
+                                status,
+                              })
+                          : undefined
+                      }
+                      formatCurrency={formatCurrency}
+                    />
+                  ))}
                 </div>
               </div>
             ))}
