@@ -273,24 +273,26 @@ export function IncomesContent({ data }: PageProps) {
           return (
             <div
               key={item.id}
-              className="relative group flex items-center p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden"
-              style={{ backgroundColor: withAlpha(color, 0.05) }}
+              className="relative group flex items-center p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden bg-navi-surface"
               onClick={() => handleEdit(item)}
               role="button"
               tabIndex={0}
               onKeyDown={(event) => handleRowKeyDown(event, item)}
             >
-              <div className="absolute -left-2 top-1/2 -translate-y-1/2 opacity-[0.12] pointer-events-none transition-transform duration-700">
-                <CategoryIcon
-                  category={item.category}
-                  config={config}
-                  kind="income"
-                  className="size-24 -rotate-12"
-                  color={color}
-                  strokeWidth={1}
-                />
-              </div>
-              <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10 pl-16">
+              <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
+                <div
+                  className="size-12 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
+                >
+                  <CategoryIcon
+                    category={item.category}
+                    config={config}
+                    kind="income"
+                    className="size-5"
+                    color={color}
+                    strokeWidth={1}
+                  />
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3">
                     <h4 className="font-display font-medium text-[16px] text-navi-dark truncate">

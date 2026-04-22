@@ -300,31 +300,34 @@ export function DashboardContent({ data }: PageProps) {
                         style={{ width: `${share}%`, backgroundColor: color, opacity: 0.1 }}
                       />
 
-                      {/* Large Watermark Icon */}
-                      <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none transition-transform duration-700">
-                        <CategoryIcon
-                          category={item.name}
-                          config={config}
-                          kind="expense"
-                          className="size-24 -rotate-12"
-                          color={color}
-                          strokeWidth={1}
-                        />
-                      </div>
-
-                      <div className="relative z-10 pl-16 flex-1 min-w-0">
-                        <p className="font-display font-medium text-[16px] text-navi-dark truncate">
-                          {item.name}
-                        </p>
-                        <div className="flex items-center gap-3">
-                          <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
-                            {item.count} {item.count === 1 ? "txn" : "txns"}
+                      <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
+                        <div
+                          className="size-12 rounded-full flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
+                        >
+                          <CategoryIcon
+                            category={item.name}
+                            config={config}
+                            kind="expense"
+                            className="size-6"
+                            color={color}
+                            strokeWidth={1}
+                          />
+                        </div>
+                        <div className="space-y-1 min-w-0">
+                          <p className="font-display font-medium text-[16px] text-navi-dark truncate">
+                            {item.name}
                           </p>
-                          <div className="size-1 rounded-full bg-navi-border/50" />
-                          <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
-                            {Math.round((item.amount / currentMonthCategoryData.total) * 100) || 0}%
-                            share
-                          </p>
+                          <div className="flex items-center gap-3">
+                            <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
+                              {item.count} {item.count === 1 ? "txn" : "txns"}
+                            </p>
+                            <div className="size-1 rounded-full bg-navi-border/50" />
+                            <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
+                              {Math.round((item.amount / currentMonthCategoryData.total) * 100) || 0}%
+                              share
+                            </p>
+                          </div>
                         </div>
                       </div>
 
@@ -385,22 +388,23 @@ export function DashboardContent({ data }: PageProps) {
                     return (
                       <div
                         key={tx.id}
-                        className="relative flex items-center justify-between p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden"
-                        style={{ backgroundColor: withAlpha(color, 0.05) }}
+                        className="relative flex items-center justify-between p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden bg-navi-surface"
                         onClick={() => handleEdit(tx)}
                       >
-                        <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.12] pointer-events-none transition-transform duration-700">
-                          <CategoryIcon
-                            category={tx.category}
-                            config={config}
-                            kind={tx.type}
-                            className="size-24 -rotate-12"
-                            color={color}
-                            strokeWidth={1}
-                          />
-                        </div>
-
-                        <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10 pl-16">
+                        <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
+                          <div
+                            className="size-12 rounded-full flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
+                          >
+                            <CategoryIcon
+                              category={tx.category}
+                              config={config}
+                              kind={tx.type}
+                              className="size-5"
+                              color={color}
+                              strokeWidth={1}
+                            />
+                          </div>
                           <div className="space-y-1 min-w-0">
                             <div className="flex items-center gap-3">
                               <p className="font-display font-medium text-[16px] text-navi-dark truncate">
