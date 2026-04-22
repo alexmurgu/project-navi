@@ -6,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
+import { getTransactionSuggestions } from "@/actions";
+import { useState, useRef, useEffect } from "react";
 
 interface TransactionFormProps {
   mode: "expense" | "income";
@@ -19,6 +22,7 @@ interface TransactionFormProps {
   onStatusChange: (val: "pending" | "paid") => void;
   isRecurrent: boolean;
   onRecurrentChange: (val: boolean) => void;
+  onSuggestionSelect?: (suggestion: any) => void;
 }
 
 export function TransactionForm({
@@ -33,8 +37,28 @@ export function TransactionForm({
   onStatusChange,
   isRecurrent,
   onRecurrentChange,
+  onSuggestionSelect,
 }: TransactionFormProps) {
   const showStatus = mode === "income" || isRecurrent;
+  
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { data: suggestions } = useQuery({
+    queryKey: ["suggestions", description],
+    queryFn: () => getTransactionSuggestions({ data: description }),
+    enabled: description.length >= 2 && showSuggestions,
+  });
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -62,9 +86,9 @@ export function TransactionForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Description */}
-        <div className="space-y-3">
+        <div className="space-y-3" ref={containerRef}>
           <Label htmlFor="description" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
-            Reference
+            Description
           </Label>
           <div className="relative">
             <FileText className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
@@ -72,9 +96,49 @@ export function TransactionForm({
               id="description"
               placeholder="What was this for?"
               value={description}
-              onChange={(e) => onDescriptionChange(e.target.value)}
+              onChange={(e) => {
+                onDescriptionChange(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
               className="h-14 rounded-2xl border-none bg-navi-surface px-12 font-display font-medium text-navi-dark shadow-sm"
+              autoComplete="off"
             />
+            {showSuggestions && suggestions && suggestions.length > 0 && (
+              <div className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white rounded-2xl shadow-xl border border-navi-surface p-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                <ul className="max-h-[200px] overflow-auto">
+                  {suggestions.map((suggestion, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-navi-surface/50 transition-colors flex flex-col gap-1"
+                        onClick={() => {
+                          onDescriptionChange(suggestion.description);
+                          if (onSuggestionSelect) {
+                            onSuggestionSelect(suggestion);
+                          }
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        <span className="font-display font-medium text-navi-dark text-sm block truncate">
+                          {suggestion.description}
+                        </span>
+                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-navi-gray/60 font-black">
+                          <span className={cn(
+                            "px-2 py-0.5 rounded-full border",
+                            suggestion.type === "expense" ? "bg-navi-dark/5 border-navi-dark/10" : "bg-navi-teal/5 border-navi-teal/10"
+                          )}>
+                            {suggestion.category}
+                          </span>
+                          <span>•</span>
+                          <span>{(suggestion.amount / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" })}</span>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 
