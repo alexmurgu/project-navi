@@ -2,8 +2,6 @@ import React from "react";
 import { LayoutList, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
-  CategoryIcon, 
-  getCategoryConfig, 
   withAlpha, 
   CATEGORY_ICON_OPTIONS,
   type CategoryConfig 
@@ -41,21 +39,13 @@ export function CategoryPicker({
   draftIcon,
   onDraftIconChange,
 }: CategoryPickerProps) {
-  const categoryConfigMap = React.useMemo(() => {
-    const map: Record<string, CategoryConfig> = {};
-    categoryConfigs.forEach((config) => {
-      map[config.name] = config;
-    });
-    return map;
-  }, [categoryConfigs]);
 
-  const config = getCategoryConfig(categoryConfigMap, category);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
         <Label htmlFor="category-selector" className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
-          Classification
+          Category
         </Label>
         <button
           type="button"
@@ -82,23 +72,6 @@ export function CategoryPicker({
           categories={availableCategories}
           categoryConfigs={categoryConfigs}
         />
-
-        <div
-          className="size-14 rounded-[22px] flex items-center justify-center shrink-0 border transition-all duration-500"
-          style={{
-            backgroundColor: isCustomizing ? withAlpha(draftColor, 0.05) : withAlpha(config?.color || "#494fdf", 0.05),
-            borderColor: isCustomizing ? withAlpha(draftColor, 0.1) : withAlpha(config?.color || "#494fdf", 0.1),
-            color: isCustomizing ? draftColor : (config?.color || "#494fdf"),
-          }}
-        >
-          <CategoryIcon
-            category={category}
-            config={isCustomizing ? { name: category, color: draftColor, icon: draftIcon } : config}
-            className="size-6"
-            color={isCustomizing ? draftColor : (config?.color || "#494fdf")}
-            strokeWidth={1.2}
-          />
-        </div>
       </div>
 
       {isCustomizing && (

@@ -44,9 +44,9 @@ export function TransactionForm({
           Transaction Amount
         </Label>
         <div className="relative group">
-          <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 text-navi-dark/30 group-focus-within:text-navi-dark transition-colors">
-            <CreditCard className="size-5" strokeWidth={1.2} />
-            <span className="text-xl font-display font-medium">€</span>
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2 text-navi-gray/40 group-focus-within:text-navi-dark transition-colors">
+            <CreditCard className="size-4" strokeWidth={1} />
+            <span className="text-[15px] font-display font-medium">€</span>
           </div>
           <Input
             id="amount"
@@ -55,7 +55,7 @@ export function TransactionForm({
             placeholder="0.00"
             value={amount}
             onChange={(e) => onAmountChange(e.target.value)}
-            className="h-20 py-0 rounded-premium border-none bg-navi-surface pl-[88px] pr-8 text-4xl font-display font-medium text-navi-dark placeholder:text-navi-gray/20 focus-visible:ring-2 focus-visible:ring-navi-dark/5 shadow-sm"
+            className="h-14 rounded-2xl border-none bg-navi-surface pl-[72px] pr-5 font-display font-medium text-navi-dark shadow-sm placeholder:text-navi-gray/40 focus-visible:ring-2 focus-visible:ring-navi-dark/5"
           />
         </div>
       </div>
