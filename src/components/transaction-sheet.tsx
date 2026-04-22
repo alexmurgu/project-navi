@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Save, Trash2, Users, Check, LayoutList, Palette, ChevronRight } from "lucide-react";
+import { Save, Trash2, Users, Check, LayoutList, Palette, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -188,6 +188,7 @@ export function TransactionSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
+        showCloseButton={false}
         className="h-[95vh] sm:h-fit sm:max-h-[95vh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
       >
         <SheetHeader className="p-8 pb-4 text-left shrink-0">
@@ -462,7 +463,7 @@ export function TransactionSheet({
             )}
           </div>
 
-          <div className={cn("pt-6", showDelete ? "grid grid-cols-2 gap-6" : "flex")}>
+          <div className={cn("pt-6", showDelete ? "grid grid-cols-3 gap-4" : "grid grid-cols-2 gap-4")}>
             {showDelete && (
               <AlertDialog>
                 <AlertDialogTrigger
@@ -505,10 +506,20 @@ export function TransactionSheet({
             )}
 
             <Button
+              type="button"
+              variant="secondary"
+              className="h-16 rounded-full border-none bg-navi-surface px-0 font-display font-medium uppercase tracking-widest text-navi-dark transition-all hover:opacity-90 active:scale-[0.98] sm:px-4"
+              onClick={() => onOpenChange(false)}
+            >
+              <X className="size-5" />
+              <span className="hidden sm:inline">Cancel</span>
+            </Button>
+
+            <Button
               type="submit"
               disabled={saving || upsertCategoryMutation.isPending}
               className={cn(
-                "h-16 flex-1 rounded-full border-none px-0 font-display font-medium uppercase tracking-[0.2em] transition-all hover:opacity-90 active:scale-[0.98] sm:px-4",
+                "h-16 rounded-full border-none px-0 font-display font-medium uppercase tracking-[0.2em] transition-all hover:opacity-90 active:scale-[0.98] sm:px-4",
                 mode === "expense" ? "bg-navi-dark text-white" : "bg-navi-teal text-white",
               )}
             >
