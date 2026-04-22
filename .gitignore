@@ -7,15 +7,13 @@ node_modules/
 /coverage
 
 # production / build
-dist/
-build/
-.next/
-out/
-/apps/web/dist
-/apps/api/dist
-
-# apps specific
-.tanstack/
+/dist/
+/build/
+/.next/
+/out/
+/.output/
+/.tanstack/
+*.timestamp_*.js
 
 # misc
 .DS_Store

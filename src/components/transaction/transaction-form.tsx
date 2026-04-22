@@ -1,0 +1,190 @@
+import React from "react";
+import { Calendar as CalendarIcon, Check, Clock, CreditCard, FileText, Repeat } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+
+interface TransactionFormProps {
+  mode: "expense" | "income";
+  amount: string;
+  onAmountChange: (val: string) => void;
+  description: string;
+  onDescriptionChange: (val: string) => void;
+  date: Date | undefined;
+  onDateChange: (val: Date | undefined) => void;
+  status: "pending" | "paid";
+  onStatusChange: (val: "pending" | "paid") => void;
+  isRecurrent: boolean;
+  onRecurrentChange: (val: boolean) => void;
+}
+
+export function TransactionForm({
+  mode,
+  amount,
+  onAmountChange,
+  description,
+  onDescriptionChange,
+  date,
+  onDateChange,
+  status,
+  onStatusChange,
+  isRecurrent,
+  onRecurrentChange,
+}: TransactionFormProps) {
+  const showStatus = mode === "income" || isRecurrent;
+
+  return (
+    <div className="space-y-8">
+      {/* Amount Input */}
+      <div className="space-y-4">
+        <Label htmlFor="amount" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+          Transaction Amount
+        </Label>
+        <div className="relative group">
+          <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-2 text-navi-gray/40 group-focus-within:text-navi-dark transition-colors">
+            <CreditCard className="size-4" strokeWidth={1} />
+            <span className="text-[15px] font-display font-medium">€</span>
+          </div>
+          <Input
+            id="amount"
+            type="text"
+            inputMode="decimal"
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => onAmountChange(e.target.value)}
+            className="h-14 rounded-2xl border-none bg-navi-surface pl-[72px] pr-5 font-display font-medium text-navi-dark shadow-sm placeholder:text-navi-gray/40 focus-visible:ring-2 focus-visible:ring-navi-dark/5"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Description */}
+        <div className="space-y-3">
+          <Label htmlFor="description" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+            Reference
+          </Label>
+          <div className="relative">
+            <FileText className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+            <Input
+              id="description"
+              placeholder="What was this for?"
+              value={description}
+              onChange={(e) => onDescriptionChange(e.target.value)}
+              className="h-14 rounded-2xl border-none bg-navi-surface px-12 font-display font-medium text-navi-dark shadow-sm"
+            />
+          </div>
+        </div>
+
+        {/* Date Picker */}
+        <div className="space-y-3">
+          <Label htmlFor="date-picker" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+            Occurrence
+          </Label>
+          <Popover>
+            <PopoverTrigger
+              render={
+                <button
+                  id="date-picker"
+                  type="button"
+                  className="w-full h-14 rounded-2xl bg-navi-surface flex items-center px-5 gap-4 text-navi-dark hover:bg-white/50 transition-colors shadow-sm"
+                >
+                  <CalendarIcon className="size-4 text-navi-gray/40" strokeWidth={1} />
+                  <span className="font-display font-medium text-[15px]">
+                    {date ? format(date, "PPP") : "Select date"}
+                  </span>
+                </button>
+              }
+            />
+            <PopoverContent className="w-auto p-0 rounded-3xl overflow-hidden border-none shadow-2xl" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={onDateChange}
+                initialFocus
+                className="p-4"
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
+      {/* Recurrent Toggle */}
+      {mode === "expense" && (
+        <div className="space-y-4 pt-2">
+          <Label id="recurrent-status-label" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+            Recurrence
+          </Label>
+          <button
+            type="button"
+            onClick={() => onRecurrentChange(!isRecurrent)}
+            className={cn(
+              "flex items-center justify-center gap-3 h-14 w-full rounded-2xl border transition-all active:scale-[0.98]",
+              isRecurrent 
+                ? "bg-navi-dark border-navi-dark text-white shadow-lg shadow-navi-dark/20" 
+                : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+            )}
+          >
+            <div className={cn(
+              "size-7 rounded-full flex items-center justify-center",
+              isRecurrent ? "bg-white/20" : "bg-white shadow-sm"
+            )}>
+              <Repeat className="size-4" strokeWidth={1.5} />
+            </div>
+            <span className="text-sm font-display font-medium uppercase tracking-widest">Recurring Expense</span>
+          </button>
+        </div>
+      )}
+
+      {/* Status Toggle */}
+      {showStatus && (
+        <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2">
+          <Label id="payment-status-label" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+            Payment Status
+          </Label>
+          <div className="grid grid-cols-2 gap-3" role="group" aria-labelledby="payment-status-label">
+            <button
+              type="button"
+              onClick={() => onStatusChange("paid")}
+              className={cn(
+                "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
+                status === "paid" 
+                  ? "bg-navi-teal border-navi-teal text-white shadow-lg shadow-navi-teal/20" 
+                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+              )}
+            >
+              <div className={cn(
+                "size-7 rounded-full flex items-center justify-center",
+                status === "paid" ? "bg-white/20" : "bg-white shadow-sm"
+              )}>
+                <Check className="size-4" strokeWidth={1.5} />
+              </div>
+              <span className="text-sm font-display font-medium uppercase tracking-widest">Settled</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onStatusChange("pending")}
+              className={cn(
+                "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
+                status === "pending" 
+                  ? "bg-navi-warning border-navi-warning text-white shadow-lg shadow-navi-warning/20" 
+                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+              )}
+            >
+              <div className={cn(
+                "size-7 rounded-full flex items-center justify-center",
+                status === "pending" ? "bg-white/20" : "bg-white shadow-sm"
+              )}>
+                <Clock className="size-4" strokeWidth={1.5} />
+              </div>
+              <span className="text-sm font-display font-medium uppercase tracking-widest">Pending</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
