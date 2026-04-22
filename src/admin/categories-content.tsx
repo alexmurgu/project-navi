@@ -33,6 +33,12 @@ interface CategoriesContentProps {
   configMap: Record<string, CategoryConfig>;
 }
 
+const PRESET_COLORS = [
+  "#F87171", "#FB923C", "#FBBF24", "#34D399", "#22D3EE", "#38BDF8", "#818CF8", "#A78BFA", "#F472B6",
+  "#EF4444", "#F97316", "#F59E0B", "#10B981", "#06B6D4", "#0EA5E9", "#6366F1", "#8B5CF6", "#EC4899",
+  "#B91C1C", "#C2410C", "#B45309", "#047857", "#0E7490", "#0369A1", "#4338CA", "#6D28D9", "#BE185D",
+];
+
 export function CategoriesContent({
   expenseCategories,
   incomeCategories,
@@ -41,41 +47,8 @@ export function CategoriesContent({
   const queryClient = useQueryClient();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [draftColor, setDraftColor] = useState<string>("#F59E0B");
+  const [draftColor, setDraftColor] = useState<string>("#494fdf");
   const [draftIcon, setDraftIcon] = useState<string | null>(null);
-
-  const colors = useMemo(
-    () => [
-      "#F87171",
-      "#FB923C",
-      "#FBBF24",
-      "#34D399",
-      "#22D3EE",
-      "#38BDF8",
-      "#818CF8",
-      "#A78BFA",
-      "#F472B6",
-      "#EF4444",
-      "#F97316",
-      "#F59E0B",
-      "#10B981",
-      "#06B6D4",
-      "#0EA5E9",
-      "#6366F1",
-      "#8B5CF6",
-      "#EC4899",
-      "#B91C1C",
-      "#C2410C",
-      "#B45309",
-      "#047857",
-      "#0E7490",
-      "#0369A1",
-      "#4338CA",
-      "#6D28D9",
-      "#BE185D",
-    ],
-    [],
-  );
 
   const upsertMutation = useMutation({
     mutationFn: (data: { name: string; color: string; icon: string | null }) =>
@@ -96,7 +69,7 @@ export function CategoriesContent({
   useEffect(() => {
     if (!activeCategory) return;
     const config = configMap[activeCategory];
-    setDraftColor(config?.color || "#F59E0B");
+    setDraftColor(config?.color || "#494fdf");
     setDraftIcon(config?.icon || null);
   }, [activeCategory, configMap]);
 
@@ -116,61 +89,82 @@ export function CategoriesContent({
     }
   };
 
-  const renderCategoryTable = (names: string[], title: string) => (
-    <div className="space-y-6">
-      <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40 ml-2">
-        {title}
-      </h3>
-      <div className="grid gap-4">
+  const renderCategoryTable = (names: string[], title: string, accentColor: string) => (
+    <section className="space-y-8">
+      <div className="flex items-center gap-4 px-2">
+        <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: accentColor }} />
+        <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+          {title}
+        </h3>
+      </div>
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         {names.sort().map((name) => {
           const config = configMap[name];
-          const color = config?.color || "#191c1f";
+          const color = config?.color || "#494fdf";
 
           return (
             <button
               type="button"
               key={name}
-              className="relative flex items-center justify-between p-6 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface"
-              style={{ backgroundColor: withAlpha(color, 0.05) }}
+              className="relative flex items-center justify-between p-6 rounded-[24px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface"
               onClick={() => {
                 setActiveCategory(name);
                 setIsPickerOpen(true);
               }}
             >
-              <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none transition-transform duration-700">
-                <CategoryIcon
-                  category={name}
-                  config={config}
-                  className="size-24 -rotate-12"
-                  color={color}
-                  strokeWidth={1}
-                />
+              <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
+                <div
+                  className="size-12 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
+                >
+                  <CategoryIcon
+                    category={name}
+                    config={config}
+                    className="size-6"
+                    color={color}
+                    strokeWidth={1}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-display font-medium text-[18px] text-navi-dark truncate">
+                    {name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60">
+                      {config?.icon || "Default Branded"}
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="relative z-10 pl-16 flex-1 min-w-0">
-                <p className="font-display font-medium text-lg text-navi-dark truncate">
-                  {name}
-                </p>
-                <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60 mt-1">
-                  {config?.icon || "Default Icon"}
-                </p>
-              </div>
-
-              <div className="relative z-10 flex items-center justify-center size-10 rounded-full bg-white/50 text-navi-dark opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="relative z-10 size-10 rounded-full bg-white flex items-center justify-center text-navi-dark opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
                 <Check className="size-4" strokeWidth={1} />
               </div>
             </button>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 
   return (
-    <div className="mx-auto w-full max-w-7xl flex-1 space-y-8 p-4 pt-6 md:p-8 bg-background text-foreground antialiased">
-      <div className="grid gap-8 lg:grid-cols-2 items-start">
-        {renderCategoryTable(expenseCategories, "Expense Categories")}
-        {renderCategoryTable(incomeCategories, "Income Categories")}
+    <div className="w-full min-h-screen flex flex-col bg-white antialiased">
+      {/* High-Impact Header */}
+      <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
+        <div className="space-y-4 relative z-10">
+          <p className="text-[12px] font-display font-medium uppercase tracking-[0.25em] opacity-50">
+            Interface Customization
+          </p>
+          <h1 className="text-[64px] md:text-[80px] font-display font-medium leading-[0.9] tracking-[-0.04em]">
+            Categories
+          </h1>
+        </div>
+      </section>
+
+      <div className="p-6 md:p-12 space-y-20">
+        {renderCategoryTable(expenseCategories, "Expense Categories", "#494fdf")}
+        {renderCategoryTable(incomeCategories, "Income Categories", "#00a87e")}
       </div>
 
       <Sheet open={isPickerOpen} onOpenChange={setIsPickerOpen}>
@@ -231,7 +225,7 @@ export function CategoriesContent({
                   <span className="text-[10px] font-mono text-navi-gray/60">{draftColor}</span>
                 </div>
                 <div className="grid grid-cols-7 gap-4">
-                  {colors.map((color) => {
+                  {PRESET_COLORS.map((color) => {
                     const selected = draftColor === color;
                     return (
                       <button

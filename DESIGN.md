@@ -108,19 +108,20 @@ What distinguishes Navi is its pill-everything button system. Every button uses 
 - Radius: 9999px
 
 ### Cards & Containers
-- Radius: 12px (small), 20px (cards)
-- No shadows — flat surfaces with color contrast
-- **Transaction Cards**: 
-  - Background: Subtly tinted with category color (`withAlpha(color, 0.05)`)
-  - Watermark: Large category icon (`size-24`) absolutely positioned (`-left-4`), rotated (`-rotate-12`), and low opacity (`0.08`)
-  - Content: Indented from left (`pl-16` / 4rem) to avoid overlap with watermark
-  - Elevation: No shadows, flat design
-- Dark and light section alternation
+- Radius: 12px (small), 20px (standard cards), 24px (admin/settings cards)
+- Background: Consistent neutral surface (`bg-navi-surface` / `oklch(96.5% 0 0)`)
+- No shadows — depth achieved through surface contrast
+- **Card Content**:
+  - Icon: Left-aligned in a small circular background (`withAlpha(color, 0.1)`)
+  - Typography: Aeonik Pro for primary titles, Inter for metadata
+  - Status/Actions: Right-aligned relative to content
+- Flat geometric surfaces only
 
 ### Icons
 - **Stroke Width**: Standardized at `1` (lighter aesthetic)
 - **Library**: Lucide React
-- **Placement**: Center-aligned in buttons and list items
+- **Branding**: The `Navigation` icon (branded 'N') is the universal fallback for unknown categories.
+- **Placement**: Integrated into buttons and list items with consistent spacing.
 
 ### Navigation
 - Aeonik Pro 20px weight 500
