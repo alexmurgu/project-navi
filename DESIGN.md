@@ -108,17 +108,19 @@ What distinguishes Navi is its pill-everything button system. Every button uses 
 - Radius: 9999px
 
 ### Cards & Containers
-- Radius: 12px (small), 20px (standard cards), 24px (admin/settings cards)
-- Background: Consistent neutral surface (`bg-navi-surface` / `oklch(96.5% 0 0)`)
-- No shadows — depth achieved through surface contrast
-- **Card Content**:
-  - Icon: Left-aligned in a small circular background (`withAlpha(color, 0.1)`)
-  - Typography: Aeonik Pro for primary titles, Inter for metadata
+- Radius: 12px (small), 20px (standard cards), 24px (transaction/admin cards)
+- Background: Consistent neutral surface (`bg-navi-surface` / `oklch(96.5% 0 0)`) or White (`#ffffff`)
+- No shadows — depth achieved through surface contrast and borders
+- **Transaction Card Content**:
+  - Icon: Left-aligned in a **Squircle** container (`rounded-[18px]`)
+  - Icon Background: Category-tinted (`withAlpha(color, 0.05)`) with a 1px subtle border (`withAlpha(color, 0.1)`)
+  - Typography: Aeonik Pro for primary titles/amounts, Inter for metadata
+  - Metadata: `CATEGORY • DATE, TIME` (uppercase, tracking-widest, Inter font)
   - Status/Actions: Right-aligned relative to content
 - Flat geometric surfaces only
 
 ### Icons
-- **Stroke Width**: Standardized at `1` (lighter aesthetic)
+- **Stroke Width**: Standardized at `1.2` for UI elements (Transaction cards) and `1` for general actions
 - **Library**: Lucide React
 - **Branding**: The `Navigation` icon (branded 'N') is the universal fallback for unknown categories.
 - **Placement**: Integrated into buttons and list items with consistent spacing.
