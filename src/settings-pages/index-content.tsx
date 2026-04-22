@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Palette, Users, ShieldCheck, Bell, Smartphone } from "lucide-react";
+import { withAlpha } from "@/lib/category-visuals";
 
 const managementTiles = [
   {
@@ -72,25 +73,29 @@ export function SettingsContent() {
                 <Link
                   key={tile.to}
                   to={tile.to}
-                  className="group relative flex items-center justify-between p-6 rounded-[24px] transition-all bg-navi-surface border-none active:scale-[0.99] overflow-hidden"
+                  className="navi-card flex items-center justify-between p-6 border-none overflow-hidden group"
                 >
                   <div className="flex items-center gap-6 relative z-10">
                     <div 
-                      className="size-14 rounded-full flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 duration-500"
-                      style={{ backgroundColor: "white", color: tile.color }}
+                      className="size-14 rounded-[18px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 duration-500 border"
+                      style={{ 
+                        backgroundColor: withAlpha(tile.color, 0.05),
+                        borderColor: withAlpha(tile.color, 0.1),
+                        color: tile.color 
+                      }}
                     >
-                      <Icon className="size-6" strokeWidth={1} />
+                      <Icon className="size-6" strokeWidth={1.2} />
                     </div>
                     <div className="min-w-0">
                       <h2 className="text-[18px] font-display font-medium text-navi-dark tracking-tight">
                         {tile.title}
                       </h2>
-                      <p className="text-[11px] font-display font-medium uppercase tracking-widest text-navi-gray/60 mt-1">
+                      <p className="text-[11px] font-sans font-medium uppercase tracking-widest text-navi-gray/60 mt-1">
                         {tile.description}
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="relative z-10 size-5 text-navi-gray/40 transition-transform group-hover:translate-x-1" strokeWidth={1} />
+                  <ChevronRight className="relative z-10 size-5 text-navi-gray/40 transition-transform group-hover:translate-x-1" strokeWidth={1.2} />
                 </Link>
               );
             })}
@@ -112,19 +117,24 @@ export function SettingsContent() {
               return (
                 <div
                   key={item.title}
-                  className="flex items-center justify-between p-6 rounded-[24px] bg-navi-surface transition-all active:scale-[0.995]"
+                  className="navi-card flex items-center justify-between p-6"
                 >
                   <div className="flex items-center gap-6">
                     <div 
-                      className="size-12 rounded-full flex items-center justify-center bg-white text-navi-dark shadow-sm"
+                      className="size-12 rounded-[18px] flex items-center justify-center border"
+                      style={{ 
+                        backgroundColor: withAlpha(item.color, 0.05),
+                        borderColor: withAlpha(item.color, 0.1),
+                        color: item.color 
+                      }}
                     >
-                      <Icon className="size-5" strokeWidth={1} />
+                      <Icon className="size-5" strokeWidth={1.2} />
                     </div>
                     <div>
                       <h4 className="text-[16px] font-display font-medium text-navi-dark tracking-tight">
                         {item.title}
                       </h4>
-                      <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60 mt-0.5">
+                      <p className="text-[10px] font-sans font-medium uppercase tracking-widest text-navi-gray/60 mt-0.5">
                         {item.description}
                       </p>
                     </div>

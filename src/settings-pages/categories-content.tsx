@@ -98,7 +98,7 @@ export function CategoriesContent({
             <button
               type="button"
               key={name}
-              className="relative flex items-center justify-between p-6 rounded-[24px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface"
+              className="navi-card flex items-center justify-between p-6 text-left group"
               onClick={() => {
                 setActiveCategory(name);
                 setIsPickerOpen(true);
@@ -106,15 +106,19 @@ export function CategoriesContent({
             >
               <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
                 <div
-                  className="size-12 rounded-full flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
+                  className="size-12 rounded-[18px] flex items-center justify-center shrink-0 border transition-colors"
+                  style={{
+                    backgroundColor: withAlpha(color, 0.05),
+                    borderColor: withAlpha(color, 0.1),
+                    color: color,
+                  }}
                 >
                   <CategoryIcon
                     category={name}
                     config={config}
                     className="size-6"
                     color={color}
-                    strokeWidth={1}
+                    strokeWidth={1.2}
                   />
                 </div>
                 <div className="min-w-0">
@@ -122,15 +126,15 @@ export function CategoriesContent({
                     {name}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60">
+                    <p className="text-[10px] font-sans font-medium uppercase tracking-widest text-navi-gray/60">
                       {config?.icon || "Default Branded"}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="relative z-10 size-10 rounded-full bg-white flex items-center justify-center text-navi-dark opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                <Check className="size-4" strokeWidth={1} />
+              <div className="relative z-10 size-10 rounded-full bg-navi-surface flex items-center justify-center text-navi-dark opacity-0 group-hover:opacity-100 transition-opacity">
+                <Check className="size-4" strokeWidth={1.2} />
               </div>
             </button>
           );
@@ -175,7 +179,7 @@ export function CategoriesContent({
 
             <div className="space-y-12 p-8">
               {/* Refined Preview */}
-              <div className="flex items-center justify-between bg-navi-surface p-8 rounded-[32px] border border-navi-border/20 overflow-hidden relative">
+              <div className="navi-card flex items-center justify-between p-8 overflow-hidden relative">
                 <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.1] pointer-events-none">
                   <CategoryIcon
                     category={activeCategory || ""}
@@ -186,7 +190,7 @@ export function CategoriesContent({
                   />
                 </div>
                 <div className="relative z-10 pl-20">
-                  <p className="text-[10px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray">
+                  <p className="text-[10px] font-sans font-medium uppercase tracking-[0.25em] text-navi-gray">
                     Live Preview
                   </p>
                   <p className="text-[24px] font-display font-medium text-navi-dark mt-1">
@@ -194,15 +198,19 @@ export function CategoriesContent({
                   </p>
                 </div>
                 <div 
-                  className="size-16 rounded-full flex items-center justify-center relative z-10"
-                  style={{ backgroundColor: withAlpha(draftColor, 0.1), color: draftColor }}
+                  className="size-16 rounded-[18px] flex items-center justify-center relative z-10 border"
+                  style={{ 
+                    backgroundColor: withAlpha(draftColor, 0.05), 
+                    borderColor: withAlpha(draftColor, 0.1),
+                    color: draftColor 
+                  }}
                 >
                   <CategoryIcon
                     category={activeCategory || ""}
                     config={{ name: activeCategory || "", color: draftColor, icon: draftIcon }}
                     className="size-8"
                     color={draftColor}
-                    strokeWidth={1}
+                    strokeWidth={1.2}
                   />
                 </div>
               </div>

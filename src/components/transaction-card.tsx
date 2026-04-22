@@ -43,7 +43,7 @@ export function TransactionCard({
   return (
     <div
       onClick={onClick}
-      className="relative group flex items-center p-4 md:p-5 rounded-[24px] bg-white border border-navi-border/20 transition-all cursor-pointer active:scale-[0.99] hover:border-navi-border/40"
+      className="navi-card flex items-center p-4 md:p-5"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
