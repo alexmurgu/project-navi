@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Save, Trash2, Users, Check, LayoutList, Palette } from "lucide-react";
+import { Save, Trash2, Users, Check, LayoutList, Palette, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { CategoryCombobox } from "@/components/category-combobox";
 import { cn } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addAdminCategory } from "@/actions";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { addAdminCategory, getTransactionSuggestions } from "@/actions";
 import {
   CATEGORY_ICON_OPTIONS,
   CategoryIcon,
@@ -100,6 +100,20 @@ export function TransactionSheet({
   
   const [draftColor, setDraftColor] = React.useState("#F59E0B");
   const [draftIcon, setDraftIcon] = React.useState<string | null>(null);
+  const [description, setDescription] = React.useState("");
+  const [debouncedDescription, setDebouncedDescription] = React.useState("");
+
+  // Debounce description for suggestions
+  React.useEffect(() => {
+    const timer = setTimeout(() => setDebouncedDescription(description), 300);
+    return () => clearTimeout(timer);
+  }, [description]);
+
+  const { data: suggestions = [] } = useQuery({
+    queryKey: ["suggestions", debouncedDescription],
+    queryFn: () => getTransactionSuggestions({ data: debouncedDescription }),
+    enabled: debouncedDescription.length >= 2 && !editingItem,
+  });
 
   const categoryConfigMap = React.useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
@@ -120,6 +134,7 @@ export function TransactionSheet({
       setIsMonthly(editingItem?.isMonthly || false);
       setStatus(editingItem?.status || "paid");
       setIsCustomizing(false);
+      setDescription(editingItem?.description || "");
       
       const activeCat = editingItem?.category || category;
       if (activeCat) {
@@ -262,12 +277,45 @@ export function TransactionSheet({
             <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
               Description
             </Label>
-            <Input
-              name="description"
-              required
-              defaultValue={editingItem?.description || ""}
-              className="h-14 rounded-xl border-none bg-secondary/40 px-6 font-bold shadow-inner"
-            />
+            <div className="relative">
+              <Input
+                name="description"
+                required
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="h-14 rounded-xl border-none bg-secondary/40 px-6 font-bold shadow-inner"
+              />
+              {suggestions.length > 0 && !editingItem && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded-2xl bg-card border border-muted/20 shadow-2xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {suggestions.map((s: any) => (
+                    <button
+                      key={s.description}
+                      type="button"
+                      onClick={() => {
+                        setDescription(s.description);
+                        setCategory(s.category);
+                        // Auto-fill amount if empty
+                        const amountInput = document.querySelector(
+                          'input[name="amount"]',
+                        ) as HTMLInputElement;
+                        if (amountInput && (!amountInput.value || amountInput.value === "0")) {
+                          amountInput.value = (s.amount / 100).toString();
+                        }
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-muted/10 transition-colors text-left"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm truncate">{s.description}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest opacity-30">
+                          {s.category}
+                        </p>
+                      </div>
+                      <ChevronRight className="size-4 opacity-20" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="space-y-3">

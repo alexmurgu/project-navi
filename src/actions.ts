@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "./db";
 import { expense, income, user as userSchema, categoryConfig } from "./db/schema";
-import { eq, sql, and, isNotNull, desc } from "drizzle-orm";
+import { eq, sql, and, isNotNull, desc, like, or } from "drizzle-orm";
 import { auth } from "./auth";
 import { getRequest } from "@tanstack/react-start/server";
 import { addMonths, isBefore, startOfMonth } from "date-fns";
@@ -352,4 +352,44 @@ export const deleteAdminCategory = createServerFn({ method: "POST" })
     await checkAdmin();
     await db.delete(categoryConfig).where(eq(categoryConfig.id, id));
     return { success: true };
+  });
+
+export const getTransactionSuggestions = createServerFn({ method: "GET" })
+  .inputValidator((query: string) => query)
+  .handler(async ({ data: query }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    if (!query || query.length < 2) return [];
+
+    // Query both tables for matching descriptions
+    const expenseMatches = await db
+      .select({
+        description: expense.description,
+        category: expense.category,
+        amount: expense.amount,
+        type: sql<string>`'expense'`,
+      })
+      .from(expense)
+      .where(like(expense.description, `%${query}%`))
+      .orderBy(desc(expense.date))
+      .limit(20);
+
+    const incomeMatches = await db
+      .select({
+        description: income.description,
+        category: income.category,
+        amount: income.amount,
+        type: sql<string>`'income'`,
+      })
+      .from(income)
+      .where(like(income.description, `%${query}%`))
+      .orderBy(desc(income.date))
+      .limit(20);
+
+    // Combine and unique by description
+    const combined = [...expenseMatches, ...incomeMatches];
+    const unique = Array.from(new Map(combined.map((item) => [item.description, item])).values());
+
+    return unique.slice(0, 5);
   });
