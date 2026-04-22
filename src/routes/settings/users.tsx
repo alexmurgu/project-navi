@@ -1,15 +1,15 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { UsersContent } from "@/admin/users-content";
-import { useAuthStore } from "../../store/useAuthStore";
-import { getAdminUsers } from "../../actions";
+import { UsersContent } from "@/settings-pages/users-content";
+import { useAuthStore } from "@/store/useAuthStore";
+import { getAdminUsers } from "@/actions";
 
-export const Route = createFileRoute("/admin/users")({
+export const Route = createFileRoute("/settings/users")({
   loader: () => getAdminUsers(),
-  component: AdminUsersPage,
+  component: SettingsUsersPage,
 });
 
-function AdminUsersPage() {
+function SettingsUsersPage() {
   const { user } = useAuthStore();
 
   const { data: users, isLoading } = useQuery({

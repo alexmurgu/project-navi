@@ -1,8 +1,8 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { SettingsContent } from "@/settings-content";
+import { SettingsContent } from "@/settings-pages/index-content";
 import { useRequireAuth } from "@/hooks/use-auth-guard";
 
-export const Route = createFileRoute("/settings")({
+export const Route = createFileRoute("/settings/")({
   head: () => ({
     meta: [
       { title: "Settings | Aftermind" },

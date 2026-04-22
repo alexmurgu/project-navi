@@ -1,16 +1,16 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CategoriesContent } from "@/admin/categories-content";
-import { useAuthStore } from "../../store/useAuthStore";
+import { CategoriesContent } from "@/settings-pages/categories-content";
+import { useAuthStore } from "@/store/useAuthStore";
 import type { CategoryConfig } from "@/lib/category-visuals";
-import { getDashboardData } from "../../actions";
+import { getDashboardData } from "@/actions";
 
-export const Route = createFileRoute("/admin/categories")({
+export const Route = createFileRoute("/settings/categories")({
   loader: () => getDashboardData(),
-  component: AdminCategories,
+  component: SettingsCategoriesPage,
 });
 
-function AdminCategories() {
+function SettingsCategoriesPage() {
   const { user } = useAuthStore();
 
   const { data, isLoading } = useQuery({

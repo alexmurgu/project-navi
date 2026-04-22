@@ -9,23 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IncomesRouteImport } from './routes/incomes'
 import { Route as ImportRouteImport } from './routes/import'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsUsersRouteImport } from './routes/settings/users'
+import { Route as SettingsCategoriesRouteImport } from './routes/settings/categories'
 import { Route as MembersMemberIdRouteImport } from './routes/members.$memberId'
 import { Route as CategoriesCategoryRouteImport } from './routes/categories.$category'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
-import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -51,6 +46,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsUsersRoute = SettingsUsersRouteImport.update({
+  id: '/settings/users',
+  path: '/settings/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
+  id: '/settings/categories',
+  path: '/settings/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MembersMemberIdRoute = MembersMemberIdRouteImport.update({
   id: '/members/$memberId',
   path: '/members/$memberId',
@@ -59,16 +69,6 @@ const MembersMemberIdRoute = MembersMemberIdRouteImport.update({
 const CategoriesCategoryRoute = CategoriesCategoryRouteImport.update({
   id: '/categories/$category',
   path: '/categories/$category',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
-  id: '/admin/categories',
-  path: '/admin/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -83,11 +83,11 @@ export interface FileRoutesByFullPath {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/users': typeof AdminUsersRoute
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
+  '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/users': typeof SettingsUsersRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -96,11 +96,11 @@ export interface FileRoutesByTo {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/users': typeof AdminUsersRoute
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
+  '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/users': typeof SettingsUsersRoute
+  '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -110,11 +110,11 @@ export interface FileRoutesById {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/admin/categories': typeof AdminCategoriesRoute
-  '/admin/users': typeof AdminUsersRoute
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
+  '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/users': typeof SettingsUsersRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -125,11 +125,11 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
-    | '/settings'
-    | '/admin/categories'
-    | '/admin/users'
     | '/categories/$category'
     | '/members/$memberId'
+    | '/settings/categories'
+    | '/settings/users'
+    | '/settings/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,11 +138,11 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
-    | '/settings'
-    | '/admin/categories'
-    | '/admin/users'
     | '/categories/$category'
     | '/members/$memberId'
+    | '/settings/categories'
+    | '/settings/users'
+    | '/settings'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -151,11 +151,11 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
-    | '/settings'
-    | '/admin/categories'
-    | '/admin/users'
     | '/categories/$category'
     | '/members/$memberId'
+    | '/settings/categories'
+    | '/settings/users'
+    | '/settings/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -165,23 +165,16 @@ export interface RootRouteChildren {
   ImportRoute: typeof ImportRoute
   IncomesRoute: typeof IncomesRoute
   LoginRoute: typeof LoginRoute
-  SettingsRoute: typeof SettingsRoute
-  AdminCategoriesRoute: typeof AdminCategoriesRoute
-  AdminUsersRoute: typeof AdminUsersRoute
   CategoriesCategoryRoute: typeof CategoriesCategoryRoute
   MembersMemberIdRoute: typeof MembersMemberIdRoute
+  SettingsCategoriesRoute: typeof SettingsCategoriesRoute
+  SettingsUsersRoute: typeof SettingsUsersRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -217,6 +210,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/users': {
+      id: '/settings/users'
+      path: '/settings/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof SettingsUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/categories': {
+      id: '/settings/categories'
+      path: '/settings/categories'
+      fullPath: '/settings/categories'
+      preLoaderRoute: typeof SettingsCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/members/$memberId': {
       id: '/members/$memberId'
       path: '/members/$memberId'
@@ -229,20 +243,6 @@ declare module '@tanstack/react-router' {
       path: '/categories/$category'
       fullPath: '/categories/$category'
       preLoaderRoute: typeof CategoriesCategoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/admin/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/categories': {
-      id: '/admin/categories'
-      path: '/admin/categories'
-      fullPath: '/admin/categories'
-      preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -261,11 +261,11 @@ const rootRouteChildren: RootRouteChildren = {
   ImportRoute: ImportRoute,
   IncomesRoute: IncomesRoute,
   LoginRoute: LoginRoute,
-  SettingsRoute: SettingsRoute,
-  AdminCategoriesRoute: AdminCategoriesRoute,
-  AdminUsersRoute: AdminUsersRoute,
   CategoriesCategoryRoute: CategoriesCategoryRoute,
   MembersMemberIdRoute: MembersMemberIdRoute,
+  SettingsCategoriesRoute: SettingsCategoriesRoute,
+  SettingsUsersRoute: SettingsUsersRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

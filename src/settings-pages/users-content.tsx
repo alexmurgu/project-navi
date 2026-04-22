@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trash2, UserPlus, ShieldCheck, Mail, Lock, User as UserIcon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addAdminUser, deleteAdminUser } from "../actions";
+import { addAdminUser, deleteAdminUser } from "@/actions";
 import { cn } from "@/lib/utils";
 
 interface UsersContentProps {

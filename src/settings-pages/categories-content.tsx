@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2, Check, Save, X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addAdminCategory, deleteAdminCategory } from "../actions";
+import { addAdminCategory, deleteAdminCategory } from "@/actions";
 import {
   CATEGORY_ICON_OPTIONS,
   CategoryIcon,

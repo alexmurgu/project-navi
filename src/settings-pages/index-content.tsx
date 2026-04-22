@@ -2,16 +2,16 @@ import React from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Palette, Users, ShieldCheck, Bell, Smartphone } from "lucide-react";
 
-const adminTiles = [
+const managementTiles = [
   {
-    to: "/admin/categories",
+    to: "/settings/categories",
     title: "Categories",
     description: "Manage visual configuration & tags",
     icon: Palette,
     color: "#494fdf",
   },
   {
-    to: "/admin/users",
+    to: "/settings/users",
     title: "Members",
     description: "Manage family access & roles",
     icon: Users,
@@ -56,17 +56,17 @@ export function SettingsContent() {
       </section>
 
       <div className="p-6 md:p-12 max-w-5xl space-y-16">
-        {/* Admin Management Section */}
+        {/* Management Section */}
         <section className="space-y-8">
           <div className="flex items-center gap-4 px-2">
             <div className="h-1.5 w-8 bg-navi-blue rounded-full" />
             <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
-              Administration
+              Management
             </h3>
           </div>
           
           <div className="grid gap-4 md:grid-cols-2">
-            {adminTiles.map((tile) => {
+            {managementTiles.map((tile) => {
               const Icon = tile.icon;
               return (
                 <Link
