@@ -250,7 +250,7 @@ export function DashboardContent({ data }: PageProps) {
               {formatCurrency(stats.monthlyExp)}
             </p>
           </div>
-          <div className="h-16 w-[1px] bg-white/10" />
+          <div className="h-16 w-px bg-white/10" />
           <div className="space-y-2 text-right">
             <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
               Income (Total)
@@ -269,7 +269,7 @@ export function DashboardContent({ data }: PageProps) {
           </h3>
           <div className="grid gap-4">
             {currentMonthCategoryData.items.length === 0 ? (
-              <div className="rounded-[20px] border border-navi-border/30 bg-navi-surface px-8 py-10 text-sm text-navi-gray font-medium uppercase tracking-widest text-center">
+              <div className="rounded-card border border-navi-border/30 bg-navi-surface px-8 py-10 text-sm text-navi-gray font-medium uppercase tracking-widest text-center">
                 No expenses recorded for this month yet.
               </div>
             ) : (
@@ -288,7 +288,7 @@ export function DashboardContent({ data }: PageProps) {
                     <button
                       type="button"
                       key={item.name}
-                      className="relative flex items-center justify-between p-5 rounded-[20px] transition-all border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface cursor-pointer w-full"
+                      className="relative flex items-center justify-between p-5 rounded-card transition-all border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface cursor-pointer w-full"
                       style={{ backgroundColor: withAlpha(color, 0.05) }}
                       onClick={() =>
                         navigate({ to: "/categories/$category", params: { category: item.name } })
@@ -388,7 +388,7 @@ export function DashboardContent({ data }: PageProps) {
                     return (
                       <div
                         key={tx.id}
-                        className="relative flex items-center justify-between p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden bg-navi-surface"
+                        className="relative flex items-center justify-between p-5 rounded-card transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden bg-navi-surface"
                         onClick={() => handleEdit(tx)}
                       >
                         <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">

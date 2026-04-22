@@ -248,7 +248,7 @@ export function TransactionSheet({
                 placeholder="0.00"
                 defaultValue={editingItem?.amount ? editingItem.amount / 100 : ""}
                 className={cn(
-                  "h-16 rounded-[20px] border-none px-6 font-display font-medium text-[24px] bg-navi-surface",
+                  "h-16 rounded-card border-none px-6 font-display font-medium text-[24px] bg-navi-surface",
                   mode === "expense" ? "text-navi-dark" : "text-navi-teal",
                 )}
               />
@@ -264,7 +264,7 @@ export function TransactionSheet({
                 defaultValue={
                   editingItem?.date ? new Date(editingItem.date).toISOString().split("T")[0] : today
                 }
-                className="h-16 rounded-[20px] border-none bg-navi-surface px-6 font-display font-medium"
+                className="h-16 rounded-card border-none bg-navi-surface px-6 font-display font-medium"
               />
             </div>
           </div>
@@ -279,7 +279,7 @@ export function TransactionSheet({
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="h-16 rounded-[20px] border-none bg-navi-surface px-6 font-display font-medium"
+                className="h-16 rounded-card border-none bg-navi-surface px-6 font-display font-medium"
               />
               {suggestions.length > 0 && !editingItem && (
                 <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded-2xl bg-card border border-muted/20 shadow-2xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -381,7 +381,7 @@ export function TransactionSheet({
                       type="button"
                       onClick={() => setDraftIcon(null)}
                       className={cn(
-                        "flex flex-col items-center gap-3 p-4 rounded-[20px] border-2 transition-all",
+                        "flex flex-col items-center gap-3 p-4 rounded-card border-2 transition-all",
                         draftIcon === null ? "bg-navi-dark text-white border-navi-dark" : "bg-white border-transparent hover:bg-white"
                       )}
                     >
@@ -395,7 +395,7 @@ export function TransactionSheet({
                           type="button"
                           onClick={() => setDraftIcon(opt.value)}
                           className={cn(
-                            "flex flex-col items-center gap-3 p-4 rounded-[20px] border-2 transition-all",
+                            "flex flex-col items-center gap-3 p-4 rounded-card border-2 transition-all",
                             draftIcon === opt.value ? "bg-navi-dark text-white border-navi-dark" : "bg-white border-transparent hover:bg-white"
                           )}
                         >

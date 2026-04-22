@@ -92,7 +92,7 @@
   }
 
   .navi-card {
-    @apply rounded-[20px] bg-white border border-navi-border/30 shadow-none p-6;
+    @apply rounded-card bg-white border border-navi-border/30 shadow-none p-6;
   }
 
   .display-mega {

@@ -20,7 +20,7 @@ export function MobileNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[60] px-6 pb-8 pt-4 pointer-events-none">
+    <nav className="fixed bottom-0 left-0 right-0 z-60 px-6 pb-8 pt-4 pointer-events-none">
       <div className="relative mx-auto max-w-lg">
         <div className="pointer-events-auto grid grid-cols-5 items-center gap-1 rounded-full border border-navi-border/30 bg-white/95 px-3 py-3 shadow-none backdrop-blur-xl">
           {navItems.map((item) => {

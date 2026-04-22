@@ -3,25 +3,12 @@ import {
   Search,
   Plus,
   ArrowUpDown,
-  Pencil,
-  Trash2,
   ChevronDown,
   User as UserIcon,
   Check,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,7 +64,6 @@ export function ExpensesContent({ data }: PageProps) {
   const [availableCategories, setAvailableCategories] = useState<string[]>(data.expenseCategories);
   const [selectedUserId, setSelectedUserId] = useState<string>("family");
   const [expenseCategory, setExpenseCategory] = useState("");
-  const [selectedExpenseType, setSelectedExpenseType] = useState<"monthly" | "extra">("extra");
   const [editingItem, setEditingItem] = useState<Transaction | null>(null);
   const [tableSearch, setTableSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
@@ -159,7 +145,6 @@ export function ExpensesContent({ data }: PageProps) {
     setEditingItem(tx);
     setSelectedUserId(tx.userId || "family");
     setExpenseCategory(tx.category);
-    setSelectedExpenseType(tx.isMonthly ? "monthly" : "extra");
     setExpenseSheetOpen(true);
   };
 
@@ -262,7 +247,7 @@ export function ExpensesContent({ data }: PageProps) {
           return (
             <div
               key={item.id}
-              className="relative group flex items-center p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden bg-navi-surface"
+              className="relative group flex items-center p-5 rounded-card transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden bg-navi-surface"
               onClick={() => handleEdit(item)}
               role="button"
               tabIndex={0}
