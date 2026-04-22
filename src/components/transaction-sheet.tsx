@@ -187,9 +187,6 @@ export function TransactionSheet({
                 if (suggestion.category) {
                   dispatch({ type: "SET_FIELD", field: "category", value: suggestion.category });
                 }
-                if (suggestion.amount) {
-                  dispatch({ type: "SET_FIELD", field: "amount", value: (suggestion.amount / 100).toString() });
-                }
               }}
             />
           </div>
