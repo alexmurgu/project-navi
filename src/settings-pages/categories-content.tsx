@@ -290,7 +290,7 @@ export function CategoriesContent({
                       type="button"
                       onClick={() => setDraftIcon(null)}
                       className={cn(
-                        "flex items-center justify-center p-4 sm:p-5 rounded-[20px] border transition-all active:scale-[0.98]",
+                        "flex items-center justify-center p-4 sm:p-5 rounded-card border transition-all active:scale-[0.98]",
                         draftIcon === null 
                           ? "bg-white border-navi-dark shadow-sm" 
                           : "bg-navi-surface border-transparent hover:bg-white/50"
@@ -317,7 +317,7 @@ export function CategoriesContent({
                             type="button"
                             onClick={() => setDraftIcon(option.value)}
                             className={cn(
-                              "flex items-center justify-center p-4 sm:p-5 rounded-[20px] border transition-all active:scale-[0.98]",
+                              "flex items-center justify-center p-4 sm:p-5 rounded-card border transition-all active:scale-[0.98]",
                               selected
                                 ? "bg-white border-navi-dark shadow-sm"
                                 : "bg-navi-surface border-transparent hover:bg-white/50"

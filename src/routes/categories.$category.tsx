@@ -10,8 +10,8 @@ export const Route = createFileRoute("/categories/$category")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData.category} | Categories` },
-      { name: "description", content: `Viewing transactions for ${loaderData.category}` },
+      { title: `${loaderData?.category || "Category"} | Categories` },
+      { name: "description", content: `Viewing transactions for ${loaderData?.category || "Category"}` },
     ],
   }),
   component: CategoryOverviewPage,

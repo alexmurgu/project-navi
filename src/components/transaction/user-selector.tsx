@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 interface User {
   id: string;
   name: string;
-  email: string;
+  email?: string;
 }
 
 interface UserSelectorProps {

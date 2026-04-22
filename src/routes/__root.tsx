@@ -189,7 +189,7 @@ function RootLayout() {
               <Button
                 type="button"
                 variant="default"
-                className="h-24 rounded-[24px] font-display font-medium tracking-widest text-[12px] uppercase bg-navi-dark text-white hover:opacity-90"
+                className="h-24 rounded-premium font-display font-medium tracking-widest text-[12px] uppercase bg-navi-dark text-white hover:opacity-90"
                 onClick={() => openQuickAdd("expense")}
               >
                 <div className="flex flex-col items-center gap-3">
@@ -199,7 +199,7 @@ function RootLayout() {
               </Button>
               <Button
                 type="button"
-                className="h-24 rounded-[24px] font-display font-medium tracking-widest text-[12px] uppercase bg-navi-teal text-white hover:opacity-90"
+                className="h-24 rounded-premium font-display font-medium tracking-widest text-[12px] uppercase bg-navi-teal text-white hover:opacity-90"
                 onClick={() => openQuickAdd("income")}
               >
                 <div className="flex flex-col items-center gap-3">

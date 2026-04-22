@@ -146,7 +146,7 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                 return (
                   <div
                     key={user.id}
-                    className="group relative flex items-center justify-between p-6 rounded-[24px] bg-navi-surface transition-all active:scale-[0.995]"
+                    className="group relative flex items-center justify-between p-6 rounded-premium bg-navi-surface transition-all active:scale-[0.995]"
                   >
                     <div className="flex items-center gap-6">
                       <div 

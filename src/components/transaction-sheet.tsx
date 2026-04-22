@@ -18,7 +18,7 @@ import { TransactionForm } from "./transaction/transaction-form";
 interface User {
   id: string;
   name: string;
-  email: string;
+  email?: string;
 }
 
 interface TransactionSheetProps {

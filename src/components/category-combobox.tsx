@@ -66,41 +66,43 @@ export function CategoryCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          type="button"
-          variant="outline"
-          role="combobox"
-          aria-controls={listboxId}
-          aria-expanded={open}
-          className={cn(
-            "flex h-14 flex-1 items-center justify-between rounded-2xl border-none bg-navi-surface px-6 text-base font-display font-medium transition-all hover:bg-white/50 shadow-sm",
-            className,
-          )}
-          style={style}
-        >
-          <div className="flex items-center gap-3 overflow-hidden">
-            {value && (
-              <div 
-                className="size-6 rounded-lg flex items-center justify-center shrink-0"
-                style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
-              >
-                <CategoryIcon category={value} config={config} className="size-3.5" color={color} strokeWidth={1.5} />
-              </div>
+      <PopoverTrigger
+        render={
+          <Button
+            id={id}
+            type="button"
+            variant="outline"
+            role="combobox"
+            aria-controls={listboxId}
+            aria-expanded={open}
+            className={cn(
+              "flex h-14 flex-1 items-center justify-between rounded-2xl border-none bg-navi-surface px-6 text-base font-display font-medium transition-all hover:bg-white/50 shadow-sm",
+              className,
             )}
-            <span
-              className={cn(
-                "truncate",
-                value ? "text-navi-dark" : "text-navi-gray/40 font-sans uppercase text-[10px] tracking-widest",
+            style={style}
+          >
+            <div className="flex items-center gap-3 overflow-hidden">
+              {value && (
+                <div 
+                  className="size-6 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
+                >
+                  <CategoryIcon category={value} config={config} className="size-3.5" color={color} strokeWidth={1.5} />
+                </div>
               )}
-            >
-              {value || placeholder}
-            </span>
-          </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-20" />
-        </Button>
-      </PopoverTrigger>
+              <span
+                className={cn(
+                  "truncate",
+                  value ? "text-navi-dark" : "text-navi-gray/40 font-sans uppercase text-[10px] tracking-widest",
+                )}
+              >
+                {value || placeholder}
+              </span>
+            </div>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-20" />
+          </Button>
+        }
+      />
       <PopoverContent
         className="w-(--radix-popover-trigger-width) rounded-3xl border-none p-2 shadow-[0_30px_80px_-45px_rgba(0,0,0,0.35)] bg-white/95 backdrop-blur-xl"
         align="start"

@@ -76,18 +76,20 @@ export function TransactionForm({
             Occurrence
           </Label>
           <Popover>
-            <PopoverTrigger asChild>
-              <button
-                id="date-picker"
-                type="button"
-                className="w-full h-14 rounded-2xl bg-navi-surface flex items-center px-5 gap-4 text-navi-dark hover:bg-white/50 transition-colors shadow-sm"
-              >
-                <CalendarIcon className="size-4 text-navi-gray/40" strokeWidth={1} />
-                <span className="font-display font-medium text-[15px]">
-                  {date ? format(date, "PPP") : "Select date"}
-                </span>
-              </button>
-            </PopoverTrigger>
+            <PopoverTrigger
+              render={
+                <button
+                  id="date-picker"
+                  type="button"
+                  className="w-full h-14 rounded-2xl bg-navi-surface flex items-center px-5 gap-4 text-navi-dark hover:bg-white/50 transition-colors shadow-sm"
+                >
+                  <CalendarIcon className="size-4 text-navi-gray/40" strokeWidth={1} />
+                  <span className="font-display font-medium text-[15px]">
+                    {date ? format(date, "PPP") : "Select date"}
+                  </span>
+                </button>
+              }
+            />
             <PopoverContent className="w-auto p-0 rounded-3xl overflow-hidden border-none shadow-2xl" align="start">
               <Calendar
                 mode="single"

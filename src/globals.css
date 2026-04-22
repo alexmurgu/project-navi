@@ -94,7 +94,7 @@
   }
 
   .navi-card {
-    @apply rounded-[var(--radius-premium)] bg-white border border-navi-border/20 transition-all active:scale-[0.99] hover:border-navi-border/40;
+    @apply rounded-premium bg-white border border-navi-border/20 transition-all active:scale-[0.99] hover:border-navi-border/40;
   }
 
   .display-mega {
