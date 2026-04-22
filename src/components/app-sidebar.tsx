@@ -48,10 +48,10 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="gap-3">
               {[
-                { to: "/", icon: <Home className="size-5" />, label: "Home" }, // Terminal -> Home
-                { to: "/incomes", icon: <ArrowUpCircle className="size-5" />, label: "Income" },
-                { to: "/expenses", icon: <TrendingDown className="size-5" />, label: "Expenses" },
-                { to: "/import", icon: <FileUp className="size-5" />, label: "Import" },
+                { to: "/", icon: <Home className="size-5" strokeWidth={1} />, label: "Home" }, // Terminal -> Home
+                { to: "/incomes", icon: <ArrowUpCircle className="size-5" strokeWidth={1} />, label: "Income" },
+                { to: "/expenses", icon: <TrendingDown className="size-5" strokeWidth={1} />, label: "Expenses" },
+                { to: "/import", icon: <FileUp className="size-5" strokeWidth={1} />, label: "Import" },
               ].map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton
@@ -88,7 +88,7 @@ export function AppSidebar() {
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-1",
                 )}
               >
-                <Settings className="size-5 mr-4 opacity-50" />
+                <Settings className="size-5 mr-4 opacity-50" strokeWidth={1} />
                 <span className="font-black text-[10px] uppercase tracking-widest">Settings</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -97,7 +97,7 @@ export function AppSidebar() {
                 onClick={handleLogout}
                 className="h-12 px-6 rounded-xl text-muted-foreground hover:bg-destructive/5 hover:text-destructive transition-all duration-500"
               >
-                <LogOut className="size-5 mr-4 opacity-50" />
+                <LogOut className="size-5 mr-4 opacity-50" strokeWidth={1} />
                 <span className="font-black text-[10px] uppercase tracking-widest">Logout</span>
               </SidebarMenuButton>
             </SidebarMenuItem>

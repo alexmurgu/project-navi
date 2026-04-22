@@ -10,7 +10,6 @@ import {
   type CategoryConfig,
   withAlpha,
 } from "@/lib/category-visuals";
-import { TransactionSheet } from "@/components/transaction-sheet";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   addExpense,
@@ -21,12 +20,15 @@ import {
   deleteIncome,
   updateTransactionStatus,
 } from "./actions";
+import { TransactionSheet } from "@/components/transaction-sheet";
+import { Button } from "./components/ui/button";
 
 interface User {
   id: string;
   name: string;
   email: string;
 }
+
 interface Transaction {
   id: string;
   date: string | Date;
@@ -39,6 +41,7 @@ interface Transaction {
   isMonthly?: boolean;
   status?: "pending" | "paid";
 }
+
 interface PageProps {
   data: {
     user: User;
@@ -68,37 +71,11 @@ export function DashboardContent({ data }: PageProps) {
   const [availableIncomeCategories, setAvailableIncomeCategories] = useState<string[]>(
     data.incomeCategories,
   );
+
+  const [editingItem, setEditingItem] = useState<Transaction | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>("family");
   const [expenseCategory, setExpenseCategory] = useState("");
   const [incomeCategory, setIncomeCategory] = useState("");
-  const [editingItem, setEditingItem] = useState<Transaction | null>(null);
-
-  useEffect(() => {
-    const handleQuickAddExpense = () => {
-      setEditingItem(null);
-      setExpenseSheetOpen(true);
-    };
-    const handleQuickAddIncome = () => {
-      setEditingItem(null);
-      setIncomeSheetOpen(true);
-    };
-    const pendingQuickAdd = sessionStorage.getItem("pendingQuickAdd");
-    if (pendingQuickAdd === "expense") {
-      setEditingItem(null);
-      setExpenseSheetOpen(true);
-      sessionStorage.removeItem("pendingQuickAdd");
-    } else if (pendingQuickAdd === "income") {
-      setEditingItem(null);
-      setIncomeSheetOpen(true);
-      sessionStorage.removeItem("pendingQuickAdd");
-    }
-    window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
-    window.addEventListener("open-quick-add-income", handleQuickAddIncome);
-    return () => {
-      window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
-      window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
-    };
-  }, []);
 
   const addExpenseMutation = useMutation({
     mutationFn: (d: any) => addExpense({ data: d }),
@@ -107,6 +84,7 @@ export function DashboardContent({ data }: PageProps) {
       setExpenseSheetOpen(false);
     },
   });
+
   const updateExpenseMutation = useMutation({
     mutationFn: (d: any) => updateExpense({ data: d }),
     onSuccess: async () => {
@@ -114,6 +92,7 @@ export function DashboardContent({ data }: PageProps) {
       setExpenseSheetOpen(false);
     },
   });
+
   const addIncomeMutation = useMutation({
     mutationFn: (d: any) => addIncome({ data: d }),
     onSuccess: async () => {
@@ -121,6 +100,7 @@ export function DashboardContent({ data }: PageProps) {
       setIncomeSheetOpen(false);
     },
   });
+
   const updateIncomeMutation = useMutation({
     mutationFn: (d: any) => updateIncome({ data: d }),
     onSuccess: async () => {
@@ -146,14 +126,19 @@ export function DashboardContent({ data }: PageProps) {
   ) as Transaction[];
 
   const stats = useMemo(() => {
-    const totalIncome = data.incomes.reduce((acc, curr) => acc + curr.amount, 0);
-    const totalExp = data.expenses.reduce((acc, curr) => acc + curr.amount, 0);
+    const paidIncomes = data.incomes.filter((i) => (i as any).status !== "pending");
+    const paidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
+
+    const totalIncome = paidIncomes.reduce((acc, curr) => acc + curr.amount, 0);
+    const totalExp = paidExpenses.reduce((acc, curr) => acc + curr.amount, 0);
     const now = new Date();
     const start = startOfMonth(now);
     const end = endOfMonth(now);
-    const monthlyExp = data.expenses
+
+    const monthlyExp = paidExpenses
       .filter((e) => isWithinInterval(new Date(e.date), { start, end }))
       .reduce((acc, curr) => acc + curr.amount, 0);
+
     return { income: totalIncome, expense: totalExp, monthlyExp, balance: totalIncome - totalExp };
   }, [data]);
 
@@ -221,47 +206,70 @@ export function DashboardContent({ data }: PageProps) {
     }
   };
 
-  return (
-    <div className="w-full min-h-screen flex flex-col bg-background antialiased">
-      {/* High-Impact Hero Section - Full bleed everywhere */}
-      <section className="wallet-hero-gradient pt-10 pb-16 px-6 md:px-12 flex flex-col gap-14 relative overflow-hidden text-white shadow-xl">
-        <div className="absolute top-0 right-0 size-96 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
+  useEffect(() => {
+    const handleQuickAddExpense = () => {
+      setEditingItem(null);
+      setSelectedUserId("family");
+      setExpenseCategory("");
+      setExpenseSheetOpen(true);
+    };
+    const handleQuickAddIncome = () => {
+      setEditingItem(null);
+      setSelectedUserId("family");
+      setIncomeCategory("");
+      setIncomeSheetOpen(true);
+    };
 
-        <div className="space-y-4 relative z-10 text-center md:text-left">
-          <p className="text-[11px] font-black uppercase tracking-[0.3em] opacity-60">
+    window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
+    window.addEventListener("open-quick-add-income", handleQuickAddIncome);
+    return () => {
+      window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
+      window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
+    };
+  }, []);
+
+  return (
+    <div className="w-full min-h-screen flex flex-col bg-white antialiased">
+      {/* High-Impact Hero Section */}
+      <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-16 relative overflow-hidden text-white">
+        <div className="space-y-6 relative z-10 text-center md:text-left">
+          <p className="text-[12px] font-display font-medium uppercase tracking-[0.25em] opacity-50">
             Available Balance
           </p>
-          <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-none">
+          <h1 className="text-[64px] md:text-[120px] font-display font-medium leading-[0.9] tracking-[-0.04em]">
             {formatCurrency(stats.balance)}
           </h1>
         </div>
 
         <div className="flex items-center justify-between px-2 relative z-10">
-          <div className="space-y-1">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-50">
+          <div className="space-y-2">
+            <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
               Expenses (Monthly)
             </p>
-            <p className="text-3xl md:text-5xl font-black tracking-tight">
+            <p className="text-[32px] md:text-[48px] font-display font-medium tracking-tight">
               {formatCurrency(stats.monthlyExp)}
             </p>
           </div>
-          <div className="h-16 w-1.5 bg-white/20 rounded-full" />
-          <div className="space-y-1 text-right">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-50">
+          <div className="h-16 w-[1px] bg-white/10" />
+          <div className="space-y-2 text-right">
+            <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
               Income (Total)
             </p>
-            <p className="text-3xl md:text-5xl font-black tracking-tight">
+            <p className="text-[32px] md:text-[48px] font-display font-medium tracking-tight">
               {formatCurrency(stats.income)}
             </p>
           </div>
         </div>
       </section>
 
-      <div className="p-6 md:p-12 space-y-12">
-        <section className="space-y-3">
-          <div className="space-y-3">
+      <div className="p-6 md:p-12 space-y-16">
+        <section className="space-y-6">
+          <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40 ml-2">
+            Monthly Breakdown
+          </h3>
+          <div className="grid gap-4">
             {currentMonthCategoryData.items.length === 0 ? (
-              <div className="rounded-2xl border border-muted/10 bg-secondary/20 px-5 py-6 text-sm text-muted-foreground">
+              <div className="rounded-[20px] border border-navi-border/30 bg-navi-surface px-8 py-10 text-sm text-navi-gray font-medium uppercase tracking-widest text-center">
                 No expenses recorded for this month yet.
               </div>
             ) : (
@@ -271,73 +279,76 @@ export function DashboardContent({ data }: PageProps) {
                   : currentMonthCategoryData.items.slice(0, 3)
                 ).map((item) => {
                   const config = getCategoryConfig(categoryConfigMap, item.name);
-                  const color = config?.color || "#14B8A6";
-                  const bgColor = withAlpha(color, 0.05);
+                  const color = config?.color || "#494fdf";
                   const share = currentMonthCategoryData.total
-                    ? Math.max(4, (item.amount / currentMonthCategoryData.total) * 100)
+                    ? Math.max(2, (item.amount / currentMonthCategoryData.total) * 100)
                     : 0;
 
                   return (
                     <button
                       type="button"
                       key={item.name}
-                      className="relative flex w-full flex-col p-4 rounded-xl transition-all border border-transparent hover:border-muted/10 shadow-sm md:shadow-none group overflow-hidden text-left cursor-pointer"
-                      style={{
-                        backgroundImage: `linear-gradient(90deg, ${withAlpha(
-                          color,
-                          0.22,
-                        )} 0%, ${withAlpha(color, 0.22)} ${share}%, ${bgColor} ${share}%, ${bgColor} 100%)`,
-                      }}
+                      className="relative flex items-center justify-between p-5 rounded-[20px] transition-all border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface cursor-pointer w-full"
+                      style={{ backgroundColor: withAlpha(color, 0.05) }}
                       onClick={() =>
                         navigate({ to: "/categories/$category", params: { category: item.name } })
                       }
                     >
-                      <div className="relative z-10 flex items-center justify-between gap-4 min-w-0">
-                        <div className="flex items-center gap-4 min-w-0">
-                          <div className="size-11 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6 shrink-0">
-                            <CategoryIcon
-                              category={item.name}
-                              config={config}
-                              kind="expense"
-                              className="size-6"
-                              color={color}
-                            />
-                          </div>
-                          <div className="space-y-0.5 min-w-0">
-                            <p className="font-bold text-sm tracking-tight text-foreground truncate">
-                              {item.name}
-                            </p>
-                            <div className="flex items-center gap-2">
-                              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">
-                                {item.count} {item.count === 1 ? "transaction" : "transactions"}
-                              </p>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-                                {Math.round((item.amount / currentMonthCategoryData.total) * 100) ||
-                                  0}
-                                % of month
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="font-black text-sm tracking-tight text-foreground">
-                            {formatCurrency(item.amount)}
+                      {/* Integrated Progress Bar as Background Overlay */}
+                      <div
+                        className="absolute inset-y-0 left-0 transition-all duration-1000 ease-out"
+                        style={{ width: `${share}%`, backgroundColor: color, opacity: 0.1 }}
+                      />
+
+                      {/* Large Watermark Icon */}
+                      <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                        <CategoryIcon
+                          category={item.name}
+                          config={config}
+                          kind="expense"
+                          className="size-24 -rotate-12"
+                          color={color}
+                          strokeWidth={1}
+                        />
+                      </div>
+
+                      <div className="relative z-10 pl-16 flex-1 min-w-0">
+                        <p className="font-display font-medium text-[16px] text-navi-dark truncate">
+                          {item.name}
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
+                            {item.count} {item.count === 1 ? "txn" : "txns"}
+                          </p>
+                          <div className="size-1 rounded-full bg-navi-border/50" />
+                          <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
+                            {Math.round((item.amount / currentMonthCategoryData.total) * 100) || 0}%
+                            share
                           </p>
                         </div>
+                      </div>
+
+                      <div className="relative z-10 text-right shrink-0">
+                        <p className="font-display font-medium text-[18px] text-navi-dark">
+                          {formatCurrency(item.amount)}
+                        </p>
                       </div>
                     </button>
                   );
                 })}
                 {currentMonthCategoryData.items.length > 3 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllCategories(!showAllCategories)}
-                    className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 hover:text-primary transition-colors text-center"
-                  >
-                    {showAllCategories
-                      ? "Show less"
-                      : `Show ${currentMonthCategoryData.items.length - 3} more categories`}
-                  </button>
+                  <div className="pt-2 flex justify-center">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setShowAllCategories(!showAllCategories)}
+                      className="px-8"
+                    >
+                      {showAllCategories
+                        ? "Show less"
+                        : `Show ${currentMonthCategoryData.items.length - 3} more categories`}
+                    </Button>
+                  </div>
                 )}
               </>
             )}
@@ -345,77 +356,82 @@ export function DashboardContent({ data }: PageProps) {
         </section>
 
         {/* Recent Transactions List */}
-        <section className="space-y-8">
+        <section className="space-y-10">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-lg font-black tracking-tight italic uppercase">Recent Activity</h3>
-            <button
+            <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+              Recent Activity
+            </h3>
+            <Button
+              variant="link"
+              size="xs"
               onClick={() => navigate({ to: "/expenses" })}
-              className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
+              className="p-0 h-auto"
             >
               View All
-            </button>
+            </Button>
           </div>
 
-          <div className="space-y-10">
+          <div className="space-y-12">
             {groupedRecentActivity.map((group) => (
-              <div key={group.title} className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40 ml-2">
+              <div key={group.title} className="space-y-6 px-2">
+                <h4 className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60 ml-2">
                   {group.title}
                 </h4>
-                <div className="space-y-2">
+                <div className="grid gap-4">
                   {group.items.map((tx) => {
                     const config = getCategoryConfig(categoryConfigMap, tx.category);
-                    const color = config?.color || (tx.type === "expense" ? "#F43F5E" : "#10B981");
-                    const bgColor = withAlpha(color, 0.05);
+                    const color = tx.type === "expense" ? config?.color || "#191c1f" : "#00a87e";
+
                     return (
                       <div
                         key={tx.id}
-                        className="flex items-center justify-between p-4 rounded-xl transition-all cursor-pointer group border border-transparent hover:border-muted/10 shadow-sm md:shadow-none"
-                        style={{ backgroundColor: bgColor }}
+                        className="relative flex items-center justify-between p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden"
+                        style={{ backgroundColor: withAlpha(color, 0.05) }}
                         onClick={() => handleEdit(tx)}
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="size-12 rounded-lg flex items-center justify-center transition-transform group-hover:-rotate-6">
-                            <CategoryIcon
-                              category={tx.category}
-                              config={config}
-                              kind={tx.type}
-                              className="size-6"
-                              color={color}
-                            />
-                          </div>
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-2">
-                              <p className="font-bold text-sm tracking-tight text-foreground">
+                        <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                          <CategoryIcon
+                            category={tx.category}
+                            config={config}
+                            kind={tx.type}
+                            className="size-24 -rotate-12"
+                            color={color}
+                            strokeWidth={1}
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10 pl-16">
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-3">
+                              <p className="font-display font-medium text-[16px] text-navi-dark truncate">
                                 {tx.description}
                               </p>
                               {tx.status === "pending" && (
-                                <span className="px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 text-[8px] font-black uppercase tracking-widest">
+                                <span className="px-2 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[9px] font-display font-medium uppercase tracking-widest">
                                   Pending
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-30">
-                                {tx.category}
-                              </p>
-                              <div className="flex items-center gap-1 text-[8px] font-black uppercase text-muted-foreground/40 bg-muted/5 px-1.5 py-0.5 rounded">
-                                <UserIcon className="size-2 opacity-50" />
+                            <div className="flex items-center gap-3 text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60">
+                              <p>{tx.category}</p>
+                              <div className="size-1 rounded-full bg-navi-border/50" />
+                              <div className="flex items-center gap-1.5">
+                                <UserIcon className="size-2.5 opacity-40" strokeWidth={1} />
                                 <span>{tx.userName || "Family"}</span>
                               </div>
                             </div>
                           </div>
                         </div>
-                        <div className="text-right flex items-center gap-3 shrink-0">
+                        <div className="text-right flex items-center gap-4 shrink-0 relative z-10">
                           <div>
                             <p
                               className={cn(
-                                "font-black text-sm tracking-tight",
+                                "font-display font-medium text-[18px]",
                                 tx.status === "pending"
-                                  ? "text-muted-foreground opacity-40"
+                                  ? "text-navi-gray/40"
                                   : tx.type === "expense"
-                                    ? "text-rose-600"
-                                    : "text-emerald-600",
+                                    ? "text-navi-dark"
+                                    : "text-navi-teal",
                               )}
                             >
                               {tx.type === "expense" ? "-" : "+"}
@@ -432,9 +448,9 @@ export function DashboardContent({ data }: PageProps) {
                                   status: "paid",
                                 });
                               }}
-                              className="size-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center hover:bg-emerald-500/20 transition-all shadow-sm"
+                              className="size-10 rounded-full bg-navi-teal text-white flex items-center justify-center hover:opacity-90 transition-all"
                             >
-                              <Check className="size-4" />
+                              <Check className="size-5" strokeWidth={1} />
                             </button>
                           )}
                         </div>

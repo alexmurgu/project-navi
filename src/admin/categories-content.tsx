@@ -117,58 +117,53 @@ export function CategoriesContent({
   };
 
   const renderCategoryTable = (names: string[], title: string) => (
-    <Card className="rounded-xl shadow-sm border bg-card overflow-hidden">
-      <CardHeader className="border-b pb-4">
-        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-xs font-medium text-muted-foreground uppercase tracking-wider pl-6">
-                Category
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {names.sort().map((name) => {
-              const config = configMap[name];
-              return (
-                <TableRow
-                  key={name}
-                  className="group cursor-pointer transition-colors"
-                  onClick={() => {
-                    setActiveCategory(name);
-                    setIsPickerOpen(true);
-                  }}
-                  style={{
-                    backgroundColor: config?.color ? withAlpha(config.color, 0.05) : "transparent",
-                  }}
-                >
-                  <TableCell className="pl-6">
-                    <div className="flex items-center gap-4 py-1.5">
-                      <div className="size-11 rounded-xl flex items-center justify-center shrink-0">
-                        <CategoryIcon
-                          category={name}
-                          config={config}
-                          className="size-5"
-                          color={config?.color}
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm tracking-tight text-foreground truncate">
-                          {name}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40 ml-2">
+        {title}
+      </h3>
+      <div className="grid gap-4">
+        {names.sort().map((name) => {
+          const config = configMap[name];
+          const color = config?.color || "#191c1f";
+
+          return (
+            <button
+              type="button"
+              key={name}
+              className="relative flex items-center justify-between p-6 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface"
+              style={{ backgroundColor: withAlpha(color, 0.05) }}
+              onClick={() => {
+                setActiveCategory(name);
+                setIsPickerOpen(true);
+              }}
+            >
+              <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                <CategoryIcon
+                  category={name}
+                  config={config}
+                  className="size-24 -rotate-12"
+                  color={color}
+                  strokeWidth={1}
+                />
+              </div>
+
+              <div className="relative z-10 pl-16 flex-1 min-w-0">
+                <p className="font-display font-medium text-lg text-navi-dark truncate">
+                  {name}
+                </p>
+                <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60 mt-1">
+                  {config?.icon || "Default Icon"}
+                </p>
+              </div>
+
+              <div className="relative z-10 flex items-center justify-center size-10 rounded-full bg-white/50 text-navi-dark opacity-0 group-hover:opacity-100 transition-opacity">
+                <Check className="size-4" strokeWidth={1} />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 
   return (
@@ -181,129 +176,104 @@ export function CategoriesContent({
       <Sheet open={isPickerOpen} onOpenChange={setIsPickerOpen}>
         <SheetContent
           side="bottom"
-          className="h-[90vh] sm:h-fit sm:side-right border-t sm:border-l rounded-t-2xl sm:rounded-l-2xl p-0 shadow-2xl border-none"
+          className="h-[95vh] sm:h-fit sm:max-h-[95vh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
         >
           <div className="h-full overflow-y-auto">
-            <SheetHeader className="border-b pb-5">
-              <SheetTitle className="text-lg font-semibold">Customize {activeCategory}</SheetTitle>
-              <SheetDescription>Tap a color and icon for {activeCategory}</SheetDescription>
+            <SheetHeader className="p-8 pb-4 text-left shrink-0">
+              <SheetTitle className="text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
+                Customize {activeCategory}
+              </SheetTitle>
+              <SheetDescription className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                Update visual configuration for this category
+              </SheetDescription>
             </SheetHeader>
-            <div className="space-y-8 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                    Preview
-                  </p>
-                  <p className="text-sm font-medium text-foreground/70">{activeCategory}</p>
+
+            <div className="space-y-12 p-8">
+              {/* Refined Preview */}
+              <div className="flex items-center justify-between bg-navi-surface p-8 rounded-[32px] border border-navi-border/20 overflow-hidden relative">
+                <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.1] pointer-events-none">
+                  <CategoryIcon
+                    category={activeCategory || ""}
+                    config={{ name: activeCategory || "", color: draftColor, icon: draftIcon }}
+                    className="size-32 -rotate-12"
+                    color={draftColor}
+                    strokeWidth={1}
+                  />
                 </div>
-                <div
-                  className="flex items-center gap-3 rounded-full border px-3 py-2"
-                  style={{
-                    borderColor: withAlpha(draftColor, 0.22),
-                    backgroundColor: withAlpha(draftColor, 0.08),
-                    color: draftColor,
-                  }}
+                <div className="relative z-10 pl-20">
+                  <p className="text-[10px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray">
+                    Live Preview
+                  </p>
+                  <p className="text-[24px] font-display font-medium text-navi-dark mt-1">
+                    {activeCategory}
+                  </p>
+                </div>
+                <div 
+                  className="size-16 rounded-full flex items-center justify-center relative z-10"
+                  style={{ backgroundColor: withAlpha(draftColor, 0.1), color: draftColor }}
                 >
-                  <div
-                    className="size-9 rounded-full flex items-center justify-center shadow-sm"
-                    style={{
-                      backgroundColor: withAlpha(draftColor, 0.16),
-                      color: draftColor,
-                    }}
-                  >
-                    {draftIcon ? (
-                      <CategoryIcon
-                        category={activeCategory || ""}
-                        config={{ name: activeCategory || "", color: draftColor, icon: draftIcon }}
-                        className="size-4"
-                      />
-                    ) : (
-                      <CategoryIcon
-                        category={activeCategory || ""}
-                        config={{ name: activeCategory || "", color: draftColor }}
-                        className="size-4"
-                      />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-[10px] font-black uppercase tracking-[0.22em]">
-                      {activeCategory}
-                    </p>
-                    <p className="truncate text-[10px] text-muted-foreground">
-                      {draftIcon || "Default"}
-                    </p>
-                  </div>
+                  <CategoryIcon
+                    category={activeCategory || ""}
+                    config={{ name: activeCategory || "", color: draftColor, icon: draftIcon }}
+                    className="size-8"
+                    color={draftColor}
+                    strokeWidth={1}
+                  />
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
-                    Color
+              {/* Color Picker */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between px-1">
+                  <p className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
+                    Color Palette
                   </p>
-                  <span className="text-[10px] font-mono text-muted-foreground">{draftColor}</span>
+                  <span className="text-[10px] font-mono text-navi-gray/60">{draftColor}</span>
                 </div>
-                <div className="grid grid-cols-6 gap-3 sm:grid-cols-9">
+                <div className="grid grid-cols-7 gap-4">
                   {colors.map((color) => {
                     const selected = draftColor === color;
                     return (
                       <button
                         key={color}
                         type="button"
-                        aria-label={`Choose color ${color}`}
                         onClick={() => setDraftColor(color)}
                         className={cn(
-                          "size-10 rounded-full transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                          selected
-                            ? "scale-110 ring-2 ring-foreground ring-offset-2"
-                            : "hover:scale-105",
+                          "size-10 rounded-full transition-all flex items-center justify-center",
+                          selected ? "ring-2 ring-navi-dark ring-offset-4 scale-110" : "hover:scale-105"
                         )}
-                        style={{
-                          backgroundColor: color,
-                          boxShadow: selected
-                            ? "0 0 0 1px rgba(255,255,255,0.8), 0 8px 20px rgba(0,0,0,0.12)"
-                            : "0 4px 10px rgba(0,0,0,0.08)",
-                        }}
+                        style={{ backgroundColor: color }}
                       >
-                        {selected && (
-                          <Check className="mx-auto size-4 text-white mix-blend-difference" />
-                        )}
+                        {selected && <Check className="size-5 text-white mix-blend-difference" strokeWidth={1} />}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
-                    Icon
+              {/* Icon Picker */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between px-1">
+                  <p className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
+                    Icon Selection
                   </p>
-                  <span className="text-[10px] font-mono text-muted-foreground">
+                  <span className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60">
                     {draftIcon || "Default"}
                   </span>
                 </div>
-                <div className="grid max-h-[34vh] grid-cols-3 gap-3 overflow-y-auto pr-1 sm:grid-cols-4 md:grid-cols-6">
+                <div className="grid grid-cols-4 gap-4 max-h-[300px] overflow-y-auto pr-2">
                   <button
                     type="button"
-                    aria-label="Choose default icon"
                     onClick={() => setDraftIcon(null)}
                     className={cn(
-                      "flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                      draftIcon === null
-                        ? "border-foreground bg-foreground text-background shadow-sm"
-                        : "bg-background hover:bg-muted/30",
+                      "flex flex-col items-center gap-4 p-6 rounded-[24px] border-2 transition-all",
+                      draftIcon === null 
+                        ? "bg-navi-dark text-white border-navi-dark" 
+                        : "bg-navi-surface border-transparent hover:bg-white"
                     )}
                   >
-                    <div
-                      className={cn(
-                        "size-9 rounded-full flex items-center justify-center",
-                        draftIcon === null ? "bg-white/10" : "bg-muted/20",
-                      )}
-                    >
-                      <LayoutListIcon className="size-4" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.16em]">
+                    <LayoutListIcon className="size-6" strokeWidth={1} />
+                    <span className="text-[10px] font-display font-medium uppercase tracking-widest">
                       Default
                     </span>
                   </button>
@@ -313,26 +283,18 @@ export function CategoriesContent({
                       const selected = draftIcon === option.value;
                       return (
                         <button
-                          type="button"
-                          aria-label={`Choose icon ${option.label}`}
                           key={option.value}
+                          type="button"
                           onClick={() => setDraftIcon(option.value)}
                           className={cn(
-                            "flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                            "flex flex-col items-center gap-4 p-6 rounded-[24px] border-2 transition-all",
                             selected
-                              ? "border-foreground bg-foreground text-background shadow-sm"
-                              : "bg-background hover:bg-muted/30",
+                              ? "bg-navi-dark text-white border-navi-dark"
+                              : "bg-navi-surface border-transparent hover:bg-white"
                           )}
                         >
-                          <div
-                            className={cn(
-                              "size-9 rounded-full flex items-center justify-center",
-                              selected ? "bg-white/10" : "bg-muted/20",
-                            )}
-                          >
-                            <Icon className="size-4" />
-                          </div>
-                          <span className="text-[10px] font-black uppercase tracking-[0.16em] leading-none">
+                          <Icon className="size-6" strokeWidth={1} />
+                          <span className="text-[10px] font-display font-medium uppercase tracking-widest">
                             {option.label}
                           </span>
                         </button>
@@ -342,30 +304,28 @@ export function CategoriesContent({
                 </div>
               </div>
 
-              <div className="border-t pt-4">
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-[1fr_1fr_1.15fr] sm:gap-3">
+              {/* Actions */}
+              <div className="border-t border-navi-border/20 pt-8">
+                <div className="grid grid-cols-3 gap-4">
                   <Button
-                    type="button"
-                    variant="outline"
-                    className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em] px-0 sm:px-4"
+                    variant="secondary"
+                    className="h-16 rounded-full"
                     onClick={() => setIsPickerOpen(false)}
                   >
-                    <X className="size-4" />
-                    <span className="hidden sm:inline">Cancel</span>
+                    <X className="size-5" />
+                    <span>Cancel</span>
                   </Button>
                   <Button
-                    type="button"
-                    className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em] px-0 sm:px-4"
+                    className="h-16 rounded-full bg-navi-dark text-white"
                     onClick={handleSave}
                     disabled={upsertMutation.isPending}
                   >
-                    <Save className="size-4" />
-                    <span className="hidden sm:inline">Save</span>
+                    <Save className="size-5" />
+                    <span>Save</span>
                   </Button>
                   <Button
-                    type="button"
                     variant="destructive"
-                    className="h-14 w-full rounded-2xl font-black uppercase tracking-[0.18em] px-0 sm:px-4"
+                    className="h-16 rounded-full"
                     onClick={handleDelete}
                     disabled={
                       upsertMutation.isPending ||
@@ -373,8 +333,8 @@ export function CategoriesContent({
                       !configMap[activeCategory || ""]?.id
                     }
                   >
-                    <Trash2 className="size-4" />
-                    <span className="hidden sm:inline">Delete</span>
+                    <Trash2 className="size-5" />
+                    <span>Delete</span>
                   </Button>
                 </div>
               </div>

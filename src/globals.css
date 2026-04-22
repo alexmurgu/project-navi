@@ -1,152 +1,122 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
-
 @import "tailwindcss";
-@import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@theme {
+  --color-background: oklch(100% 0 0);
+  --color-foreground: oklch(20.9% 0.015 258.1); /* #191c1f */
+  
+  --color-navi-dark: oklch(20.9% 0.015 258.1);
+  --color-navi-blue: oklch(45.5% 0.22 269.9); /* #494fdf */
+  --color-navi-teal: oklch(61.2% 0.16 166.5); /* #00a87e */
+  --color-navi-danger: oklch(57.7% 0.2 19.3); /* #e23b4a */
+  --color-navi-warning: oklch(64.6% 0.19 51.5); /* #ec7e00 */
+  --color-navi-surface: oklch(96.5% 0 0); /* #f4f4f4 */
+  --color-navi-gray: oklch(64.6% 0.015 258.1); /* #8d969e */
+  --color-navi-border: oklch(84.4% 0.005 258.1); /* #c9c9cd */
 
-:root {
-  --font-sans:
-    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Aeonik Pro", "Inter", sans-serif;
+  --font-sans: "Inter", "Arial", sans-serif;
 
-  --radius: 1rem; /* Reduced from 2rem/3rem for a more structured feel */
-
-  /* Minimalist Teal/Neutral Palette */
-  --background: oklch(0.99 0.005 190);
-  --foreground: oklch(0.25 0.04 190);
-
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.04 190);
-
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.04 190);
-
-  --primary: oklch(0.6 0.12 190);
-  --primary-foreground: oklch(1 0 0);
-
-  --secondary: oklch(0.96 0.01 190);
-  --secondary-foreground: oklch(0.4 0.05 190);
-
-  --muted: oklch(0.96 0.01 190);
-  --muted-foreground: oklch(0.5 0.04 190);
-
-  --accent: oklch(0.94 0.04 190);
-  --accent-foreground: oklch(0.25 0.04 190);
-
-  --destructive: oklch(0.65 0.12 25);
-  --border: oklch(0.92 0.01 190);
-  --input: oklch(0.92 0.01 190);
-  --ring: var(--primary);
-
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.4 0.04 190);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.96 0.04 190);
-  --sidebar-accent-foreground: oklch(0.25 0.04 190);
-  --sidebar-border: oklch(0.92 0.01 190);
-}
-
-.dark {
-  --background: oklch(0.12 0.02 190);
-  --foreground: oklch(0.95 0.02 190);
-
-  --card: oklch(0.15 0.02 190);
-  --card-foreground: oklch(0.95 0.02 190);
-
-  --popover: oklch(0.15 0.02 190);
-  --popover-foreground: oklch(0.95 0.02 190);
-
-  --primary: oklch(0.7 0.12 190);
-  --primary-foreground: oklch(0.1 0.02 190);
-
-  --secondary: oklch(0.2 0.04 190);
-  --secondary-foreground: oklch(0.95 0.02 190);
-
-  --muted: oklch(0.18 0.04 190);
-  --muted-foreground: oklch(0.65 0.04 190);
-
-  --accent: oklch(0.22 0.04 190);
-  --accent-foreground: oklch(0.95 0.02 190);
-
-  --destructive: oklch(0.55 0.15 25);
-  --border: oklch(0.22 0.02 190);
-  --input: oklch(0.22 0.02 190);
-
-  --sidebar: oklch(0.12 0.02 190);
-  --sidebar-foreground: oklch(0.7 0.04 190);
-  --sidebar-border: oklch(0.22 0.02 190);
-}
-
-@theme inline {
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius: var(--radius);
+  --radius-pill: 9999px;
+  --radius-card: 20px;
+  --radius-standard: 12px;
 }
 
 @layer base {
+  :root {
+    --background: 100% 0 0;
+    --foreground: 20.9% 0.015 258.1;
+    
+    --card: 100% 0 0;
+    --card-foreground: 20.9% 0.015 258.1;
+    
+    --popover: 100% 0 0;
+    --popover-foreground: 20.9% 0.015 258.1;
+    
+    --primary: 20.9% 0.015 258.1;
+    --primary-foreground: 100% 0 0;
+    
+    --secondary: 96.5% 0 0;
+    --secondary-foreground: 20.9% 0.015 258.1;
+    
+    --muted: 96.5% 0 0;
+    --muted-foreground: 64.6% 0.015 258.1;
+    
+    --accent: 96.5% 0 0;
+    --accent-foreground: 20.9% 0.015 258.1;
+    
+    --destructive: 57.7% 0.2 19.3;
+    --destructive-foreground: 100% 0 0;
+    
+    --border: 84.4% 0.005 258.1;
+    --input: 84.4% 0.005 258.1;
+    --ring: 45.5% 0.22 269.9;
+    
+    --radius: 12px;
+  }
+
   * {
-    @apply border-border outline-ring/50;
+    border-color: oklch(var(--border));
+    outline-color: oklch(var(--ring) / 0.5);
+    -webkit-tap-highlight-color: transparent;
   }
+  
   body {
-    @apply min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20;
+    background-color: oklch(var(--background));
+    color: oklch(var(--foreground));
+    @apply font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+    letter-spacing: 0.24px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-medium tracking-tight;
+    line-height: 1.0;
   }
 }
 
-/* Wallet Style Utilities - Refined Radii */
-.wallet-card {
-  @apply rounded-2xl border-none bg-card shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] transition-all;
+@layer components {
+  .pill-button {
+    @apply rounded-full px-8 py-3.5 font-display font-medium text-[15px] uppercase tracking-wider transition-all active:scale-[0.98] hover:opacity-90 flex items-center justify-center gap-2;
+  }
+  
+  .pill-button-primary {
+    @apply bg-navi-dark text-white;
+  }
+  
+  .pill-button-secondary {
+    @apply bg-navi-surface text-navi-dark;
+  }
+  
+  .pill-button-outline {
+    @apply border-2 border-navi-dark bg-transparent text-navi-dark;
+  }
+
+  .navi-card {
+    @apply rounded-[20px] bg-white border border-navi-border/30 shadow-none p-6;
+  }
+
+  .display-mega {
+    @apply text-[136px] font-medium leading-none tracking-[-0.02em];
+    letter-spacing: -2.72px;
+  }
+
+  .display-hero {
+    @apply text-[80px] font-medium leading-none tracking-tight;
+    letter-spacing: -0.8px;
+  }
 }
 
+/* Custom Wallet Hero Gradient from Navi reference */
 .wallet-hero-gradient {
-  @apply bg-linear-to-br from-primary/90 to-primary text-white shadow-[0_20px_40px_-10px_rgba(45,212,191,0.2)];
+  background: oklch(20.9% 0.015 258.1);
 }
 
-.smooth-badge {
-  @apply inline-flex items-center px-4 py-1.5 rounded-lg text-[11px] font-extrabold tracking-tight uppercase;
+/* Hide all shadows per Navi zero-shadow policy */
+.shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+  box-shadow: none !important;
 }
 
-.state-teal {
-  @apply bg-emerald-500/10 text-emerald-600 border-none dark:bg-emerald-500/20 dark:text-emerald-400;
-}
-.state-rose {
-  @apply bg-rose-500/10 text-rose-600 border-none dark:bg-rose-500/20 dark:text-rose-400;
-}
-.state-indigo {
-  @apply bg-indigo-500/10 text-indigo-600 border-none dark:bg-indigo-500/20 dark:text-indigo-400;
-}
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full;
+/* Custom Inter tracking */
+.font-sans {
+  letter-spacing: 0.24px;
 }

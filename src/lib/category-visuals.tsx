@@ -25,6 +25,7 @@ import {
   Utensils,
   Wallet,
   Zap,
+  Navigation,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -109,7 +110,7 @@ export const getCategoryFallbackIcon = (category: string, kind?: CategoryKind) =
     if (c.includes("salary") || c.includes("wage") || c.includes("work")) return Briefcase;
     if (c.includes("investment") || c.includes("dividend")) return Landmark;
     if (c.includes("gift") || c.includes("bonus")) return Gift;
-    return DEFAULT_INCOME_ICON;
+    return Navigation;
   }
 
   if (c.includes("food") || c.includes("eat") || c.includes("restaurant")) return Utensils;
@@ -119,7 +120,7 @@ export const getCategoryFallbackIcon = (category: string, kind?: CategoryKind) =
   if (c.includes("transport") || c.includes("car")) return Car;
   if (c.includes("utility") || c.includes("bill")) return Zap;
   if (c.includes("health") || c.includes("med")) return Heart;
-  return DEFAULT_EXPENSE_ICON;
+  return Navigation;
 };
 
 export const CategoryIcon = ({
@@ -129,6 +130,7 @@ export const CategoryIcon = ({
   className = "size-5",
   fallbackClassName = "size-5",
   color,
+  strokeWidth = 1,
 }: {
   category: string;
   config?: CategoryConfig;
@@ -136,6 +138,7 @@ export const CategoryIcon = ({
   className?: string;
   fallbackClassName?: string;
   color?: string;
+  strokeWidth?: number;
 }) => {
   const Icon = config?.icon
     ? getCategoryIconComponent(config.icon, kind)
@@ -144,6 +147,7 @@ export const CategoryIcon = ({
     <Icon
       className={cn(className, !config?.icon && fallbackClassName)}
       style={{ color: color || config?.color || "currentColor" }}
+      strokeWidth={strokeWidth}
     />
   );
 };

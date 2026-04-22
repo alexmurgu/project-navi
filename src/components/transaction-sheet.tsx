@@ -191,17 +191,17 @@ export function TransactionSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-[95vh] sm:h-fit sm:max-h-[95vh] sm:side-right border-t sm:border-l rounded-t-2xl sm:rounded-l-2xl p-0 shadow-2xl border-none overflow-hidden flex flex-col"
+        className="h-[95vh] sm:h-fit sm:max-h-[95vh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
       >
         <SheetHeader className="p-8 pb-4 text-left shrink-0">
-          <SheetTitle className="text-3xl font-black tracking-tighter uppercase italic">
+          <SheetTitle className="text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
             {title}
           </SheetTitle>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-8 pb-12 space-y-8">
           <div className="space-y-4">
-            <Label className="ml-1 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+            <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
               Member
             </Label>
             <div className="flex flex-wrap gap-3">
@@ -211,12 +211,10 @@ export function TransactionSheet({
                   type="button"
                   onClick={() => setSelectedUserId(user.id)}
                   className={cn(
-                    "size-12 rounded-xl border flex items-center justify-center text-sm font-black transition-all",
+                    "size-14 rounded-full border-2 flex items-center justify-center text-sm font-display font-medium transition-all",
                     selectedUserId === user.id
-                      ? mode === "expense"
-                        ? "bg-foreground text-background border-foreground shadow-lg"
-                        : "bg-emerald-600 text-white border-emerald-600 shadow-lg"
-                      : "bg-muted/10 text-muted-foreground border-transparent hover:bg-muted/20",
+                      ? "bg-navi-dark text-white border-navi-dark"
+                      : "bg-transparent text-navi-gray border-navi-border/30 hover:border-navi-dark/20",
                   )}
                 >
                   {user.name[0]}
@@ -226,22 +224,20 @@ export function TransactionSheet({
                 type="button"
                 onClick={() => setSelectedUserId("family")}
                 className={cn(
-                  "size-12 rounded-xl border flex items-center justify-center transition-all",
+                  "size-14 rounded-full border-2 flex items-center justify-center transition-all",
                   selectedUserId === "family"
-                    ? mode === "expense"
-                      ? "bg-foreground text-background border-foreground shadow-lg"
-                      : "bg-emerald-600 text-white border-emerald-600 shadow-lg"
-                    : "bg-muted/10 text-muted-foreground border-transparent hover:bg-muted/20",
+                    ? "bg-navi-dark text-white border-navi-dark"
+                    : "bg-transparent text-navi-gray border-navi-border/30 hover:border-navi-dark/20",
                 )}
               >
-                <Users className="size-5" />
+                <Users className="size-6" strokeWidth={1} />
               </button>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-3">
-              <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
+              <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                 Amount
               </Label>
               <Input
@@ -252,13 +248,13 @@ export function TransactionSheet({
                 placeholder="0.00"
                 defaultValue={editingItem?.amount ? editingItem.amount / 100 : ""}
                 className={cn(
-                  "h-14 rounded-xl border-none px-6 font-black text-2xl shadow-inner",
-                  mode === "expense" ? "bg-secondary/40" : "bg-secondary/40 text-emerald-600",
+                  "h-16 rounded-[20px] border-none px-6 font-display font-medium text-[24px] bg-navi-surface",
+                  mode === "expense" ? "text-navi-dark" : "text-navi-teal",
                 )}
               />
             </div>
             <div className="space-y-3">
-              <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
+              <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                 Date
               </Label>
               <Input
@@ -268,13 +264,13 @@ export function TransactionSheet({
                 defaultValue={
                   editingItem?.date ? new Date(editingItem.date).toISOString().split("T")[0] : today
                 }
-                className="h-14 rounded-xl border-none bg-secondary/40 px-6 font-bold shadow-inner"
+                className="h-16 rounded-[20px] border-none bg-navi-surface px-6 font-display font-medium"
               />
             </div>
           </div>
 
           <div className="space-y-3">
-            <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
+            <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
               Description
             </Label>
             <div className="relative">
@@ -283,7 +279,7 @@ export function TransactionSheet({
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="h-14 rounded-xl border-none bg-secondary/40 px-6 font-bold shadow-inner"
+                className="h-16 rounded-[20px] border-none bg-navi-surface px-6 font-display font-medium"
               />
               {suggestions.length > 0 && !editingItem && (
                 <div className="absolute top-full left-0 right-0 z-50 mt-2 p-2 rounded-2xl bg-card border border-muted/20 shadow-2xl space-y-1 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -320,7 +316,7 @@ export function TransactionSheet({
 
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
-              <Label className="text-[10px] font-black uppercase tracking-widest opacity-40">
+              <Label className="text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                 {mode === "expense" ? "Category" : "Source"}
               </Label>
               {category && (
@@ -328,13 +324,13 @@ export function TransactionSheet({
                   type="button"
                   onClick={() => setIsCustomizing(!isCustomizing)}
                   className={cn(
-                    "text-[8px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5 px-2 py-1 rounded-md",
+                    "text-[9px] font-display font-medium uppercase tracking-widest transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full",
                     isCustomizing 
-                      ? "bg-primary text-primary-foreground" 
-                      : "bg-muted/10 text-muted-foreground hover:bg-muted/20"
+                      ? "bg-navi-dark text-white" 
+                      : "bg-navi-surface text-navi-gray hover:text-navi-dark"
                   )}
                 >
-                  <Palette className="size-2.5" />
+                  <Palette className="size-3" />
                   Customize
                 </button>
               )}
@@ -351,13 +347,13 @@ export function TransactionSheet({
             />
 
             {isCustomizing && category && (
-              <div className="mt-4 p-6 rounded-2xl bg-secondary/20 border border-muted/10 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="mt-4 p-6 rounded-[24px] bg-navi-surface border border-navi-border/20 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Color</p>
-                    <span className="text-[8px] font-mono opacity-40">{draftColor}</span>
+                    <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">Color</p>
+                    <span className="text-[10px] font-mono text-navi-gray/60">{draftColor}</span>
                   </div>
-                  <div className="grid grid-cols-7 gap-2">
+                  <div className="grid grid-cols-7 gap-3">
                     {PRESET_COLORS.map((color) => (
                       <button
                         key={color}
@@ -365,11 +361,11 @@ export function TransactionSheet({
                         onClick={() => setDraftColor(color)}
                         className={cn(
                           "size-8 rounded-full transition-all flex items-center justify-center",
-                          draftColor === color ? "ring-2 ring-foreground ring-offset-2 scale-110" : "hover:scale-105"
+                          draftColor === color ? "ring-2 ring-navi-dark ring-offset-2 scale-110" : "hover:scale-105"
                         )}
                         style={{ backgroundColor: color }}
                       >
-                        {draftColor === color && <Check className="size-3 text-white mix-blend-difference" />}
+                        {draftColor === color && <Check className="size-4 text-white mix-blend-difference" />}
                       </button>
                     ))}
                   </div>
@@ -377,19 +373,19 @@ export function TransactionSheet({
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Icon</p>
-                    <span className="text-[8px] font-mono opacity-40">{draftIcon || "Default"}</span>
+                    <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">Icon</p>
+                    <span className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60">{draftIcon || "Default"}</span>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 max-h-[160px] overflow-y-auto pr-1">
+                  <div className="grid grid-cols-4 gap-3 max-h-[200px] overflow-y-auto pr-1">
                     <button
                       type="button"
                       onClick={() => setDraftIcon(null)}
                       className={cn(
-                        "flex flex-col items-center gap-2 p-3 rounded-xl border transition-all",
-                        draftIcon === null ? "bg-foreground text-background border-foreground" : "bg-background/50 border-transparent hover:bg-muted/20"
+                        "flex flex-col items-center gap-3 p-4 rounded-[20px] border-2 transition-all",
+                        draftIcon === null ? "bg-navi-dark text-white border-navi-dark" : "bg-white border-transparent hover:bg-white"
                       )}
                     >
-                      <LayoutList className="size-4" />
+                      <LayoutList className="size-5" strokeWidth={1} />
                     </button>
                     {CATEGORY_ICON_OPTIONS.filter(o => o.value !== "LayoutList").map((opt) => {
                       const Icon = opt.icon;
@@ -399,11 +395,11 @@ export function TransactionSheet({
                           type="button"
                           onClick={() => setDraftIcon(opt.value)}
                           className={cn(
-                            "flex flex-col items-center gap-2 p-3 rounded-xl border transition-all",
-                            draftIcon === opt.value ? "bg-foreground text-background border-foreground" : "bg-background/50 border-transparent hover:bg-muted/20"
+                            "flex flex-col items-center gap-3 p-4 rounded-[20px] border-2 transition-all",
+                            draftIcon === opt.value ? "bg-navi-dark text-white border-navi-dark" : "bg-white border-transparent hover:bg-white"
                           )}
                         >
-                          <Icon className="size-4" />
+                          <Icon className="size-5" />
                         </button>
                       );
                     })}
@@ -413,19 +409,19 @@ export function TransactionSheet({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             {isMonthly && (
               <div className="space-y-3">
-                <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
+                <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                   Status
                 </Label>
-                <div className="flex bg-secondary/40 rounded-xl p-1">
+                <div className="flex bg-navi-surface rounded-full p-1.5">
                   <button
                     type="button"
                     onClick={() => setStatus("paid")}
                     className={cn(
-                      "flex-1 h-10 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                      status === "paid" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground opacity-40"
+                      "flex-1 h-11 rounded-full text-[10px] font-display font-medium uppercase tracking-widest transition-all",
+                      status === "paid" ? "bg-white text-navi-dark" : "text-navi-gray"
                     )}
                   >
                     Paid
@@ -434,8 +430,8 @@ export function TransactionSheet({
                     type="button"
                     onClick={() => setStatus("pending")}
                     className={cn(
-                      "flex-1 h-10 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                      status === "pending" ? "bg-background shadow-sm text-amber-600" : "text-muted-foreground opacity-40"
+                      "flex-1 h-11 rounded-full text-[10px] font-display font-medium uppercase tracking-widest transition-all",
+                      status === "pending" ? "bg-white text-navi-warning" : "text-navi-gray"
                     )}
                   >
                     Pending
@@ -446,7 +442,7 @@ export function TransactionSheet({
 
             {mode === "expense" && (
               <div className={cn("space-y-3", !isMonthly && "col-span-2")}>
-                <Label className="ml-1 text-[10px] font-black uppercase tracking-widest opacity-40">
+                <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                   Recurring
                 </Label>
                 <button
@@ -454,13 +450,13 @@ export function TransactionSheet({
                   onClick={() => {
                     const nextValue = !isMonthly;
                     setIsMonthly(nextValue);
-                    if (!nextValue) setStatus("paid"); // Reset status to paid if switched to one-time
+                    if (!nextValue) setStatus("paid");
                   }}
                   className={cn(
-                    "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
+                    "w-full h-14 rounded-full text-[10px] font-display font-medium uppercase tracking-widest transition-all border-2",
                     isMonthly 
-                      ? "bg-foreground text-background border-foreground shadow-lg" 
-                      : "bg-secondary/40 text-muted-foreground border-transparent opacity-40"
+                      ? "bg-navi-dark text-white border-navi-dark" 
+                      : "bg-transparent text-navi-gray border-navi-border/30 hover:border-navi-dark/20"
                   )}
                 >
                   {isMonthly ? "Every Month" : "One-time"}
@@ -469,7 +465,7 @@ export function TransactionSheet({
             )}
           </div>
 
-          <div className={cn("pt-6", showDelete ? "grid grid-cols-2 gap-4" : "flex")}>
+          <div className={cn("pt-6", showDelete ? "grid grid-cols-2 gap-6" : "flex")}>
             {showDelete && (
               <AlertDialog>
                 <AlertDialogTrigger
@@ -477,24 +473,24 @@ export function TransactionSheet({
                     <Button
                       type="button"
                       variant="destructive"
-                      className="h-14 w-full rounded-xl border-none bg-rose-600 px-0 font-black uppercase tracking-widest text-white shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] sm:px-4"
+                      className="h-16 w-full rounded-full border-none bg-navi-danger px-0 font-display font-medium uppercase tracking-widest text-white transition-all hover:opacity-90 active:scale-[0.98] sm:px-4"
                     >
-                      <Trash2 className="size-4" />
+                      <Trash2 className="size-5" />
                       <span className="hidden sm:inline">Delete</span>
                     </Button>
                   }
                 />
-                <AlertDialogContent className="rounded-2xl border-none p-8 shadow-2xl">
+                <AlertDialogContent className="rounded-[32px] border-none p-10 shadow-none bg-white">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-2xl font-black italic tracking-tight uppercase">
+                    <AlertDialogTitle className="text-3xl font-display font-medium italic tracking-tight uppercase text-navi-dark">
                       Delete {mode === "expense" ? "Expense" : "Income"}
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="mt-2 text-xs font-bold uppercase opacity-50">
+                    <AlertDialogDescription className="mt-4 text-sm font-medium uppercase tracking-widest text-navi-gray">
                       Are you sure you want to delete this {mode}?
                     </AlertDialogDescription>
                   </AlertDialogHeader>
-                  <AlertDialogFooter className="mt-8 gap-3">
-                    <AlertDialogCancel className="h-12 rounded-xl border-none bg-muted/10 text-[10px] font-black uppercase tracking-widest">
+                  <AlertDialogFooter className="mt-10 gap-4">
+                    <AlertDialogCancel className="h-14 flex-1 rounded-full border-none bg-navi-surface text-navi-dark font-display font-medium text-[11px] uppercase tracking-widest">
                       Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
@@ -502,7 +498,7 @@ export function TransactionSheet({
                         if (!editingItem?.id || !onDelete) return;
                         Promise.resolve(onDelete(editingItem.id)).then(() => onOpenChange(false));
                       }}
-                      className="h-12 rounded-xl border-none bg-rose-600 text-[10px] font-black uppercase tracking-widest text-white"
+                      className="h-14 flex-1 rounded-full border-none bg-navi-danger text-[11px] font-display font-medium uppercase tracking-widest text-white"
                     >
                       Delete
                     </AlertDialogAction>
@@ -515,11 +511,11 @@ export function TransactionSheet({
               type="submit"
               disabled={saving || upsertCategoryMutation.isPending}
               className={cn(
-                "h-14 flex-1 rounded-xl border-none px-0 font-black uppercase tracking-[0.2em] shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] sm:px-4",
-                submitColor,
+                "h-16 flex-1 rounded-full border-none px-0 font-display font-medium uppercase tracking-[0.2em] transition-all hover:opacity-90 active:scale-[0.98] sm:px-4",
+                mode === "expense" ? "bg-navi-dark text-white" : "bg-navi-teal text-white",
               )}
             >
-              <Save className="size-4" />
+              <Save className="size-5" />
               <span className="hidden sm:inline">Save</span>
             </Button>
           </div>

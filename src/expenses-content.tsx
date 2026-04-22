@@ -254,89 +254,87 @@ export function ExpensesContent({ data }: PageProps) {
       </div>
 
       {/* Redesigned List */}
-      <div className="flex flex-col gap-2">
-        {/* Table Header (Desktop Only) */}
-        <div className="hidden md:flex items-center px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-30">
-          <div className="w-12 mr-5"></div>
-          <div className="flex-1">Description</div>
-          <div className="w-32">Member</div>
-          <div className="w-40">Date</div>
-          <div className="w-32 text-right">Amount</div>
-          <div className="w-24 ml-4"></div>
-        </div>
-
+      <div className="flex flex-col gap-4">
         {paginatedHistory.map((item) => {
           const config = getCategoryConfig(categoryConfigMap, item.category);
-          const color = config?.color || "#F43F5E";
-          const bgColor = withAlpha(color, 0.05);
+          const color = config?.color || "#191c1f";
+          
           return (
             <div
               key={item.id}
-              className="group flex items-center p-4 rounded-xl transition-all cursor-pointer border border-transparent hover:border-muted/10 shadow-sm"
-              style={{ backgroundColor: bgColor }}
+              className="relative group flex items-center p-5 rounded-[20px] transition-all cursor-pointer border border-transparent active:scale-[0.99] overflow-hidden"
+              style={{ backgroundColor: withAlpha(color, 0.05) }}
               onClick={() => handleEdit(item)}
               role="button"
               tabIndex={0}
               onKeyDown={(event) => handleRowKeyDown(event, item)}
             >
-              <div className="flex items-center gap-5 flex-1 min-w-0">
-                <div className="size-11 rounded-lg flex items-center justify-center shrink-0">
-                  <CategoryIcon
-                    category={item.category}
-                    config={config}
-                    kind="expense"
-                    className="size-6"
-                    color={color}
-                  />
-                </div>
+              <div className="absolute -left-4 top-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+                <CategoryIcon
+                  category={item.category}
+                  config={config}
+                  kind="expense"
+                  className="size-24 -rotate-12"
+                  color={color}
+                />
+              </div>
+
+              <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10 pl-16">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-base tracking-tight truncate">
-                    {item.description}
-                  </h4>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openCategoryOverview(item.category);
-                    }}
-                    className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 block md:inline hover:text-primary transition-colors"
-                  >
-                    {item.category}
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <h4 className="font-display font-medium text-[16px] text-navi-dark truncate">
+                      {item.description}
+                    </h4>
+                    {item.status === "pending" && (
+                      <span className="px-2 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[9px] font-display font-medium uppercase tracking-widest">
+                        Pending
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 mt-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openCategoryOverview(item.category);
+                      }}
+                      className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60 hover:text-navi-dark transition-colors"
+                    >
+                      {item.category}
+                    </button>
+                    <div className="size-1 rounded-full bg-navi-border/50 hidden md:block" />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openMemberOverview(item.userId);
+                      }}
+                      className="hidden md:inline-flex items-center gap-1.5 text-[10px] font-display font-medium uppercase text-navi-blue tracking-widest hover:underline"
+                    >
+                      <UserIcon className="size-2.5 opacity-50" strokeWidth={1} />
+                      <span>{item.userName || "Family"}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div className="hidden md:flex w-32 shrink-0 mx-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openMemberOverview(item.userId);
-                  }}
-                  className="inline-flex items-center gap-1.5 text-[9px] font-black uppercase text-primary tracking-tighter px-0 py-0 bg-transparent hover:underline underline-offset-4"
-                >
-                  <UserIcon className="size-2.5 opacity-50" />
-                  <span className="truncate">{item.userName || "Family"}</span>
-                </button>
-              </div>
-
-              <div className="hidden md:block w-40 text-[9px] font-black uppercase text-muted-foreground opacity-40 shrink-0 mx-2">
+              <div className="hidden md:block w-40 text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/40 shrink-0 mx-4">
                 {format(new Date(item.date), "MMM dd, yyyy")}
               </div>
 
-              <div className="text-right w-32 shrink-0 flex items-center gap-3 justify-end">
+              <div className="text-right w-32 shrink-0 flex items-center gap-4 justify-end">
                 <div>
                   <p
                     className={cn(
-                      "font-black text-lg tracking-tight",
+                      "font-display font-medium text-[18px]",
                       item.status === "pending"
-                        ? "text-muted-foreground opacity-40"
-                        : "text-rose-600",
+                        ? "text-navi-gray/40"
+                        : "text-navi-dark",
                     )}
                   >
                     -{formatCurrency(item.amount)}
                   </p>
-                  <p className="md:hidden text-[9px] font-black uppercase text-muted-foreground opacity-20 mt-0.5">
+                  <p className="md:hidden text-[9px] font-display font-medium uppercase tracking-widest text-navi-gray/40 mt-0.5">
                     {format(new Date(item.date), "MMM dd")}
                   </p>
                 </div>
@@ -350,57 +348,11 @@ export function ExpensesContent({ data }: PageProps) {
                         status: "paid",
                       });
                     }}
-                    className="size-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center hover:bg-emerald-500/20 transition-all shadow-sm"
+                    className="size-10 rounded-full bg-navi-teal text-white flex items-center justify-center hover:opacity-90 transition-all"
                   >
-                    <Check className="size-4" />
+                    <Check className="size-5" strokeWidth={1} />
                   </button>
                 )}
-              </div>
-
-              {/* Actions visible on hover */}
-              <div className="hidden md:flex items-center gap-1 ml-4 w-24 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(item);
-                  }}
-                  className="size-9 rounded-lg bg-muted/10 flex items-center justify-center hover:bg-muted/20"
-                >
-                  <Pencil className="size-4 opacity-40" />
-                </button>
-                <AlertDialog>
-                  <AlertDialogTrigger
-                    render={
-                      <button
-                        onClick={(e) => e.stopPropagation()}
-                        className="size-9 rounded-lg bg-rose-500/5 text-rose-600 flex items-center justify-center hover:bg-rose-500/15"
-                      >
-                        <Trash2 className="size-4 opacity-40" />
-                      </button>
-                    }
-                  />
-                  <AlertDialogContent className="rounded-2xl p-10 border-none shadow-2xl">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-2xl font-black tracking-tight uppercase italic">
-                        Delete Record
-                      </AlertDialogTitle>
-                      <AlertDialogDescription className="text-xs font-bold opacity-50 mt-2 uppercase">
-                        This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="mt-8 gap-3">
-                      <AlertDialogCancel className="h-12 rounded-xl font-black text-[10px] uppercase tracking-widest border-none bg-muted/10">
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => deleteExpenseMutation.mutate(item.id)}
-                        className="h-12 rounded-xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest border-none"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
               </div>
             </div>
           );

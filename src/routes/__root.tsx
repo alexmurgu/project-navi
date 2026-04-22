@@ -169,34 +169,33 @@ function RootLayout() {
         <Sheet open={quickAddOpen} onOpenChange={setQuickAddOpen}>
           <SheetContent
             side="bottom"
-            className="h-auto rounded-t-4xl border-none p-6 pb-8 shadow-2xl"
+            className="h-auto rounded-t-[40px] border-none p-8 pb-12 shadow-none bg-white"
           >
-            <SheetHeader className="px-1 pt-2">
-              <SheetTitle className="text-3xl font-black tracking-tighter uppercase italic">
+            <SheetHeader className="px-1 pt-2 text-center sm:text-left">
+              <SheetTitle className="text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
                 Add Entry
               </SheetTitle>
             </SheetHeader>
-            <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="mt-10 grid grid-cols-2 gap-6">
               <Button
                 type="button"
-                variant="outline"
-                className="h-24 rounded-2xl border-none bg-foreground text-background shadow-xl hover:bg-foreground/90"
+                variant="default"
+                className="h-24 rounded-[24px] font-display font-medium tracking-widest text-[12px] uppercase bg-navi-dark text-white hover:opacity-90"
                 onClick={() => openQuickAdd("expense")}
               >
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-3">
                   <ArrowDownCircle className="size-6" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Expense</span>
+                  <span>Expense</span>
                 </div>
               </Button>
               <Button
                 type="button"
-                variant="outline"
-                className="h-24 rounded-2xl border-none bg-emerald-600 text-white shadow-xl hover:bg-emerald-600/90"
+                className="h-24 rounded-[24px] font-display font-medium tracking-widest text-[12px] uppercase bg-navi-teal text-white hover:opacity-90"
                 onClick={() => openQuickAdd("income")}
               >
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-3">
                   <ArrowUpCircle className="size-6" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Income</span>
+                  <span>Income</span>
                 </div>
               </Button>
             </div>
