@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar as CalendarIcon, Check, Clock, CreditCard, FileText } from "lucide-react";
+import { Calendar as CalendarIcon, Check, Clock, CreditCard, FileText, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 
 interface TransactionFormProps {
+  mode: "expense" | "income";
   amount: string;
   onAmountChange: (val: string) => void;
   description: string;
@@ -16,9 +17,12 @@ interface TransactionFormProps {
   onDateChange: (val: Date | undefined) => void;
   status: "pending" | "paid";
   onStatusChange: (val: "pending" | "paid") => void;
+  isRecurrent: boolean;
+  onRecurrentChange: (val: boolean) => void;
 }
 
 export function TransactionForm({
+  mode,
   amount,
   onAmountChange,
   description,
@@ -27,7 +31,11 @@ export function TransactionForm({
   onDateChange,
   status,
   onStatusChange,
+  isRecurrent,
+  onRecurrentChange,
 }: TransactionFormProps) {
+  const showStatus = mode === "income" || isRecurrent;
+
   return (
     <div className="space-y-8">
       {/* Amount Input */}
@@ -103,51 +111,80 @@ export function TransactionForm({
         </div>
       </div>
 
-      {/* Status Toggle */}
-      <div className="space-y-4 pt-2">
-        <Label id="payment-status-label" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
-          Payment Status
-        </Label>
-        <div className="grid grid-cols-2 gap-3" role="group" aria-labelledby="payment-status-label">
+      {/* Recurrent Toggle */}
+      {mode === "expense" && (
+        <div className="space-y-4 pt-2">
+          <Label id="recurrent-status-label" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+            Recurrence
+          </Label>
           <button
             type="button"
-            onClick={() => onStatusChange("paid")}
+            onClick={() => onRecurrentChange(!isRecurrent)}
             className={cn(
-              "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
-              status === "paid" 
-                ? "bg-navi-teal border-navi-teal text-white shadow-lg shadow-navi-teal/20" 
+              "flex items-center justify-center gap-3 h-14 w-full rounded-2xl border transition-all active:scale-[0.98]",
+              isRecurrent 
+                ? "bg-navi-dark border-navi-dark text-white shadow-lg shadow-navi-dark/20" 
                 : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
             )}
           >
             <div className={cn(
               "size-7 rounded-full flex items-center justify-center",
-              status === "paid" ? "bg-white/20" : "bg-white shadow-sm"
+              isRecurrent ? "bg-white/20" : "bg-white shadow-sm"
             )}>
-              <Check className="size-4" strokeWidth={1.5} />
+              <Repeat className="size-4" strokeWidth={1.5} />
             </div>
-            <span className="text-sm font-display font-medium uppercase tracking-widest">Settled</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onStatusChange("pending")}
-            className={cn(
-              "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
-              status === "pending" 
-                ? "bg-navi-warning border-navi-warning text-white shadow-lg shadow-navi-warning/20" 
-                : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
-            )}
-          >
-            <div className={cn(
-              "size-7 rounded-full flex items-center justify-center",
-              status === "pending" ? "bg-white/20" : "bg-white shadow-sm"
-            )}>
-              <Clock className="size-4" strokeWidth={1.5} />
-            </div>
-            <span className="text-sm font-display font-medium uppercase tracking-widest">Pending</span>
+            <span className="text-sm font-display font-medium uppercase tracking-widest">Recurring Expense</span>
           </button>
         </div>
-      </div>
+      )}
+
+      {/* Status Toggle */}
+      {showStatus && (
+        <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2">
+          <Label id="payment-status-label" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+            Payment Status
+          </Label>
+          <div className="grid grid-cols-2 gap-3" role="group" aria-labelledby="payment-status-label">
+            <button
+              type="button"
+              onClick={() => onStatusChange("paid")}
+              className={cn(
+                "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
+                status === "paid" 
+                  ? "bg-navi-teal border-navi-teal text-white shadow-lg shadow-navi-teal/20" 
+                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+              )}
+            >
+              <div className={cn(
+                "size-7 rounded-full flex items-center justify-center",
+                status === "paid" ? "bg-white/20" : "bg-white shadow-sm"
+              )}>
+                <Check className="size-4" strokeWidth={1.5} />
+              </div>
+              <span className="text-sm font-display font-medium uppercase tracking-widest">Settled</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onStatusChange("pending")}
+              className={cn(
+                "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
+                status === "pending" 
+                  ? "bg-navi-warning border-navi-warning text-white shadow-lg shadow-navi-warning/20" 
+                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+              )}
+            >
+              <div className={cn(
+                "size-7 rounded-full flex items-center justify-center",
+                status === "pending" ? "bg-white/20" : "bg-white shadow-sm"
+              )}>
+                <Clock className="size-4" strokeWidth={1.5} />
+              </div>
+              <span className="text-sm font-display font-medium uppercase tracking-widest">Pending</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

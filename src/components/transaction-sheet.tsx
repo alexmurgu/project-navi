@@ -49,6 +49,7 @@ interface FormState {
   isCustomizing: boolean;
   draftColor: string;
   draftIcon: string | null;
+  isRecurrent: boolean;
 }
 
 type FormAction =
@@ -88,6 +89,7 @@ export function TransactionSheet({
     isCustomizing: false,
     draftColor: "#494fdf",
     draftIcon: null,
+    isRecurrent: false,
   });
 
   useEffect(() => {
@@ -102,6 +104,7 @@ export function TransactionSheet({
         isCustomizing: false,
         draftColor: "#494fdf",
         draftIcon: null,
+        isRecurrent: editingItem?.isRecurrent || false,
       };
       dispatch({ type: "RESET", payload: initialState });
     }
@@ -118,7 +121,8 @@ export function TransactionSheet({
       date: state.date?.toISOString(),
       category: state.category,
       userId: state.selectedUserId === "family" ? null : state.selectedUserId,
-      status: state.status,
+      status: mode === "expense" && !state.isRecurrent ? "paid" : state.status,
+      isRecurrent: state.isRecurrent,
       customization: state.isCustomizing ? { color: state.draftColor, icon: state.draftIcon } : undefined,
     });
   };
@@ -162,6 +166,7 @@ export function TransactionSheet({
             />
 
             <TransactionForm 
+              mode={mode}
               amount={state.amount}
               onAmountChange={(val) => dispatch({ type: "SET_FIELD", field: "amount", value: val })}
               description={state.description}
@@ -170,6 +175,8 @@ export function TransactionSheet({
               onDateChange={(val) => dispatch({ type: "SET_FIELD", field: "date", value: val })}
               status={state.status}
               onStatusChange={(val) => dispatch({ type: "SET_FIELD", field: "status", value: val })}
+              isRecurrent={state.isRecurrent}
+              onRecurrentChange={(val) => dispatch({ type: "SET_FIELD", field: "isRecurrent", value: val })}
             />
           </div>
         </div>
