@@ -218,13 +218,9 @@ function RootLayout() {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   beforeLoad: async ({ location }) => {
-    if (location.pathname === "/login") {
-      return;
-    }
-
     const sessionData = await fetchSession();
 
-    if (!sessionData) {
+    if (!sessionData && location.pathname !== "/login") {
       throw redirect({
         to: "/login",
         search: {
@@ -234,8 +230,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     }
 
     return {
-      user: sessionData.user,
-      session: sessionData.session,
+      user: sessionData?.user,
+      session: sessionData?.session,
     };
   },
   component: () => (

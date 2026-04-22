@@ -57,7 +57,7 @@ export function ImportContent({
   const importMutation = useMutation({
     mutationFn: (data: any[]) => bulkImportTransactions({ data }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       navigate({ to: "/" });
     },
   });

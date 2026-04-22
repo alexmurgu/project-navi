@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ExpensesContent } from "@/expenses-content";
 import { useRequireAuth } from "@/hooks/use-auth-guard";
@@ -25,7 +25,6 @@ function ExpensesPage() {
   });
 
   if (loading) return <div className="p-8 text-foreground">Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
   if (isLoading) return <div className="p-8 text-foreground">Loading Expenses...</div>;
   if (!data) return null;
 

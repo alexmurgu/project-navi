@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { type FormEvent, useReducer } from "react";
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -9,6 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: ({ context }) => {
+    if (context.user) {
+      throw redirect({ to: "/" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Login | Aftermind" },
@@ -20,7 +25,7 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const navigate = useNavigate();
-  const { user, loading } = useRedirectIfAuthed();
+  const { loading } = useRedirectIfAuthed();
   const { fetchSession } = useAuthStore();
   const [state, setState] = useReducer(
     (
@@ -60,10 +65,6 @@ function Login() {
         </div>
       </main>
     );
-  }
-
-  if (user) {
-    return <Navigate to="/" replace />;
   }
 
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {

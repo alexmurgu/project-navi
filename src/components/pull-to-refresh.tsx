@@ -72,9 +72,9 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
       }
     };
 
-    window.addEventListener("touchstart", handleTouchStart, { passive: false });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
@@ -88,7 +88,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
       {/* Pull indicator */}
       <div 
         className={cn(
-          "fixed left-1/2 -translate-x-1/2 flex items-center justify-center z-[100] transition-opacity duration-200 pointer-events-none",
+          "fixed left-1/2 -translate-x-1/2 flex items-center justify-center z-100 transition-opacity duration-200 pointer-events-none",
           (pullDistance > 10 || isRefreshing) ? "opacity-100" : "opacity-0"
         )}
         style={{ 

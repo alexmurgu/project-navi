@@ -1,14 +1,11 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { User as UserIcon, Check } from "lucide-react";
+import React, { useMemo, useEffect } from "react";
+import { } from "lucide-react";
 import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 
-import { cn } from "@/lib/utils";
+
 import {
-  CategoryIcon,
-  getCategoryConfig,
   type CategoryConfig,
-  withAlpha,
 } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
@@ -21,8 +18,9 @@ import {
   updateTransactionStatus,
 } from "./actions";
 import { TransactionSheet } from "@/components/transaction-sheet";
-import { TransactionCard } from "@/components/transaction-card";
-import { Button } from "./components/ui/button";
+import { StatsHero } from "@/components/dashboard/stats-hero";
+import { CategoryBreakdown } from "@/components/dashboard/category-breakdown";
+import { RecentActivity } from "@/components/dashboard/recent-activity";
 
 interface User {
   id: string;
@@ -63,50 +61,51 @@ export function DashboardContent({ data }: PageProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const [expenseSheetOpen, setExpenseSheetOpen] = useState(false);
-  const [incomeSheetOpen, setIncomeSheetOpen] = useState(false);
-  const [showAllCategories, setShowAllCategories] = useState(false);
-  const [availableExpenseCategories, setAvailableExpenseCategories] = useState<string[]>(
-    data.expenseCategories,
-  );
-  const [availableIncomeCategories, setAvailableIncomeCategories] = useState<string[]>(
-    data.incomeCategories,
+  const [state, dispatch] = React.useReducer(
+    (s: any, a: any) => ({ ...s, ...a }),
+    {
+      expenseSheetOpen: false,
+      incomeSheetOpen: false,
+      showAllCategories: false,
+      editingItem: null,
+      selectedUserId: "family",
+      expenseCategory: "",
+      incomeCategory: "",
+    }
   );
 
-  const [editingItem, setEditingItem] = useState<Transaction | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState<string>("family");
-  const [expenseCategory, setExpenseCategory] = useState("");
-  const [incomeCategory, setIncomeCategory] = useState("");
+  const availableExpenseCategories = data.expenseCategories;
+  const availableIncomeCategories = data.incomeCategories;
 
   const addExpenseMutation = useMutation({
     mutationFn: (d: any) => addExpense({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setExpenseSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ expenseSheetOpen: false });
     },
   });
 
   const updateExpenseMutation = useMutation({
     mutationFn: (d: any) => updateExpense({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setExpenseSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ expenseSheetOpen: false });
     },
   });
 
   const addIncomeMutation = useMutation({
     mutationFn: (d: any) => addIncome({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setIncomeSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ incomeSheetOpen: false });
     },
   });
 
   const updateIncomeMutation = useMutation({
     mutationFn: (d: any) => updateIncome({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setIncomeSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ incomeSheetOpen: false });
     },
   });
 
@@ -114,7 +113,7 @@ export function DashboardContent({ data }: PageProps) {
     mutationFn: (d: { id: string; type: "expense" | "income"; status: "pending" | "paid" }) =>
       updateTransactionStatus({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 
@@ -196,29 +195,36 @@ export function DashboardContent({ data }: PageProps) {
   }, [data.categoryConfigs]);
 
   const handleEdit = (item: Transaction) => {
-    setEditingItem(item);
-    setSelectedUserId(item.userId || "family");
+    const updates: any = {
+      editingItem: item,
+      selectedUserId: item.userId || "family",
+    };
     if (item.type === "expense") {
-      setExpenseCategory(item.category);
-      setExpenseSheetOpen(true);
+      updates.expenseCategory = item.category;
+      updates.expenseSheetOpen = true;
     } else {
-      setIncomeCategory(item.category);
-      setIncomeSheetOpen(true);
+      updates.incomeCategory = item.category;
+      updates.incomeSheetOpen = true;
     }
+    dispatch(updates);
   };
 
   useEffect(() => {
     const handleQuickAddExpense = () => {
-      setEditingItem(null);
-      setSelectedUserId("family");
-      setExpenseCategory("");
-      setExpenseSheetOpen(true);
+      dispatch({
+        editingItem: null,
+        selectedUserId: "family",
+        expenseCategory: "",
+        expenseSheetOpen: true,
+      });
     };
     const handleQuickAddIncome = () => {
-      setEditingItem(null);
-      setSelectedUserId("family");
-      setIncomeCategory("");
-      setIncomeSheetOpen(true);
+      dispatch({
+        editingItem: null,
+        selectedUserId: "family",
+        incomeCategory: "",
+        incomeSheetOpen: true,
+      });
     };
 
     window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
@@ -231,195 +237,50 @@ export function DashboardContent({ data }: PageProps) {
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-white antialiased">
-      {/* High-Impact Hero Section */}
-      <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-16 relative overflow-hidden text-white">
-        <div className="space-y-6 relative z-10 text-center md:text-left">
-          <p className="text-[12px] font-display font-medium uppercase tracking-[0.25em] opacity-50">
-            Available Balance
-          </p>
-          <h1 className="text-[64px] md:text-[120px] font-display font-medium leading-[0.9] tracking-[-0.04em]">
-            {formatCurrency(stats.balance)}
-          </h1>
-        </div>
-
-        <div className="flex items-center justify-between px-2 relative z-10">
-          <div className="space-y-2">
-            <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
-              Expenses (Monthly)
-            </p>
-            <p className="text-[32px] md:text-[48px] font-display font-medium tracking-tight">
-              {formatCurrency(stats.monthlyExp)}
-            </p>
-          </div>
-          <div className="h-16 w-px bg-white/10" />
-          <div className="space-y-2 text-right">
-            <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
-              Income (Total)
-            </p>
-            <p className="text-[32px] md:text-[48px] font-display font-medium tracking-tight">
-              {formatCurrency(stats.income)}
-            </p>
-          </div>
-        </div>
-      </section>
+      <StatsHero
+        balance={stats.balance}
+        monthlyExp={stats.monthlyExp}
+        income={stats.income}
+        formatCurrency={formatCurrency}
+      />
 
       <div className="p-6 md:p-12 space-y-16">
-        <section className="space-y-6">
-          <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40 ml-2">
-            Monthly Breakdown
-          </h3>
-          <div className="grid gap-4">
-            {currentMonthCategoryData.items.length === 0 ? (
-              <div className="rounded-card border border-navi-border/30 bg-navi-surface px-8 py-10 text-sm text-navi-gray font-medium uppercase tracking-widest text-center">
-                No expenses recorded for this month yet.
-              </div>
-            ) : (
-              <>
-                {(showAllCategories
-                  ? currentMonthCategoryData.items
-                  : currentMonthCategoryData.items.slice(0, 3)
-                ).map((item) => {
-                  const config = getCategoryConfig(categoryConfigMap, item.name);
-                  const color = config?.color || "#494fdf";
-                  const share = currentMonthCategoryData.total
-                    ? Math.max(2, (item.amount / currentMonthCategoryData.total) * 100)
-                    : 0;
+        <CategoryBreakdown
+          items={currentMonthCategoryData.items}
+          total={currentMonthCategoryData.total}
+          categoryConfigMap={categoryConfigMap}
+          showAll={state.showAllCategories}
+          onToggleShowAll={() => dispatch({ showAllCategories: !state.showAllCategories })}
+          onCategoryClick={(name) =>
+            navigate({ to: "/categories/$category", params: { category: name } })
+          }
+          formatCurrency={formatCurrency}
+        />
 
-                  return (
-                    <button
-                      type="button"
-                      key={item.name}
-                      className="relative flex items-center justify-between p-5 rounded-card transition-all border border-transparent active:scale-[0.99] group overflow-hidden text-left bg-navi-surface cursor-pointer w-full"
-                      style={{ backgroundColor: withAlpha(color, 0.05) }}
-                      onClick={() =>
-                        navigate({ to: "/categories/$category", params: { category: item.name } })
-                      }
-                    >
-                      {/* Integrated Progress Bar as Background Overlay */}
-                      <div
-                        className="absolute inset-y-0 left-0 transition-all duration-1000 ease-out"
-                        style={{ width: `${share}%`, backgroundColor: color, opacity: 0.1 }}
-                      />
-
-                      <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
-                        <div
-                          className="size-12 rounded-full flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
-                        >
-                          <CategoryIcon
-                            category={item.name}
-                            config={config}
-                            kind="expense"
-                            className="size-6"
-                            color={color}
-                            strokeWidth={1}
-                          />
-                        </div>
-                        <div className="space-y-1 min-w-0">
-                          <p className="font-display font-medium text-[16px] text-navi-dark truncate">
-                            {item.name}
-                          </p>
-                          <div className="flex items-center gap-3">
-                            <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
-                              {item.count} {item.count === 1 ? "txn" : "txns"}
-                            </p>
-                            <div className="size-1 rounded-full bg-navi-border/50" />
-                            <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray">
-                              {Math.round((item.amount / currentMonthCategoryData.total) * 100) || 0}%
-                              share
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="relative z-10 text-right shrink-0">
-                        <p className="font-display font-medium text-[18px] text-navi-dark">
-                          {formatCurrency(item.amount)}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-                {currentMonthCategoryData.items.length > 3 && (
-                  <div className="pt-2 flex justify-center">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setShowAllCategories(!showAllCategories)}
-                      className="px-8"
-                    >
-                      {showAllCategories
-                        ? "Show less"
-                        : `Show ${currentMonthCategoryData.items.length - 3} more categories`}
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </section>
-
-        {/* Recent Transactions List */}
-        <section className="space-y-10">
-          <div className="flex items-center justify-between px-2">
-            <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
-              Recent Activity
-            </h3>
-            <Button
-              variant="link"
-              size="xs"
-              onClick={() => navigate({ to: "/expenses" })}
-              className="p-0 h-auto"
-            >
-              View All
-            </Button>
-          </div>
-
-          <div className="space-y-12">
-            {groupedRecentActivity.map((group) => (
-              <div key={group.title} className="space-y-6 px-2">
-                <h4 className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60 ml-2">
-                  {group.title}
-                </h4>
-                <div className="grid gap-4">
-                  {group.items.map((tx) => (
-                    <TransactionCard
-                      key={tx.id}
-                      transaction={tx}
-                      categoryConfigMap={categoryConfigMap}
-                      onClick={() => handleEdit(tx)}
-                      onStatusUpdate={
-                        tx.status === "pending"
-                          ? (status) =>
-                              updateStatusMutation.mutate({
-                                id: tx.id,
-                                type: tx.type,
-                                status,
-                              })
-                          : undefined
-                      }
-                      formatCurrency={formatCurrency}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <RecentActivity
+          groups={groupedRecentActivity}
+          categoryConfigMap={categoryConfigMap}
+          onEdit={handleEdit}
+          onStatusUpdate={(id, type, status) =>
+            updateStatusMutation.mutate({ id, type, status })
+          }
+          onViewAll={() => navigate({ to: "/expenses" })}
+          formatCurrency={formatCurrency}
+        />
       </div>
 
       <TransactionSheet
         mode="expense"
-        open={expenseSheetOpen}
-        onOpenChange={setExpenseSheetOpen}
-        editingItem={editingItem?.type === "expense" ? editingItem : null}
+        open={state.expenseSheetOpen}
+        onOpenChange={(open) => dispatch({ expenseSheetOpen: open })}
+        editingItem={state.editingItem?.type === "expense" ? state.editingItem : null}
         users={data.users}
-        selectedUserId={selectedUserId}
-        setSelectedUserId={setSelectedUserId}
-        category={expenseCategory}
-        setCategory={setExpenseCategory}
+        selectedUserId={state.selectedUserId}
+        setSelectedUserId={(val) => dispatch({ selectedUserId: val })}
+        category={state.expenseCategory}
+        setCategory={(val) => dispatch({ expenseCategory: val })}
         availableCategories={availableExpenseCategories}
-        setAvailableCategories={setAvailableExpenseCategories}
+        setAvailableCategories={() => {}} // No-op, managed by dashboard refetch
         categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => {
           const payload = {
@@ -427,7 +288,7 @@ export function DashboardContent({ data }: PageProps) {
             userId: d.userId,
             isMonthly: d.isMonthly ?? false,
           };
-          if (editingItem?.type === "expense") {
+          if (state.editingItem?.type === "expense") {
             updateExpenseMutation.mutate(payload);
           } else {
             addExpenseMutation.mutate(payload);
@@ -435,7 +296,7 @@ export function DashboardContent({ data }: PageProps) {
         }}
         onDelete={(id) =>
           deleteExpense({ data: id }).then(() =>
-            queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" }),
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
           )
         }
         saving={addExpenseMutation.isPending || updateExpenseMutation.isPending}
@@ -443,19 +304,19 @@ export function DashboardContent({ data }: PageProps) {
 
       <TransactionSheet
         mode="income"
-        open={incomeSheetOpen}
-        onOpenChange={setIncomeSheetOpen}
-        editingItem={editingItem?.type === "income" ? editingItem : null}
+        open={state.incomeSheetOpen}
+        onOpenChange={(open) => dispatch({ incomeSheetOpen: open })}
+        editingItem={state.editingItem?.type === "income" ? state.editingItem : null}
         users={data.users}
-        selectedUserId={selectedUserId}
-        setSelectedUserId={setSelectedUserId}
-        category={incomeCategory}
-        setCategory={setIncomeCategory}
+        selectedUserId={state.selectedUserId}
+        setSelectedUserId={(val) => dispatch({ selectedUserId: val })}
+        category={state.incomeCategory}
+        setCategory={(val) => dispatch({ incomeCategory: val })}
         availableCategories={availableIncomeCategories}
-        setAvailableCategories={setAvailableIncomeCategories}
+        setAvailableCategories={() => {}} // No-op, managed by dashboard refetch
         categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => {
-          if (editingItem?.type === "income") {
+          if (state.editingItem?.type === "income") {
             updateIncomeMutation.mutate(d);
           } else {
             addIncomeMutation.mutate(d);
@@ -463,7 +324,7 @@ export function DashboardContent({ data }: PageProps) {
         }}
         onDelete={(id) =>
           deleteIncome({ data: id }).then(() =>
-            queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" }),
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
           )
         }
         saving={addIncomeMutation.isPending || updateIncomeMutation.isPending}

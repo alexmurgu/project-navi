@@ -13,10 +13,8 @@ import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
 
 interface CategoriesContentProps {
   expenseCategories: string[];
@@ -35,57 +33,16 @@ const PRESET_COLORS = [
   "#191C1F", "#475569", "#868E96", "#6366F1", "#00D2D3", "#54A0FF", "#FF9FF3",
 ];
 
-export function CategoriesContent({
-  expenseCategories,
-  incomeCategories,
-  configMap,
-}: CategoriesContentProps) {
-  const queryClient = useQueryClient();
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [draftColor, setDraftColor] = useState<string>("#494fdf");
-  const [draftIcon, setDraftIcon] = useState<string | null>(null);
+interface CategorySectionProps {
+  names: string[];
+  title: string;
+  accentColor: string;
+  configMap: Record<string, CategoryConfig>;
+  onSelect: (name: string) => void;
+}
 
-  const upsertMutation = useMutation({
-    mutationFn: (data: { name: string; color: string; icon: string | null }) =>
-      addAdminCategory({ data }),
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setIsPickerOpen(false);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteAdminCategory({ data: id }),
-    onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-    },
-  });
-
-  useEffect(() => {
-    if (!activeCategory) return;
-    const config = configMap[activeCategory];
-    setDraftColor(config?.color || "#494fdf");
-    setDraftIcon(config?.icon || null);
-  }, [activeCategory, configMap]);
-
-  const handleSave = () => {
-    if (activeCategory) {
-      upsertMutation.mutate({ name: activeCategory, color: draftColor, icon: draftIcon });
-    }
-  };
-
-  const handleDelete = () => {
-    if (!activeCategory) return;
-    const config = configMap[activeCategory];
-    if (!config?.id) return;
-    if (confirm(`Are you sure you want to delete "${activeCategory}"?`)) {
-      deleteMutation.mutate(config.id);
-      setIsPickerOpen(false);
-    }
-  };
-
-  const renderCategoryTable = (names: string[], title: string, accentColor: string) => (
+function CategorySection({ names, title, accentColor, configMap, onSelect }: CategorySectionProps) {
+  return (
     <section className="space-y-8">
       <div className="flex items-center gap-4 px-2">
         <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: accentColor }} />
@@ -104,10 +61,7 @@ export function CategoriesContent({
               type="button"
               key={name}
               className="navi-card flex items-center justify-between p-6 text-left group"
-              onClick={() => {
-                setActiveCategory(name);
-                setIsPickerOpen(true);
-              }}
+              onClick={() => onSelect(name)}
             >
               <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
                 <div
@@ -147,6 +101,57 @@ export function CategoriesContent({
       </div>
     </section>
   );
+}
+
+export function CategoriesContent({
+  expenseCategories,
+  incomeCategories,
+  configMap,
+}: CategoriesContentProps) {
+  const queryClient = useQueryClient();
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [draftColor, setDraftColor] = useState<string>("#494fdf");
+  const [draftIcon, setDraftIcon] = useState<string | null>(null);
+
+  const upsertMutation = useMutation({
+    mutationFn: (data: { name: string; color: string; icon: string | null }) =>
+      addAdminCategory({ data }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      setIsPickerOpen(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteAdminCategory({ data: id }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+
+  useEffect(() => {
+    if (!activeCategory) return;
+    const config = configMap[activeCategory];
+    setDraftColor(config?.color || "#494fdf");
+    setDraftIcon(config?.icon || null);
+  }, [activeCategory, configMap]);
+
+  const handleSave = () => {
+    if (activeCategory) {
+      upsertMutation.mutate({ name: activeCategory, color: draftColor, icon: draftIcon });
+    }
+  };
+
+  const handleDelete = () => {
+    if (!activeCategory) return;
+    const config = configMap[activeCategory];
+    if (!config?.id) return;
+    if (confirm(`Are you sure you want to delete "${activeCategory}"?`)) {
+      deleteMutation.mutate(config.id);
+      setIsPickerOpen(false);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-white antialiased">
@@ -163,8 +168,26 @@ export function CategoriesContent({
       </section>
 
       <div className="p-6 md:p-12 space-y-20">
-        {renderCategoryTable(expenseCategories, "Expense Categories", "#494fdf")}
-        {renderCategoryTable(incomeCategories, "Income Categories", "#00a87e")}
+        <CategorySection 
+          names={expenseCategories} 
+          title="Expense Categories" 
+          accentColor="#494fdf" 
+          configMap={configMap}
+          onSelect={(name) => {
+            setActiveCategory(name);
+            setIsPickerOpen(true);
+          }}
+        />
+        <CategorySection 
+          names={incomeCategories} 
+          title="Income Categories" 
+          accentColor="#00a87e" 
+          configMap={configMap}
+          onSelect={(name) => {
+            setActiveCategory(name);
+            setIsPickerOpen(true);
+          }}
+        />
       </div>
 
       <Sheet open={isPickerOpen} onOpenChange={setIsPickerOpen}>
@@ -223,12 +246,12 @@ export function CategoriesContent({
                 {/* Color Picker */}
                 <div className="space-y-6">
                   <div className="flex items-center justify-between px-1">
-                    <p className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
+                    <Label id="color-palette-label" className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
                       Color Palette
-                    </p>
+                    </Label>
                     <span className="text-[10px] font-mono text-navi-gray/60">{draftColor}</span>
                   </div>
-                  <div className="grid grid-cols-7 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-7 gap-3 sm:gap-4" role="group" aria-labelledby="color-palette-label">
                     {PRESET_COLORS.map((color) => {
                       const selected = draftColor === color;
                       return (
@@ -255,14 +278,14 @@ export function CategoriesContent({
                 {/* Icon Picker */}
                 <div className="space-y-6">
                   <div className="flex items-center justify-between px-1">
-                    <p className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
+                    <Label id="icon-selection-label" className="text-[11px] font-display font-medium uppercase tracking-[0.25em] text-navi-gray/60">
                       Icon Selection
-                    </p>
+                    </Label>
                     <span className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/60">
                       {draftIcon || "Default"}
                     </span>
                   </div>
-                  <div className="grid grid-cols-4 gap-3 sm:gap-4 max-h-[300px] overflow-y-auto pr-2">
+                  <div className="grid grid-cols-4 gap-3 sm:gap-4 max-h-[300px] overflow-y-auto pr-2" role="group" aria-labelledby="icon-selection-label">
                     <button
                       type="button"
                       onClick={() => setDraftIcon(null)}

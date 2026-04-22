@@ -18,14 +18,14 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
   const createUserMutation = useMutation({
     mutationFn: (data: any) => addAdminUser({ data }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["admin-users"], type: "active" });
+      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
   });
 
   const deleteUserMutation = useMutation({
     mutationFn: (id: string) => deleteAdminUser({ data: id }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["admin-users"], type: "active" });
+      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
   });
 
@@ -68,12 +68,13 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
             <div className="bg-navi-surface p-8 rounded-[32px] border border-navi-border/20">
               <form onSubmit={handleCreateUser} className="space-y-6">
                 <div className="space-y-3">
-                  <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                  <Label htmlFor="name" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                     Full Name
                   </Label>
                   <div className="relative">
                     <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
                     <Input
+                      id="name"
                       type="text"
                       name="name"
                       required
@@ -84,12 +85,13 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                  <Label htmlFor="email" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                     Email Address
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
                     <Input
+                      id="email"
                       type="email"
                       name="email"
                       required
@@ -100,12 +102,13 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                  <Label htmlFor="password" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                     Access Key
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
                     <Input
+                      id="password"
                       type="password"
                       name="password"
                       required

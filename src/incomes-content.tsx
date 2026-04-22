@@ -1,23 +1,16 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useMemo, useEffect } from "react";
 import {
   Search,
   Plus,
   ArrowUpDown,
   ChevronDown,
-  User as UserIcon,
-  Check,
 } from "lucide-react";
-import { format } from "date-fns";
-import { useNavigate } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import { TransactionCard } from "@/components/transaction-card";
 import {
-  CategoryIcon,
-  getCategoryConfig,
   type CategoryConfig,
-  withAlpha,
 } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { addIncome, updateIncome, deleteIncome, updateTransactionStatus, addExpense } from "./actions";
@@ -58,18 +51,23 @@ const formatCurrency = (amountCents: number) => {
 
 export function IncomesContent({ data }: PageProps) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const [incomeSheetOpen, setIncomeSheetOpen] = useState(false);
-  const [expenseSheetOpen, setExpenseSheetOpen] = useState(false);
-  const [availableCategories, setAvailableCategories] = useState<string[]>(data.incomeCategories);
-  const [selectedUserId, setSelectedUserId] = useState<string>("family");
-  const [incomeCategory, setIncomeCategory] = useState("");
-  // oxlint-disable-next-line no-unused-vars
-  const [expenseCategory, setExpenseCategory] = useState("");
-  const [editingItem, setEditingItem] = useState<Transaction | null>(null);
-  const [tableSearch, setTableSearch] = useState("");
-  const [visibleCount, setVisibleCount] = useState(INITIAL_PAGE_SIZE);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
+  const [state, dispatch] = React.useReducer(
+    (s: any, a: any) => ({ ...s, ...a }),
+    {
+      incomeSheetOpen: false,
+      expenseSheetOpen: false,
+      selectedUserId: "family",
+      incomeCategory: "",
+      expenseCategory: "",
+      editingItem: null,
+      tableSearch: "",
+      visibleCount: INITIAL_PAGE_SIZE,
+      sortDirection: "desc",
+    }
+  );
+
+  const availableCategories = data.incomeCategories;
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
     data.categoryConfigs.forEach((config) => {
@@ -81,22 +79,22 @@ export function IncomesContent({ data }: PageProps) {
   const addIncomeMutation = useMutation({
     mutationFn: (d: any) => addIncome({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setIncomeSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ incomeSheetOpen: false });
     },
   });
   const updateIncomeMutation = useMutation({
     mutationFn: (d: any) => updateIncome({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setIncomeSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ incomeSheetOpen: false });
     },
   });
   const deleteIncomeMutation = useMutation({
     mutationFn: (id: string) => deleteIncome({ data: id }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setIncomeSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ incomeSheetOpen: false });
     },
   });
 
@@ -104,23 +102,23 @@ export function IncomesContent({ data }: PageProps) {
     mutationFn: (d: { id: string; type: "expense" | "income"; status: "pending" | "paid" }) =>
       updateTransactionStatus({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 
   const addExpenseMutation = useMutation({
     mutationFn: (d: any) => addExpense({ data: d }),
     onSuccess: async () => {
-      await queryClient.refetchQueries({ queryKey: ["dashboard"], type: "active" });
-      setExpenseSheetOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ expenseSheetOpen: false });
     },
   });
 
   const filteredHistory = useMemo(() => {
     return data.incomes
       .filter((item) => {
-        if (tableSearch) {
-          const search = tableSearch.toLowerCase();
+        if (state.tableSearch) {
+          const search = state.tableSearch.toLowerCase();
           return (
             item.description.toLowerCase().includes(search) ||
             item.category.toLowerCase().includes(search)
@@ -131,57 +129,44 @@ export function IncomesContent({ data }: PageProps) {
       .sort((a, b) => {
         const valA = new Date(a.date).getTime();
         const valB = new Date(b.date).getTime();
-        return sortDirection === "asc" ? valA - valB : valB - valA;
+        return state.sortDirection === "asc" ? valA - valB : valB - valA;
       });
-  }, [data.incomes, tableSearch, sortDirection]);
+  }, [data.incomes, state.tableSearch, state.sortDirection]);
 
   const paginatedHistory = useMemo(
-    () => filteredHistory.slice(0, visibleCount),
-    [filteredHistory, visibleCount],
+    () => filteredHistory.slice(0, state.visibleCount),
+    [filteredHistory, state.visibleCount],
   );
-  const hasMore = filteredHistory.length > visibleCount;
+  const hasMore = filteredHistory.length > state.visibleCount;
 
   const handleEdit = (item: any) => {
     const tx = { ...item, type: "income" as const };
-    setEditingItem(tx);
-    setSelectedUserId(tx.userId || "family");
-    setIncomeCategory(tx.category);
-    setIncomeSheetOpen(true);
-  };
-
-  const handleRowKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, item: any) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      handleEdit(item);
-    }
-  };
-
-  const openMemberOverview = (memberId: string | null) => {
-    navigate({
-      to: "/members/$memberId",
-      params: { memberId: memberId || "family" },
+    dispatch({
+      editingItem: tx,
+      selectedUserId: tx.userId || "family",
+      incomeCategory: tx.category,
+      incomeSheetOpen: true,
     });
   };
 
-  const openCategoryOverview = (category: string) => {
-    navigate({
-      to: "/categories/$category",
-      params: { category },
-    });
-  };
+
 
   useEffect(() => {
     const handleQuickAddExpense = () => {
-      setEditingItem(null);
-      setSelectedUserId("family");
-      setExpenseCategory("");
-      setExpenseSheetOpen(true);
+      dispatch({
+        editingItem: null,
+        selectedUserId: "family",
+        expenseCategory: "",
+        expenseSheetOpen: true,
+      });
     };
     const handleQuickAddIncome = () => {
-      setEditingItem(null);
-      setSelectedUserId("family");
-      setIncomeCategory("");
-      setIncomeSheetOpen(true);
+      dispatch({
+        editingItem: null,
+        selectedUserId: "family",
+        incomeCategory: "",
+        incomeSheetOpen: true,
+      });
     };
 
     window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
@@ -206,8 +191,10 @@ export function IncomesContent({ data }: PageProps) {
         </div>
         <button
           onClick={() => {
-            setEditingItem(null);
-            setIncomeSheetOpen(true);
+            dispatch({
+              editingItem: null,
+              incomeSheetOpen: true,
+            });
           }}
           className="hidden size-16 rounded-xl bg-emerald-600 text-white items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-all md:flex"
         >
@@ -222,18 +209,18 @@ export function IncomesContent({ data }: PageProps) {
           <Input
             placeholder="Search income..."
             className="h-14 pl-14 rounded-xl bg-secondary/30 border-none shadow-inner text-base font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
-            value={tableSearch}
-            onChange={(e) => setTableSearch(e.target.value)}
+            value={state.tableSearch}
+            onChange={(e) => dispatch({ tableSearch: e.target.value })}
           />
         </div>
         <button
-          onClick={() => setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))}
+          onClick={() => dispatch({ sortDirection: state.sortDirection === "asc" ? "desc" : "asc" })}
           className="size-14 rounded-xl bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all shadow-inner"
         >
           <ArrowUpDown
             className={cn(
               "size-6 transition-transform duration-500",
-              sortDirection === "asc" ? "rotate-0" : "rotate-180",
+              state.sortDirection === "asc" ? "rotate-0" : "rotate-180",
             )}
           />
         </button>
@@ -266,7 +253,7 @@ export function IncomesContent({ data }: PageProps) {
         <div className="pt-10 flex justify-center">
           <Button
             variant="ghost"
-            onClick={() => setVisibleCount((prev) => prev + INITIAL_PAGE_SIZE)}
+            onClick={() => dispatch({ visibleCount: state.visibleCount + INITIAL_PAGE_SIZE })}
             className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] text-muted-foreground hover:text-emerald-600"
           >
             <ChevronDown className="mr-2 h-4 w-4" /> Load More
@@ -276,19 +263,19 @@ export function IncomesContent({ data }: PageProps) {
 
       <TransactionSheet
         mode="income"
-        open={incomeSheetOpen}
-        onOpenChange={setIncomeSheetOpen}
-        editingItem={editingItem}
+        open={state.incomeSheetOpen}
+        onOpenChange={(open) => dispatch({ incomeSheetOpen: open })}
+        editingItem={state.editingItem}
         users={data.users}
-        selectedUserId={selectedUserId}
-        setSelectedUserId={setSelectedUserId}
-        category={incomeCategory}
-        setCategory={setIncomeCategory}
+        selectedUserId={state.selectedUserId}
+        setSelectedUserId={(val) => dispatch({ selectedUserId: val })}
+        category={state.incomeCategory}
+        setCategory={(val) => dispatch({ incomeCategory: val })}
         availableCategories={availableCategories}
-        setAvailableCategories={setAvailableCategories}
+        setAvailableCategories={() => {}} // Derived from props
         categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => {
-          if (editingItem) {
+          if (state.editingItem) {
             updateIncomeMutation.mutate(d);
           } else {
             addIncomeMutation.mutate(d);
@@ -300,12 +287,12 @@ export function IncomesContent({ data }: PageProps) {
 
       <TransactionSheet
         mode="expense"
-        open={expenseSheetOpen}
-        onOpenChange={setExpenseSheetOpen}
+        open={state.expenseSheetOpen}
+        onOpenChange={(open) => dispatch({ expenseSheetOpen: open })}
         editingItem={null}
         users={data.users}
-        selectedUserId={selectedUserId}
-        setSelectedUserId={setSelectedUserId}
+        selectedUserId={state.selectedUserId}
+        setSelectedUserId={(val) => dispatch({ selectedUserId: val })}
         category={""}
         setCategory={() => {}}
         availableCategories={[]}
