@@ -172,14 +172,14 @@ export function CategoriesContent({
           side="bottom"
           className="h-[95vh] sm:h-fit sm:max-h-[95vh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
         >
-            <SheetHeader className="p-6 sm:p-8 pb-2 text-left shrink-0">
-              <SheetTitle className="text-[28px] sm:text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
+            <div className="p-6 sm:p-8 pb-2 text-left shrink-0">
+              <h2 className="text-[28px] sm:text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
                 Customize {activeCategory}
-              </SheetTitle>
-              <SheetDescription className="ml-1 text-[11px] font-sans font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+              </h2>
+              <p className="ml-1 text-[11px] font-sans font-medium uppercase tracking-[0.2em] text-navi-gray/60">
                 Update visual configuration for this category
-              </SheetDescription>
-            </SheetHeader>
+              </p>
+            </div>
 
             <div className="flex-1 overflow-y-auto p-6 sm:p-8 pt-0 space-y-8 sm:space-y-12">
               <div className="pb-10 space-y-8 sm:space-y-12">
