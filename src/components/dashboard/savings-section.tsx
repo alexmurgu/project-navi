@@ -1,5 +1,5 @@
 import React from "react";
-import { PiggyBank, ArrowRightLeft } from "lucide-react";
+import { PiggyBank } from "lucide-react";
 
 interface SavingsAccount {
   id: string;
@@ -13,29 +13,16 @@ interface SavingsAccount {
 interface SavingsSectionProps {
   accounts: SavingsAccount[];
   onEditAccount: (account: SavingsAccount) => void;
-  onTransfer: () => void;
   formatCurrency: (amount: number) => string;
 }
 
 export function SavingsSection({
   accounts,
   onEditAccount,
-  onTransfer,
   formatCurrency,
 }: SavingsSectionProps) {
   return (
     <section className="space-y-8">
-      <div className="flex items-center justify-end px-2">
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={onTransfer}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-navi-dark text-white text-[11px] font-display font-medium uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all"
-          >
-            <ArrowRightLeft className="size-3" />
-            Transfer
-          </button>
-        </div>
-      </div>
 
       <div className="flex flex-col gap-3">
         {accounts.length === 0 ? (

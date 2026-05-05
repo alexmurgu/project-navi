@@ -290,11 +290,20 @@ export function DashboardContent({ data }: PageProps) {
       });
     };
 
+    const handleQuickAddTransfer = () => {
+      dispatch({
+        editingItem: null,
+        transferSheetOpen: true,
+      });
+    };
+
     window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
     window.addEventListener("open-quick-add-income", handleQuickAddIncome);
+    window.addEventListener("open-quick-add-transfer", handleQuickAddTransfer);
     return () => {
       window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
       window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
+      window.removeEventListener("open-quick-add-transfer", handleQuickAddTransfer);
     };
   }, []);
 
@@ -313,7 +322,6 @@ export function DashboardContent({ data }: PageProps) {
         <SavingsSection
           accounts={data.savingsAccounts}
           onEditAccount={(sa) => dispatch({ editingSavingsAccount: sa, savingsSheetOpen: true })}
-          onTransfer={() => dispatch({ transferSheetOpen: true })}
           formatCurrency={formatCurrency}
         />
         <CategoryBreakdown

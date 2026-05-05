@@ -94,11 +94,13 @@ function RootLayout() {
   }, [uiState.refreshingForUpdate]);
 
   const showDevtools = typeof window !== "undefined" && window.location.hostname === "localhost";
-  const openQuickAdd = (mode: "expense" | "income") => {
+  const openQuickAdd = (mode: "expense" | "income" | "transfer") => {
     setUiState((prev) => ({ ...prev, quickAddOpen: false }));
-    window.dispatchEvent(
-      new CustomEvent(mode === "expense" ? "open-quick-add-expense" : "open-quick-add-income"),
-    );
+    const eventName = 
+      mode === "expense" ? "open-quick-add-expense" : 
+      mode === "income" ? "open-quick-add-income" : 
+      "open-quick-add-transfer";
+    window.dispatchEvent(new CustomEvent(eventName));
   };
 
   const updateApp = () => {
@@ -197,26 +199,36 @@ function RootLayout() {
                 Add Entry
               </SheetTitle>
             </SheetHeader>
-            <div className="mt-10 grid grid-cols-2 gap-6">
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Button
                 type="button"
                 variant="default"
-                className="h-24 rounded-premium font-display font-medium tracking-widest text-[12px] uppercase bg-navi-dark text-white hover:opacity-90"
+                className="h-20 sm:h-24 rounded-premium font-display font-medium tracking-widest text-[11px] uppercase bg-navi-dark text-white hover:opacity-90 transition-all"
                 onClick={() => openQuickAdd("expense")}
               >
-                <div className="flex flex-col items-center gap-3">
-                  <ArrowDownCircle className="size-6" />
+                <div className="flex flex-col items-center gap-2">
+                  <ArrowDownCircle className="size-5" />
                   <span>Expense</span>
                 </div>
               </Button>
               <Button
                 type="button"
-                className="h-24 rounded-premium font-display font-medium tracking-widest text-[12px] uppercase bg-navi-teal text-white hover:opacity-90"
+                className="h-20 sm:h-24 rounded-premium font-display font-medium tracking-widest text-[11px] uppercase bg-navi-teal text-white hover:opacity-90 transition-all"
                 onClick={() => openQuickAdd("income")}
               >
-                <div className="flex flex-col items-center gap-3">
-                  <ArrowUpCircle className="size-6" />
+                <div className="flex flex-col items-center gap-2">
+                  <ArrowUpCircle className="size-5" />
                   <span>Income</span>
+                </div>
+              </Button>
+              <Button
+                type="button"
+                className="h-20 sm:h-24 rounded-premium font-display font-medium tracking-widest text-[11px] uppercase bg-navi-dark/5 text-navi-dark hover:bg-navi-dark/10 transition-all"
+                onClick={() => openQuickAdd("transfer")}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <ArrowDownCircle className="size-5 rotate-270" />
+                  <span>Transfer</span>
                 </div>
               </Button>
             </div>
