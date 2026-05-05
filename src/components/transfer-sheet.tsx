@@ -97,12 +97,13 @@ export function TransferSheet({
   }, [open, savingsAccounts]);
 
   const amountCents = state.amount ? Math.round(parseFloat(state.amount) * 100) : 0;
-  const sourceBalance = state.fromType === "main" 
-    ? availableBalance 
-    : state.fromType === "savings"
-      ? savingsAccounts.find(sa => sa.id === state.fromId)?.currentBalance || 0
-      : creditCards.find(cc => cc.id === state.fromId)?.limit || 99999999; // Credit cards use limit or arbitrary high for now
-  
+  const sourceBalance =
+    state.fromType === "main"
+      ? availableBalance
+      : state.fromType === "savings"
+        ? savingsAccounts.find((sa) => sa.id === state.fromId)?.currentBalance || 0
+        : creditCards.find((cc) => cc.id === state.fromId)?.limit || 99999999; // Credit cards use limit or arbitrary high for now
+
   const isOverBalance = amountCents > sourceBalance;
 
   const handleSave = () => {
@@ -165,10 +166,14 @@ export function TransferSheet({
 
               <div className="flex flex-col gap-4 relative">
                 {/* From */}
-                <div className={cn(
-                  "p-5 rounded-premium border transition-colors space-y-3",
-                  isOverBalance ? "bg-navi-danger/5 border-navi-danger/20" : "bg-navi-surface/30 border-navi-border/10"
-                )}>
+                <div
+                  className={cn(
+                    "p-5 rounded-premium border transition-colors space-y-3",
+                    isOverBalance
+                      ? "bg-navi-danger/5 border-navi-danger/20"
+                      : "bg-navi-surface/30 border-navi-border/10",
+                  )}
+                >
                   <p className="text-[9px] font-display font-medium uppercase tracking-widest text-navi-gray/40">
                     From
                   </p>
@@ -181,7 +186,11 @@ export function TransferSheet({
                         dispatch({ type: "SET_FIELD", field: "fromId", value: null });
                       } else if (val.startsWith("cc_")) {
                         dispatch({ type: "SET_FIELD", field: "fromType", value: "credit" });
-                        dispatch({ type: "SET_FIELD", field: "fromId", value: val.replace("cc_", "") });
+                        dispatch({
+                          type: "SET_FIELD",
+                          field: "fromId",
+                          value: val.replace("cc_", ""),
+                        });
                       } else {
                         dispatch({ type: "SET_FIELD", field: "fromType", value: "savings" });
                         dispatch({ type: "SET_FIELD", field: "fromId", value: val });
@@ -228,7 +237,11 @@ export function TransferSheet({
                         dispatch({ type: "SET_FIELD", field: "toId", value: null });
                       } else if (val.startsWith("cc_")) {
                         dispatch({ type: "SET_FIELD", field: "toType", value: "credit" });
-                        dispatch({ type: "SET_FIELD", field: "toId", value: val.replace("cc_", "") });
+                        dispatch({
+                          type: "SET_FIELD",
+                          field: "toId",
+                          value: val.replace("cc_", ""),
+                        });
                       } else {
                         dispatch({ type: "SET_FIELD", field: "toType", value: "savings" });
                         dispatch({ type: "SET_FIELD", field: "toId", value: val });
@@ -275,9 +288,12 @@ export function TransferSheet({
               <div className="mx-2 p-4 rounded-card bg-navi-danger/10 border border-navi-danger/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                 <AlertCircle className="size-5 text-navi-danger shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[13px] font-display font-medium text-navi-danger uppercase tracking-tight">Insufficient Funds</p>
+                  <p className="text-[13px] font-display font-medium text-navi-danger uppercase tracking-tight">
+                    Insufficient Funds
+                  </p>
                   <p className="text-[11px] font-sans text-navi-danger/70 leading-relaxed">
-                    You only have {(sourceBalance / 100).toFixed(2)}€ available in your {state.fromType === "main" ? "main account" : "savings account"}.
+                    You only have {(sourceBalance / 100).toFixed(2)}€ available in your{" "}
+                    {state.fromType === "main" ? "main account" : "savings account"}.
                   </p>
                 </div>
               </div>
@@ -299,7 +315,9 @@ export function TransferSheet({
             <Button
               className={cn(
                 "h-16 rounded-full font-display font-medium uppercase tracking-[0.2em] shadow-[0_20px_40px_-15px_rgba(8,59,58,0.3)] transition-all",
-                isOverBalance ? "bg-navi-gray/20 text-navi-gray/40 cursor-not-allowed" : "bg-navi-dark text-white hover:opacity-95 active:scale-[0.98]"
+                isOverBalance
+                  ? "bg-navi-gray/20 text-navi-gray/40 cursor-not-allowed"
+                  : "bg-navi-dark text-white hover:opacity-95 active:scale-[0.98]",
               )}
               onClick={handleSave}
               disabled={

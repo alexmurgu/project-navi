@@ -1,5 +1,13 @@
 import React, { useMemo, useEffect } from "react";
-import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval, isAfter } from "date-fns";
+import {
+  format,
+  isToday,
+  isYesterday,
+  startOfMonth,
+  endOfMonth,
+  isWithinInterval,
+  isAfter,
+} from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 
 import { type CategoryConfig } from "@/lib/category-visuals";
@@ -359,16 +367,18 @@ export function DashboardContent({ data }: PageProps) {
       />
 
       <div className="p-6 md:p-12 space-y-16">
-        <SavingsSection
-          accounts={data.savingsAccounts}
-          onEditAccount={(sa) => dispatch({ editingSavingsAccount: sa, savingsSheetOpen: true })}
-          formatCurrency={formatCurrency}
-        />
-        <CreditCardsSection
-          cards={data.creditCards}
-          onEditCard={(cc) => dispatch({ editingCreditCard: cc, creditCardSheetOpen: true })}
-          formatCurrency={formatCurrency}
-        />
+        <div className="space-y-6">
+          <SavingsSection
+            accounts={data.savingsAccounts}
+            onEditAccount={(sa) => dispatch({ editingSavingsAccount: sa, savingsSheetOpen: true })}
+            formatCurrency={formatCurrency}
+          />
+          <CreditCardsSection
+            cards={data.creditCards}
+            onEditCard={(cc) => dispatch({ editingCreditCard: cc, creditCardSheetOpen: true })}
+            formatCurrency={formatCurrency}
+          />
+        </div>
         <CategoryBreakdown
           items={currentMonthCategoryData.items}
           total={currentMonthCategoryData.total}

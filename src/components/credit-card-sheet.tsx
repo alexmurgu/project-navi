@@ -66,18 +66,14 @@ export function CreditCardSheet({
         payload: {
           name: editingItem?.name || "",
           color: editingItem?.color || COLORS[0],
-          limit: editingItem?.limit
-            ? (editingItem.limit / 100).toString()
-            : "",
+          limit: editingItem?.limit ? (editingItem.limit / 100).toString() : "",
         },
       });
     }
   }, [open, editingItem]);
 
   const handleSave = () => {
-    const limitCents = state.limit
-      ? Math.round(parseFloat(state.limit) * 100)
-      : null;
+    const limitCents = state.limit ? Math.round(parseFloat(state.limit) * 100) : null;
 
     onSubmit({
       id: editingItem?.id,

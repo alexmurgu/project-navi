@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as SettingsUsersRouteImport } from './routes/settings/users'
 import { Route as SettingsSavingsRouteImport } from './routes/settings/savings'
+import { Route as SettingsCreditCardsRouteImport } from './routes/settings/credit-cards'
 import { Route as SettingsCategoriesRouteImport } from './routes/settings/categories'
 import { Route as MembersMemberIdRouteImport } from './routes/members.$memberId'
 import { Route as CategoriesCategoryRouteImport } from './routes/categories.$category'
@@ -62,6 +63,11 @@ const SettingsSavingsRoute = SettingsSavingsRouteImport.update({
   path: '/settings/savings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsCreditCardsRoute = SettingsCreditCardsRouteImport.update({
+  id: '/settings/credit-cards',
+  path: '/settings/credit-cards',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
   id: '/settings/categories',
   path: '/settings/categories',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/credit-cards': typeof SettingsCreditCardsRoute
   '/settings/savings': typeof SettingsSavingsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/credit-cards': typeof SettingsCreditCardsRoute
   '/settings/savings': typeof SettingsSavingsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings': typeof SettingsIndexRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/credit-cards': typeof SettingsCreditCardsRoute
   '/settings/savings': typeof SettingsSavingsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
+    | '/settings/credit-cards'
     | '/settings/savings'
     | '/settings/users'
     | '/settings/'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
+    | '/settings/credit-cards'
     | '/settings/savings'
     | '/settings/users'
     | '/settings'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
+    | '/settings/credit-cards'
     | '/settings/savings'
     | '/settings/users'
     | '/settings/'
@@ -180,6 +192,7 @@ export interface RootRouteChildren {
   CategoriesCategoryRoute: typeof CategoriesCategoryRoute
   MembersMemberIdRoute: typeof MembersMemberIdRoute
   SettingsCategoriesRoute: typeof SettingsCategoriesRoute
+  SettingsCreditCardsRoute: typeof SettingsCreditCardsRoute
   SettingsSavingsRoute: typeof SettingsSavingsRoute
   SettingsUsersRoute: typeof SettingsUsersRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
@@ -244,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsSavingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/credit-cards': {
+      id: '/settings/credit-cards'
+      path: '/settings/credit-cards'
+      fullPath: '/settings/credit-cards'
+      preLoaderRoute: typeof SettingsCreditCardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings/categories': {
       id: '/settings/categories'
       path: '/settings/categories'
@@ -284,6 +304,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesCategoryRoute: CategoriesCategoryRoute,
   MembersMemberIdRoute: MembersMemberIdRoute,
   SettingsCategoriesRoute: SettingsCategoriesRoute,
+  SettingsCreditCardsRoute: SettingsCreditCardsRoute,
   SettingsSavingsRoute: SettingsSavingsRoute,
   SettingsUsersRoute: SettingsUsersRoute,
   SettingsIndexRoute: SettingsIndexRoute,

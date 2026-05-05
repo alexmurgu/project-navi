@@ -16,28 +16,25 @@ interface SavingsSectionProps {
   formatCurrency: (amount: number) => string;
 }
 
-export function SavingsSection({
-  accounts,
-  onEditAccount,
-  formatCurrency,
-}: SavingsSectionProps) {
+export function SavingsSection({ accounts, onEditAccount, formatCurrency }: SavingsSectionProps) {
   return (
     <section className="space-y-8">
-
       <div className="flex flex-col gap-3">
         {accounts.length === 0 ? (
-          <div 
-            className="h-24 rounded-premium border border-dashed border-navi-border/20 flex flex-col items-center justify-center gap-2 text-navi-gray/30 transition-all"
-          >
+          <div className="h-24 rounded-premium border border-dashed border-navi-border/20 flex flex-col items-center justify-center gap-2 text-navi-gray/30 transition-all">
             <PiggyBank className="size-5" strokeWidth={1} />
-            <p className="font-display font-medium uppercase tracking-widest text-[9px]">Set your goals in settings</p>
+            <p className="font-display font-medium uppercase tracking-widest text-[9px]">
+              Set your goals in settings
+            </p>
           </div>
         ) : (
           accounts.map((sa) => {
-            const progress = sa.targetAmount ? Math.min(100, (sa.currentBalance / sa.targetAmount) * 100) : null;
-            
+            const progress = sa.targetAmount
+              ? Math.min(100, (sa.currentBalance / sa.targetAmount) * 100)
+              : null;
+
             return (
-              <div 
+              <div
                 key={sa.id}
                 onClick={() => onEditAccount(sa)}
                 className="group cursor-pointer flex flex-col gap-2 py-2 px-1 hover:opacity-60 transition-all"
@@ -53,14 +50,14 @@ export function SavingsSection({
                     {formatCurrency(sa.currentBalance)}
                   </p>
                 </div>
-                
+
                 {sa.targetAmount && (
                   <div className="h-[3px] w-full bg-navi-dark/4 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]"
-                      style={{ 
+                      style={{
                         width: `${progress}%`,
-                        backgroundColor: sa.color
+                        backgroundColor: sa.color,
                       }}
                     />
                   </div>

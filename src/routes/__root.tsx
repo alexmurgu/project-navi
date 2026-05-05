@@ -96,10 +96,12 @@ function RootLayout() {
   const showDevtools = typeof window !== "undefined" && window.location.hostname === "localhost";
   const openQuickAdd = (mode: "expense" | "income" | "transfer") => {
     setUiState((prev) => ({ ...prev, quickAddOpen: false }));
-    const eventName = 
-      mode === "expense" ? "open-quick-add-expense" : 
-      mode === "income" ? "open-quick-add-income" : 
-      "open-quick-add-transfer";
+    const eventName =
+      mode === "expense"
+        ? "open-quick-add-expense"
+        : mode === "income"
+          ? "open-quick-add-income"
+          : "open-quick-add-transfer";
     window.dispatchEvent(new CustomEvent(eventName));
   };
 

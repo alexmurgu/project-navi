@@ -250,11 +250,7 @@ export function TransactionSheet({
                 <>
                   {editingItem ? <Save className="size-5" /> : <Plus className="size-5" />}
                   <span className="hidden sm:inline">
-                    {editingItem?.isTransfer
-                      ? "Read Only"
-                      : editingItem
-                        ? "Update"
-                        : "Confirm"}
+                    {editingItem?.isTransfer ? "Read Only" : editingItem ? "Update" : "Confirm"}
                   </span>
                 </>
               )}

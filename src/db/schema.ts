@@ -237,7 +237,6 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
-
 export const incomeRelations = relations(income, ({ one }) => ({
   user: one(user, {
     fields: [income.userId],
@@ -254,7 +253,6 @@ export const creditCardRelations = relations(creditCard, ({ one, many }) => ({
   transfersFrom: many(transfer, { relationName: "fromAccount" }),
   transfersTo: many(transfer, { relationName: "toAccount" }),
 }));
-
 
 export const expenseRelations = relations(expense, ({ one }) => ({
   user: one(user, {

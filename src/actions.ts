@@ -154,10 +154,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
 
   // Synthesize transfers into expenses/incomes for transparency and simpler math
   const transferIncomes = validTransfers
-    .filter(
-      (t) =>
-        (t.fromType === "savings" || t.fromType === "credit") && t.toType === "main",
-    )
+    .filter((t) => (t.fromType === "savings" || t.fromType === "credit") && t.toType === "main")
     .map((t) => {
       const sa = savings.find((s) => s.id === t.fromId);
       const cc = creditCards.find((c) => c.id === t.fromId);
@@ -175,10 +172,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
     });
 
   const transferExpenses = validTransfers
-    .filter(
-      (t) =>
-        t.fromType === "main" && (t.toType === "savings" || t.toType === "credit"),
-    )
+    .filter((t) => t.fromType === "main" && (t.toType === "savings" || t.toType === "credit"))
     .map((t) => {
       const sa = savings.find((s) => s.id === t.toId);
       const cc = creditCards.find((c) => c.id === t.toId);

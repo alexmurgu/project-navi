@@ -58,13 +58,13 @@ export function CategoryBreakdown({
                       {formatCurrency(item.amount)}
                     </p>
                   </div>
-                  
+
                   <div className="h-[3px] w-full bg-navi-dark/4 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className="h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]"
-                      style={{ 
+                      style={{
                         width: `${share}%`,
-                        backgroundColor: color
+                        backgroundColor: color,
                       }}
                     />
                   </div>
@@ -73,7 +73,7 @@ export function CategoryBreakdown({
             })}
             {items.length > 3 && (
               <div className="pt-2 flex justify-center">
-                <button 
+                <button
                   onClick={onToggleShowAll}
                   className="text-[9px] font-display font-medium uppercase tracking-[0.2em] text-navi-dark/40 hover:text-navi-dark/60 transition-colors py-2 px-4"
                 >

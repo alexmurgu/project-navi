@@ -1,6 +1,15 @@
 import React from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Palette, Users, ShieldCheck, Bell, Smartphone, PiggyBank } from "lucide-react";
+import {
+  ChevronRight,
+  Palette,
+  Users,
+  ShieldCheck,
+  Bell,
+  Smartphone,
+  PiggyBank,
+  CreditCard,
+} from "lucide-react";
 import { withAlpha } from "@/lib/category-visuals";
 
 const managementTiles = [
@@ -24,6 +33,13 @@ const managementTiles = [
     description: "Manage targets & goals",
     icon: PiggyBank,
     color: "#ec7e00",
+  },
+  {
+    to: "/settings/credit-cards",
+    title: "Credit Cards",
+    description: "Manage debt & limits",
+    icon: CreditCard,
+    color: "#e23b4a",
   },
 ] as const;
 

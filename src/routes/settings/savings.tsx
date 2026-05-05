@@ -17,9 +17,5 @@ function SettingsSavingsPage() {
   if (isLoading) return <div className="p-8 text-foreground">Loading...</div>;
   if (!data) return null;
 
-  return (
-    <SavingsSettingsContent
-      accounts={data.savingsAccounts}
-    />
-  );
+  return <SavingsSettingsContent accounts={data.savingsAccounts} />;
 }

@@ -63,8 +63,8 @@ export function SavingsSettingsContent({ accounts }: SavingsSettingsContentProps
       {/* Header */}
       <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
         <div className="space-y-4 relative z-10">
-          <Link 
-            to="/settings" 
+          <Link
+            to="/settings"
             className="flex items-center gap-2 text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-50 hover:opacity-100 transition-opacity mb-4"
           >
             <ArrowLeft className="size-3" />
@@ -82,7 +82,7 @@ export function SavingsSettingsContent({ accounts }: SavingsSettingsContentProps
       <div className="p-6 md:p-12 space-y-12">
         {/* Action Card */}
         <section className="space-y-6">
-          <button 
+          <button
             onClick={handleAdd}
             className="w-full navi-card p-8 border-2 border-dashed border-navi-border/20 flex flex-col items-center justify-center gap-4 group hover:border-navi-dark/20 transition-all bg-navi-surface/30"
           >
@@ -90,8 +90,12 @@ export function SavingsSettingsContent({ accounts }: SavingsSettingsContentProps
               <Plus className="size-6 text-navi-dark" />
             </div>
             <div className="text-center">
-              <h3 className="text-[20px] font-display font-medium text-navi-dark">Create New Goal</h3>
-              <p className="text-[11px] font-sans font-medium uppercase tracking-widest text-navi-gray/60 mt-1">Set a new target to save for</p>
+              <h3 className="text-[20px] font-display font-medium text-navi-dark">
+                Create New Goal
+              </h3>
+              <p className="text-[11px] font-sans font-medium uppercase tracking-widest text-navi-gray/60 mt-1">
+                Set a new target to save for
+              </p>
             </div>
           </button>
         </section>
@@ -141,7 +145,9 @@ export function SavingsSettingsContent({ accounts }: SavingsSettingsContentProps
                     <p className="text-[16px] font-display font-medium text-navi-dark">
                       {(sa.currentBalance / 100).toFixed(2)}€
                     </p>
-                    <p className="text-[9px] font-sans font-medium uppercase tracking-widest text-navi-gray/40">Saved</p>
+                    <p className="text-[9px] font-sans font-medium uppercase tracking-widest text-navi-gray/40">
+                      Saved
+                    </p>
                   </div>
                   <ChevronRight className="size-5 text-navi-gray/30 group-hover:translate-x-1 transition-transform" />
                 </div>
@@ -150,7 +156,9 @@ export function SavingsSettingsContent({ accounts }: SavingsSettingsContentProps
 
             {accounts.length === 0 && (
               <div className="p-12 text-center text-navi-gray/30">
-                <p className="font-display font-medium uppercase tracking-widest text-[11px]">No active goals yet</p>
+                <p className="font-display font-medium uppercase tracking-widest text-[11px]">
+                  No active goals yet
+                </p>
               </div>
             )}
           </div>
