@@ -44,7 +44,7 @@ export function TransactionCard({
   return (
     <div
       onClick={onClick}
-      className="navi-card flex items-center p-4 md:p-5"
+      className="navi-card flex items-center p-4 md:p-5 min-w-0"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -76,12 +76,12 @@ export function TransactionCard({
         {/* Text Content */}
         <div className="flex-1 min-w-0 flex flex-col justify-center">
           <div className="flex items-center justify-between gap-3">
-            <h4 className="font-display font-medium text-[16px] md:text-[18px] text-navi-dark truncate">
+            <h4 className="flex-1 min-w-0 font-display font-medium text-[16px] md:text-[18px] text-navi-dark truncate">
               {transaction.description}
             </h4>
             <p
               className={cn(
-                "font-display font-medium text-[16px] md:text-[20px] shrink-0",
+                "font-display font-medium text-[16px] md:text-[20px] shrink-0 text-right whitespace-nowrap",
                 transaction.status === "pending" ? "text-navi-gray/40" : "text-navi-dark",
               )}
             >
@@ -91,7 +91,7 @@ export function TransactionCard({
           </div>
 
           <div className="flex items-center gap-2 mt-0.5">
-            <p className="text-[10px] font-sans font-medium uppercase tracking-[0.15em] text-navi-gray/60 truncate">
+            <p className="flex-1 min-w-0 text-[10px] font-sans font-medium uppercase tracking-[0.15em] text-navi-gray/60 truncate">
               {transaction.category} • {format(date, "EEEE, h:mm a")}
             </p>
             {transaction.status === "pending" && transaction.type === "expense" && (
