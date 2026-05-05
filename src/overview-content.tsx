@@ -13,6 +13,7 @@ import {
 } from "@/lib/category-visuals";
 import { OverviewStats } from "@/components/dashboard/overview-stats";
 import { OverviewTransactionList } from "@/components/dashboard/overview-transaction-list";
+import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
 
 interface User {
   id: string;
@@ -52,6 +53,7 @@ const formatCurrency = (amountCents: number) =>
 
 export function OverviewContent({ data, mode }: { data: DashboardData; mode: OverviewMode }) {
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = React.useState(new Date());
 
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
@@ -92,22 +94,25 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
   }, [data.users, mode]);
 
   const filteredTransactions = useMemo(() => {
+    let filtered = allItems;
     if (mode.type === "member") {
-      return allItems.filter((item) =>
+      filtered = allItems.filter((item) =>
         mode.memberId === "family" ? item.userId === null : item.userId === mode.memberId,
       );
+    } else {
+      filtered = allItems.filter((item) => {
+        if (item.category !== mode.category) return false;
+        if (!categoryKind) return true;
+        return item.type === categoryKind;
+      });
     }
-    return allItems.filter((item) => {
-      if (item.category !== mode.category) return false;
-      if (!categoryKind) return true;
-      return item.type === categoryKind;
-    });
-  }, [allItems, categoryKind, mode]);
+
+    return filterTransactionsByMonth(filtered, selectedDate);
+  }, [allItems, categoryKind, mode, selectedDate]);
 
   const stats = useMemo(() => {
-    const now = new Date();
-    const start = startOfMonth(now);
-    const end = endOfMonth(now);
+    const start = startOfMonth(selectedDate);
+    const end = endOfMonth(selectedDate);
 
     const paidItems = filteredTransactions.filter((item) => {
       if ((item as any).status === "pending") return false;
@@ -129,9 +134,8 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
   }, [filteredTransactions]);
 
   const currentMonthExpensesByCategory = useMemo(() => {
-    const now = new Date();
-    const start = startOfMonth(now);
-    const end = endOfMonth(now);
+    const start = startOfMonth(selectedDate);
+    const end = endOfMonth(selectedDate);
     const map = new Map<string, { amount: number; count: number }>();
 
     data.expenses
@@ -163,9 +167,14 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
 
     const relevantItems =
       categoryKind === "income" ? data.incomes : categoryKind === "expense" ? data.expenses : [];
+    const start = startOfMonth(selectedDate);
+    const end = endOfMonth(selectedDate);
 
     relevantItems
-      .filter((item) => item.category === mode.category && (item as any).status !== "pending")
+      .filter((item) => {
+        if (item.category !== mode.category || (item as any).status === "pending") return false;
+        return isWithinInterval(new Date(item.date), { start, end });
+      })
       .forEach((item) => {
         const key = item.userId || "family";
         const current = map.get(key) || {
@@ -183,7 +192,7 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
     return Array.from(map.entries())
       .map(([memberId, values]) => ({ memberId, ...values }))
       .sort((a, b) => b.amount - a.amount);
-  }, [categoryKind, data.expenses, data.incomes, mode]);
+  }, [categoryKind, data.expenses, data.incomes, mode, selectedDate]);
 
   const title =
     mode.type === "member"
@@ -203,15 +212,23 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
             {title}
           </h1>
         </div>
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => navigate({ to: "/" })}
-          className="h-12 rounded-xl px-4 font-black uppercase tracking-widest text-[10px]"
-        >
-          <ArrowLeft className="size-4 mr-2" />
-          Back
-        </Button>
+        <div className="flex items-center gap-3">
+          <MonthSelector
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+            variant="icon"
+            align="end"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => navigate({ to: "/" })}
+            className="h-12 rounded-xl px-4 font-black uppercase tracking-widest text-[10px]"
+          >
+            <ArrowLeft className="size-4 mr-2" />
+            Back
+          </Button>
+        </div>
       </div>
 
       <OverviewStats

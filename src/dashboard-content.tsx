@@ -205,9 +205,7 @@ export function DashboardContent({ data }: PageProps) {
   ) as Transaction[];
 
   const stats = useMemo(() => {
-    const paidIncomes = data.incomes.filter(
-      (i) => (i as any).status !== "pending" && !(i as any).isTransfer,
-    );
+    const paidIncomes = data.incomes.filter((i) => !(i as any).isTransfer);
     const allPaidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
     const mainPaidExpenses = allPaidExpenses.filter(
       (e) => (e as any).accountType !== "credit" && !(e as any).isTransfer,
@@ -386,12 +384,12 @@ export function DashboardContent({ data }: PageProps) {
         <div className="space-y-6">
           <SavingsSection
             accounts={data.savingsAccounts}
-            onEditAccount={(sa) => dispatch({ editingSavingsAccount: sa, savingsSheetOpen: true })}
+            onEditAccount={(sa) => navigate({ to: "/accounts/$accountId", params: { accountId: sa.id } })}
             formatCurrency={formatCurrency}
           />
           <CreditCardsSection
             cards={data.creditCards}
-            onEditCard={(cc) => dispatch({ editingCreditCard: cc, creditCardSheetOpen: true })}
+            onEditCard={(cc) => navigate({ to: "/accounts/$accountId", params: { accountId: cc.id } })}
             formatCurrency={formatCurrency}
           />
         </div>

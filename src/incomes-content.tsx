@@ -13,7 +13,9 @@ import {
   deleteIncome,
   updateTransactionStatus,
   addExpense,
+  addTransfer,
 } from "./actions";
+import { TransferSheet } from "@/components/transfer-sheet";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
 
 interface User {
@@ -38,8 +40,11 @@ interface PageProps {
     user: User;
     users: { id: string; name: string }[];
     incomes: Omit<Transaction, "type">[];
+    expenses: any[];
     incomeCategories: string[];
     categoryConfigs: CategoryConfig[];
+    creditCards: any[];
+    savingsAccounts: any[];
   };
 }
 
@@ -63,6 +68,7 @@ export function IncomesContent({ data }: PageProps) {
     visibleCount: INITIAL_PAGE_SIZE,
     sortDirection: "desc",
     selectedDate: new Date(),
+    transferSheetOpen: false,
   });
 
   const availableCategories = data.incomeCategories;
@@ -111,6 +117,26 @@ export function IncomesContent({ data }: PageProps) {
       dispatch({ expenseSheetOpen: false });
     },
   });
+
+  const addTransferMutation = useMutation({
+    mutationFn: (d: any) => addTransfer({ data: d }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ transferSheetOpen: false });
+    },
+  });
+
+  const availableBalance = useMemo(() => {
+    const paidIncomes = data.incomes.filter((i) => !(i as any).isTransfer);
+    const paidExpenses = data.expenses.filter(
+      (e) => (e as any).status !== "pending" && (e as any).accountType !== "credit" && !(e as any).isTransfer,
+    );
+
+    const incomeSum = paidIncomes.reduce((acc, curr) => acc + curr.amount, 0);
+    const expenseSum = paidExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+
+    return incomeSum - expenseSum;
+  }, [data]);
 
   const filteredHistory = useMemo(() => {
     let filtered = data.incomes.filter((item) => {
@@ -167,11 +193,17 @@ export function IncomesContent({ data }: PageProps) {
       });
     };
 
+    const handleQuickAddTransfer = () => {
+      dispatch({ transferSheetOpen: true });
+    };
+
     window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
     window.addEventListener("open-quick-add-income", handleQuickAddIncome);
+    window.addEventListener("open-quick-add-transfer", handleQuickAddTransfer);
     return () => {
       window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
       window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
+      window.removeEventListener("open-quick-add-transfer", handleQuickAddTransfer);
     };
   }, []);
 
@@ -310,6 +342,16 @@ export function IncomesContent({ data }: PageProps) {
         categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => addExpenseMutation.mutate(d)}
         saving={addExpenseMutation.isPending}
+      />
+      <TransferSheet
+        open={state.transferSheetOpen}
+        onOpenChange={(open) => dispatch({ transferSheetOpen: open })}
+        users={data.users}
+        savingsAccounts={data.savingsAccounts}
+        creditCards={data.creditCards}
+        availableBalance={availableBalance}
+        onSubmit={(d) => addTransferMutation.mutate(d)}
+        saving={addTransferMutation.isPending}
       />
     </div>
   );

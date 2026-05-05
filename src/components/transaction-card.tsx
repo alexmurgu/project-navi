@@ -93,7 +93,7 @@ export function TransactionCard({
             <p className="text-[10px] font-sans font-medium uppercase tracking-[0.15em] text-navi-gray/60 truncate">
               {transaction.category} • {format(date, "EEEE, h:mm a")}
             </p>
-            {transaction.status === "pending" && (
+            {transaction.status === "pending" && transaction.type === "expense" && (
               <span className="px-1.5 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[8px] font-display font-medium uppercase tracking-widest shrink-0">
                 Pending
               </span>
@@ -102,7 +102,7 @@ export function TransactionCard({
         </div>
       </div>
 
-      {transaction.status === "pending" && onStatusUpdate && (
+      {transaction.status === "pending" && transaction.type === "expense" && onStatusUpdate && (
         <button
           onClick={(e) => {
             e.stopPropagation();

@@ -14,7 +14,9 @@ import {
   deleteExpense,
   updateTransactionStatus,
   addIncome,
+  addTransfer,
 } from "./actions";
+import { TransferSheet } from "@/components/transfer-sheet";
 
 interface User {
   id: string;
@@ -38,8 +40,11 @@ interface PageProps {
     user: User;
     users: { id: string; name: string }[];
     expenses: Omit<Transaction, "type">[];
+    incomes: any[];
     expenseCategories: string[];
     categoryConfigs: CategoryConfig[];
+    creditCards: any[];
+    savingsAccounts: any[];
   };
 }
 
@@ -61,6 +66,7 @@ export function ExpensesContent({ data }: PageProps) {
     visibleCount: INITIAL_PAGE_SIZE,
     sortDirection: "desc",
     selectedDate: new Date(),
+    transferSheetOpen: false,
   });
 
   const availableCategories = data.expenseCategories;
@@ -109,6 +115,28 @@ export function ExpensesContent({ data }: PageProps) {
       dispatch({ incomeSheetOpen: false });
     },
   });
+
+  const addTransferMutation = useMutation({
+    mutationFn: (d: any) => addTransfer({ data: d }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ transferSheetOpen: false });
+    },
+  });
+
+  const availableBalance = useMemo(() => {
+    const paidIncomes = data.incomes.filter((i) => !(i as any).isTransfer);
+    const allPaidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
+    const mainPaidExpenses = allPaidExpenses.filter(
+      (e) => (e as any).accountType !== "credit" && !(e as any).isTransfer,
+    );
+
+    const incomeSum = paidIncomes.reduce((acc, curr) => acc + curr.amount, 0);
+    const expenseSum = mainPaidExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+
+    // This is a simplification, ideally it should match the dashboard exactly
+    return incomeSum - expenseSum;
+  }, [data]);
 
   const filteredHistory = useMemo(() => {
     let filtered = data.expenses.filter((item) => {
@@ -165,11 +193,17 @@ export function ExpensesContent({ data }: PageProps) {
       });
     };
 
+    const handleQuickAddTransfer = () => {
+      dispatch({ transferSheetOpen: true });
+    };
+
     window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
     window.addEventListener("open-quick-add-income", handleQuickAddIncome);
+    window.addEventListener("open-quick-add-transfer", handleQuickAddTransfer);
     return () => {
       window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
       window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
+      window.removeEventListener("open-quick-add-transfer", handleQuickAddTransfer);
     };
   }, []);
 
@@ -282,6 +316,7 @@ export function ExpensesContent({ data }: PageProps) {
         availableCategories={availableCategories}
         setAvailableCategories={() => {}} // Derived from props
         categoryConfigs={data.categoryConfigs}
+        creditCards={data.creditCards}
         onSubmit={(d) => {
           if (state.editingItem) {
             updateExpenseMutation.mutate(d);
@@ -308,6 +343,16 @@ export function ExpensesContent({ data }: PageProps) {
         categoryConfigs={data.categoryConfigs}
         onSubmit={(d) => addIncomeMutation.mutate(d)}
         saving={addIncomeMutation.isPending}
+      />
+      <TransferSheet
+        open={state.transferSheetOpen}
+        onOpenChange={(open) => dispatch({ transferSheetOpen: open })}
+        users={data.users}
+        savingsAccounts={data.savingsAccounts}
+        creditCards={data.creditCards}
+        availableBalance={availableBalance}
+        onSubmit={(d) => addTransferMutation.mutate(d)}
+        saving={addTransferMutation.isPending}
       />
     </div>
   );

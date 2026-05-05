@@ -49,7 +49,7 @@ export function TransactionForm({
   accountId,
   onAccountIdChange,
 }: TransactionFormProps) {
-  const showStatus = mode === "income" || isRecurrent;
+  const showStatus = mode === "expense" && isRecurrent;
 
   const [showSuggestions, setShowSuggestions] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);

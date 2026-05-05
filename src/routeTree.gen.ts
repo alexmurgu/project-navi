@@ -21,6 +21,7 @@ import { Route as SettingsCreditCardsRouteImport } from './routes/settings/credi
 import { Route as SettingsCategoriesRouteImport } from './routes/settings/categories'
 import { Route as MembersMemberIdRouteImport } from './routes/members.$memberId'
 import { Route as CategoriesCategoryRouteImport } from './routes/categories.$category'
+import { Route as AccountsAccountIdRouteImport } from './routes/accounts.$accountId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
 const LoginRoute = LoginRouteImport.update({
@@ -83,6 +84,11 @@ const CategoriesCategoryRoute = CategoriesCategoryRouteImport.update({
   path: '/categories/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountsAccountIdRoute = AccountsAccountIdRouteImport.update({
+  id: '/accounts/$accountId',
+  path: '/accounts/$accountId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
+  '/accounts/$accountId': typeof AccountsAccountIdRoute
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
+  '/accounts/$accountId': typeof AccountsAccountIdRoute
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/import': typeof ImportRoute
   '/incomes': typeof IncomesRoute
   '/login': typeof LoginRoute
+  '/accounts/$accountId': typeof AccountsAccountIdRoute
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
+    | '/accounts/$accountId'
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
+    | '/accounts/$accountId'
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/import'
     | '/incomes'
     | '/login'
+    | '/accounts/$accountId'
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
@@ -189,6 +201,7 @@ export interface RootRouteChildren {
   ImportRoute: typeof ImportRoute
   IncomesRoute: typeof IncomesRoute
   LoginRoute: typeof LoginRoute
+  AccountsAccountIdRoute: typeof AccountsAccountIdRoute
   CategoriesCategoryRoute: typeof CategoriesCategoryRoute
   MembersMemberIdRoute: typeof MembersMemberIdRoute
   SettingsCategoriesRoute: typeof SettingsCategoriesRoute
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accounts/$accountId': {
+      id: '/accounts/$accountId'
+      path: '/accounts/$accountId'
+      fullPath: '/accounts/$accountId'
+      preLoaderRoute: typeof AccountsAccountIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -301,6 +321,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImportRoute: ImportRoute,
   IncomesRoute: IncomesRoute,
   LoginRoute: LoginRoute,
+  AccountsAccountIdRoute: AccountsAccountIdRoute,
   CategoriesCategoryRoute: CategoriesCategoryRoute,
   MembersMemberIdRoute: MembersMemberIdRoute,
   SettingsCategoriesRoute: SettingsCategoriesRoute,
