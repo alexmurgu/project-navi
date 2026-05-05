@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SettingsContent } from "@/settings-pages/index-content";
 
-
 export const Route = createFileRoute("/settings/")({
   head: () => ({
     meta: [

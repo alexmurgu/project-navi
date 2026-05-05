@@ -15,10 +15,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   fetchSession: async () => {
     try {
       const data = await fetchSession();
-      set({ 
-        user: data?.user ?? null, 
-        session: data?.session ?? null, 
-        loading: false 
+      set({
+        user: data?.user ?? null,
+        session: data?.session ?? null,
+        loading: false,
       });
     } catch {
       set({ user: null, session: null, loading: false });

@@ -1,12 +1,9 @@
 import React, { useMemo, useEffect } from "react";
-import { } from "lucide-react";
+import {} from "lucide-react";
 import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 
-
-import {
-  type CategoryConfig,
-} from "@/lib/category-visuals";
+import { type CategoryConfig } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   addExpense,
@@ -61,18 +58,15 @@ export function DashboardContent({ data }: PageProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const [state, dispatch] = React.useReducer(
-    (s: any, a: any) => ({ ...s, ...a }),
-    {
-      expenseSheetOpen: false,
-      incomeSheetOpen: false,
-      showAllCategories: false,
-      editingItem: null,
-      selectedUserId: "family",
-      expenseCategory: "",
-      incomeCategory: "",
-    }
-  );
+  const [state, dispatch] = React.useReducer((s: any, a: any) => ({ ...s, ...a }), {
+    expenseSheetOpen: false,
+    incomeSheetOpen: false,
+    showAllCategories: false,
+    editingItem: null,
+    selectedUserId: "family",
+    expenseCategory: "",
+    incomeCategory: "",
+  });
 
   const availableExpenseCategories = data.expenseCategories;
   const availableIncomeCategories = data.incomeCategories;
@@ -129,17 +123,23 @@ export function DashboardContent({ data }: PageProps) {
     const paidIncomes = data.incomes.filter((i) => (i as any).status !== "pending");
     const paidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
 
-    const totalIncome = paidIncomes.reduce((acc, curr) => acc + curr.amount, 0);
-    const totalExp = paidExpenses.reduce((acc, curr) => acc + curr.amount, 0);
     const now = new Date();
     const start = startOfMonth(now);
     const end = endOfMonth(now);
+
+    const monthlyIncome = paidIncomes
+      .filter((i) => isWithinInterval(new Date(i.date), { start, end }))
+      .reduce((acc, curr) => acc + curr.amount, 0);
 
     const monthlyExp = paidExpenses
       .filter((e) => isWithinInterval(new Date(e.date), { start, end }))
       .reduce((acc, curr) => acc + curr.amount, 0);
 
-    return { income: totalIncome, expense: totalExp, monthlyExp, balance: totalIncome - totalExp };
+    return {
+      income: monthlyIncome,
+      monthlyExp,
+      balance: monthlyIncome - monthlyExp,
+    };
   }, [data]);
 
   const groupedRecentActivity = useMemo(() => {
@@ -261,9 +261,7 @@ export function DashboardContent({ data }: PageProps) {
           groups={groupedRecentActivity}
           categoryConfigMap={categoryConfigMap}
           onEdit={handleEdit}
-          onStatusUpdate={(id, type, status) =>
-            updateStatusMutation.mutate({ id, type, status })
-          }
+          onStatusUpdate={(id, type, status) => updateStatusMutation.mutate({ id, type, status })}
           onViewAll={() => navigate({ to: "/expenses" })}
           formatCurrency={formatCurrency}
         />

@@ -40,7 +40,7 @@ export function TransactionForm({
   onSuggestionSelect,
 }: TransactionFormProps) {
   const showStatus = mode === "income" || isRecurrent;
-  
+
   const [showSuggestions, setShowSuggestions] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +64,10 @@ export function TransactionForm({
     <div className="space-y-8">
       {/* Amount Input */}
       <div className="space-y-4">
-        <Label htmlFor="amount" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+        <Label
+          htmlFor="amount"
+          className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+        >
           Transaction Amount
         </Label>
         <div className="relative group">
@@ -87,11 +90,17 @@ export function TransactionForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Description */}
         <div className="space-y-3" ref={containerRef}>
-          <Label htmlFor="description" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+          <Label
+            htmlFor="description"
+            className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+          >
             Description
           </Label>
           <div className="relative">
-            <FileText className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+            <FileText
+              className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40"
+              strokeWidth={1}
+            />
             <Input
               id="description"
               placeholder="What was this for?"
@@ -124,14 +133,23 @@ export function TransactionForm({
                           {suggestion.description}
                         </span>
                         <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-navi-gray/60 font-black">
-                          <span className={cn(
-                            "px-2 py-0.5 rounded-full border",
-                            suggestion.type === "expense" ? "bg-navi-dark/5 border-navi-dark/10" : "bg-navi-teal/5 border-navi-teal/10"
-                          )}>
+                          <span
+                            className={cn(
+                              "px-2 py-0.5 rounded-full border",
+                              suggestion.type === "expense"
+                                ? "bg-navi-dark/5 border-navi-dark/10"
+                                : "bg-navi-teal/5 border-navi-teal/10",
+                            )}
+                          >
                             {suggestion.category}
                           </span>
                           <span>•</span>
-                          <span>{(suggestion.amount / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" })}</span>
+                          <span>
+                            {(suggestion.amount / 100).toLocaleString("en-IE", {
+                              style: "currency",
+                              currency: "EUR",
+                            })}
+                          </span>
                         </div>
                       </button>
                     </li>
@@ -144,7 +162,10 @@ export function TransactionForm({
 
         {/* Date Picker */}
         <div className="space-y-3">
-          <Label htmlFor="date-picker" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+          <Label
+            htmlFor="date-picker"
+            className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+          >
             Occurrence
           </Label>
           <Popover>
@@ -162,7 +183,10 @@ export function TransactionForm({
                 </button>
               }
             />
-            <PopoverContent className="w-auto p-0 rounded-3xl overflow-hidden border-none shadow-2xl" align="start">
+            <PopoverContent
+              className="w-auto p-0 rounded-3xl overflow-hidden border-none shadow-2xl"
+              align="start"
+            >
               <Calendar
                 mode="single"
                 selected={date}
@@ -178,7 +202,10 @@ export function TransactionForm({
       {/* Recurrent Toggle */}
       {mode === "expense" && (
         <div className="space-y-4 pt-2">
-          <Label id="recurrent-status-label" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+          <Label
+            id="recurrent-status-label"
+            className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+          >
             Recurrence
           </Label>
           <button
@@ -186,18 +213,22 @@ export function TransactionForm({
             onClick={() => onRecurrentChange(!isRecurrent)}
             className={cn(
               "flex items-center justify-center gap-3 h-14 w-full rounded-2xl border transition-all active:scale-[0.98]",
-              isRecurrent 
-                ? "bg-navi-dark border-navi-dark text-white shadow-lg shadow-navi-dark/20" 
-                : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+              isRecurrent
+                ? "bg-navi-dark border-navi-dark text-white shadow-lg shadow-navi-dark/20"
+                : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50",
             )}
           >
-            <div className={cn(
-              "size-7 rounded-full flex items-center justify-center",
-              isRecurrent ? "bg-white/20" : "bg-white shadow-sm"
-            )}>
+            <div
+              className={cn(
+                "size-7 rounded-full flex items-center justify-center",
+                isRecurrent ? "bg-white/20" : "bg-white shadow-sm",
+              )}
+            >
               <Repeat className="size-4" strokeWidth={1.5} />
             </div>
-            <span className="text-sm font-display font-medium uppercase tracking-widest">Recurring Expense</span>
+            <span className="text-sm font-display font-medium uppercase tracking-widest">
+              Recurring Expense
+            </span>
           </button>
         </div>
       )}
@@ -205,27 +236,38 @@ export function TransactionForm({
       {/* Status Toggle */}
       {showStatus && (
         <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2">
-          <Label id="payment-status-label" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+          <Label
+            id="payment-status-label"
+            className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+          >
             Payment Status
           </Label>
-          <div className="grid grid-cols-2 gap-3" role="group" aria-labelledby="payment-status-label">
+          <div
+            className="grid grid-cols-2 gap-3"
+            role="group"
+            aria-labelledby="payment-status-label"
+          >
             <button
               type="button"
               onClick={() => onStatusChange("paid")}
               className={cn(
                 "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
-                status === "paid" 
-                  ? "bg-navi-teal border-navi-teal text-white shadow-lg shadow-navi-teal/20" 
-                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+                status === "paid"
+                  ? "bg-navi-teal border-navi-teal text-white shadow-lg shadow-navi-teal/20"
+                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50",
               )}
             >
-              <div className={cn(
-                "size-7 rounded-full flex items-center justify-center",
-                status === "paid" ? "bg-white/20" : "bg-white shadow-sm"
-              )}>
+              <div
+                className={cn(
+                  "size-7 rounded-full flex items-center justify-center",
+                  status === "paid" ? "bg-white/20" : "bg-white shadow-sm",
+                )}
+              >
                 <Check className="size-4" strokeWidth={1.5} />
               </div>
-              <span className="text-sm font-display font-medium uppercase tracking-widest">Settled</span>
+              <span className="text-sm font-display font-medium uppercase tracking-widest">
+                Settled
+              </span>
             </button>
 
             <button
@@ -233,18 +275,22 @@ export function TransactionForm({
               onClick={() => onStatusChange("pending")}
               className={cn(
                 "flex items-center justify-center gap-3 h-14 rounded-2xl border transition-all active:scale-[0.98]",
-                status === "pending" 
-                  ? "bg-navi-warning border-navi-warning text-white shadow-lg shadow-navi-warning/20" 
-                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50"
+                status === "pending"
+                  ? "bg-navi-warning border-navi-warning text-white shadow-lg shadow-navi-warning/20"
+                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50",
               )}
             >
-              <div className={cn(
-                "size-7 rounded-full flex items-center justify-center",
-                status === "pending" ? "bg-white/20" : "bg-white shadow-sm"
-              )}>
+              <div
+                className={cn(
+                  "size-7 rounded-full flex items-center justify-center",
+                  status === "pending" ? "bg-white/20" : "bg-white shadow-sm",
+                )}
+              >
                 <Clock className="size-4" strokeWidth={1.5} />
               </div>
-              <span className="text-sm font-display font-medium uppercase tracking-widest">Pending</span>
+              <span className="text-sm font-display font-medium uppercase tracking-widest">
+                Pending
+              </span>
             </button>
           </div>
         </div>

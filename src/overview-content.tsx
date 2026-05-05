@@ -105,7 +105,15 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
   }, [allItems, categoryKind, mode]);
 
   const stats = useMemo(() => {
-    const paidItems = filteredTransactions.filter((item) => (item as any).status !== "pending");
+    const now = new Date();
+    const start = startOfMonth(now);
+    const end = endOfMonth(now);
+
+    const paidItems = filteredTransactions.filter((item) => {
+      if ((item as any).status === "pending") return false;
+      return isWithinInterval(new Date(item.date), { start, end });
+    });
+
     const totalIncome = paidItems
       .filter((item) => item.type === "income")
       .reduce((acc, curr) => acc + curr.amount, 0);

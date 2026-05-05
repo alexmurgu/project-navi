@@ -68,11 +68,17 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
             <div className="bg-navi-surface p-8 rounded-[32px] border border-navi-border/20">
               <form onSubmit={handleCreateUser} className="space-y-6">
                 <div className="space-y-3">
-                  <Label htmlFor="name" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                  <Label
+                    htmlFor="name"
+                    className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+                  >
                     Full Name
                   </Label>
                   <div className="relative">
-                    <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+                    <UserIcon
+                      className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40"
+                      strokeWidth={1}
+                    />
                     <Input
                       id="name"
                       type="text"
@@ -85,11 +91,17 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                 </div>
 
                 <div className="space-y-3">
-                  <Label htmlFor="email" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                  <Label
+                    htmlFor="email"
+                    className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+                  >
                     Email Address
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+                    <Mail
+                      className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40"
+                      strokeWidth={1}
+                    />
                     <Input
                       id="email"
                       type="email"
@@ -102,11 +114,17 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                 </div>
 
                 <div className="space-y-3">
-                  <Label htmlFor="password" className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+                  <Label
+                    htmlFor="password"
+                    className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+                  >
                     Access Key
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40" strokeWidth={1} />
+                    <Lock
+                      className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40"
+                      strokeWidth={1}
+                    />
                     <Input
                       id="password"
                       type="password"
@@ -149,10 +167,10 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                     className="group relative flex items-center justify-between p-6 rounded-premium bg-navi-surface transition-all active:scale-[0.995]"
                   >
                     <div className="flex items-center gap-6">
-                      <div 
+                      <div
                         className={cn(
                           "size-14 rounded-full flex items-center justify-center bg-white shadow-sm",
-                          isAdmin ? "text-navi-blue" : "text-navi-dark"
+                          isAdmin ? "text-navi-blue" : "text-navi-dark",
                         )}
                       >
                         <UserIcon className="size-6" strokeWidth={1} />

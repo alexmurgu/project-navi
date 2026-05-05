@@ -8,7 +8,12 @@ interface OverviewStatsProps {
   formatCurrency: (amount: number) => string;
 }
 
-export function OverviewStats({ totalIncome, totalExpense, balance, formatCurrency }: OverviewStatsProps) {
+export function OverviewStats({
+  totalIncome,
+  totalExpense,
+  balance,
+  formatCurrency,
+}: OverviewStatsProps) {
   return (
     <section className="grid gap-4 md:grid-cols-3 mb-10">
       <div className="rounded-2xl bg-secondary/20 p-6">

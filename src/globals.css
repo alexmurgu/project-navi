@@ -3,7 +3,7 @@
 @theme {
   --color-background: oklch(100% 0 0);
   --color-foreground: oklch(20.9% 0.015 258.1); /* #191c1f */
-  
+
   --color-navi-dark: oklch(20.9% 0.015 258.1);
   --color-navi-blue: oklch(45.5% 0.22 269.9); /* #494fdf */
   --color-navi-teal: oklch(61.2% 0.16 166.5); /* #00a87e */
@@ -26,32 +26,32 @@
   :root {
     --background: 100% 0 0;
     --foreground: 20.9% 0.015 258.1;
-    
+
     --card: 100% 0 0;
     --card-foreground: 20.9% 0.015 258.1;
-    
+
     --popover: 100% 0 0;
     --popover-foreground: 20.9% 0.015 258.1;
-    
+
     --primary: 20.9% 0.015 258.1;
     --primary-foreground: 100% 0 0;
-    
+
     --secondary: 96.5% 0 0;
     --secondary-foreground: 20.9% 0.015 258.1;
-    
+
     --muted: 96.5% 0 0;
     --muted-foreground: 64.6% 0.015 258.1;
-    
+
     --accent: 96.5% 0 0;
     --accent-foreground: 20.9% 0.015 258.1;
-    
+
     --destructive: 57.7% 0.2 19.3;
     --destructive-foreground: 100% 0 0;
-    
+
     --border: 84.4% 0.005 258.1;
     --input: 84.4% 0.005 258.1;
     --ring: 45.5% 0.22 269.9;
-    
+
     --radius: 12px;
   }
 
@@ -60,7 +60,7 @@
     outline-color: oklch(var(--ring) / 0.5);
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   body {
     background-color: oklch(var(--background));
     color: oklch(var(--foreground));
@@ -70,9 +70,14 @@
     overscroll-behavior-y: none;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display font-medium tracking-tight;
-    line-height: 1.0;
+    line-height: 1;
   }
 }
 
@@ -80,15 +85,15 @@
   .pill-button {
     @apply rounded-full px-8 py-3.5 font-display font-medium text-[15px] uppercase tracking-wider transition-all active:scale-[0.98] hover:opacity-90 flex items-center justify-center gap-2;
   }
-  
+
   .pill-button-primary {
     @apply bg-navi-dark text-white;
   }
-  
+
   .pill-button-secondary {
     @apply bg-navi-surface text-navi-dark;
   }
-  
+
   .pill-button-outline {
     @apply border-2 border-navi-dark bg-transparent text-navi-dark;
   }
@@ -114,7 +119,12 @@
 }
 
 /* Hide all shadows per Navi zero-shadow policy */
-.shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+.shadow-sm,
+.shadow,
+.shadow-md,
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
   box-shadow: none !important;
 }
 

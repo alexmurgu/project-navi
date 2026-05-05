@@ -3,7 +3,6 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-
   redirect,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -70,10 +69,10 @@ function RootLayout() {
       const customEvent = event as CustomEvent<{
         registration: ServiceWorkerRegistration;
       }>;
-      setUiState((prev) => ({ 
-        ...prev, 
+      setUiState((prev) => ({
+        ...prev,
         pendingRegistration: customEvent.detail.registration,
-        pwaUpdateAvailable: true 
+        pwaUpdateAvailable: true,
       }));
     };
     const handleControllerChange = () => {
@@ -163,13 +162,15 @@ function RootLayout() {
           )}
 
           <SidebarInset className="bg-background">
-            <PullToRefresh onRefresh={async () => {
-              // Ensure at least 800ms of visual feedback
-              await Promise.all([
-                queryClient.invalidateQueries(),
-                new Promise(resolve => setTimeout(resolve, 800))
-              ]);
-            }}>
+            <PullToRefresh
+              onRefresh={async () => {
+                // Ensure at least 800ms of visual feedback
+                await Promise.all([
+                  queryClient.invalidateQueries(),
+                  new Promise((resolve) => setTimeout(resolve, 800)),
+                ]);
+              }}
+            >
               <main className="pb-32 lg:pb-0">
                 <Outlet />
               </main>
@@ -183,7 +184,10 @@ function RootLayout() {
             )}
           </SidebarInset>
         </SidebarProvider>
-        <Sheet open={uiState.quickAddOpen} onOpenChange={(open) => setUiState((prev) => ({ ...prev, quickAddOpen: open }))}>
+        <Sheet
+          open={uiState.quickAddOpen}
+          onOpenChange={(open) => setUiState((prev) => ({ ...prev, quickAddOpen: open }))}
+        >
           <SheetContent
             side="bottom"
             className="h-auto rounded-t-[40px] border-none p-8 pb-12 shadow-none bg-white"

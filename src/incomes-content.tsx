@@ -1,19 +1,18 @@
 import React, { useMemo, useEffect } from "react";
-import {
-  Search,
-  Plus,
-  ArrowUpDown,
-  ChevronDown,
-} from "lucide-react";
+import { Search, Plus, ArrowUpDown, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import { TransactionCard } from "@/components/transaction-card";
-import {
-  type CategoryConfig,
-} from "@/lib/category-visuals";
+import { type CategoryConfig } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { addIncome, updateIncome, deleteIncome, updateTransactionStatus, addExpense } from "./actions";
+import {
+  addIncome,
+  updateIncome,
+  deleteIncome,
+  updateTransactionStatus,
+  addExpense,
+} from "./actions";
 import { cn } from "./lib/utils";
 
 interface User {
@@ -52,20 +51,17 @@ const formatCurrency = (amountCents: number) => {
 export function IncomesContent({ data }: PageProps) {
   const queryClient = useQueryClient();
 
-  const [state, dispatch] = React.useReducer(
-    (s: any, a: any) => ({ ...s, ...a }),
-    {
-      incomeSheetOpen: false,
-      expenseSheetOpen: false,
-      selectedUserId: "family",
-      incomeCategory: "",
-      expenseCategory: "",
-      editingItem: null,
-      tableSearch: "",
-      visibleCount: INITIAL_PAGE_SIZE,
-      sortDirection: "desc",
-    }
-  );
+  const [state, dispatch] = React.useReducer((s: any, a: any) => ({ ...s, ...a }), {
+    incomeSheetOpen: false,
+    expenseSheetOpen: false,
+    selectedUserId: "family",
+    incomeCategory: "",
+    expenseCategory: "",
+    editingItem: null,
+    tableSearch: "",
+    visibleCount: INITIAL_PAGE_SIZE,
+    sortDirection: "desc",
+  });
 
   const availableCategories = data.incomeCategories;
   const categoryConfigMap = useMemo(() => {
@@ -149,8 +145,6 @@ export function IncomesContent({ data }: PageProps) {
     });
   };
 
-
-
   useEffect(() => {
     const handleQuickAddExpense = () => {
       dispatch({
@@ -214,7 +208,9 @@ export function IncomesContent({ data }: PageProps) {
           />
         </div>
         <button
-          onClick={() => dispatch({ sortDirection: state.sortDirection === "asc" ? "desc" : "asc" })}
+          onClick={() =>
+            dispatch({ sortDirection: state.sortDirection === "asc" ? "desc" : "asc" })
+          }
           className="size-14 rounded-xl bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all shadow-inner"
         >
           <ArrowUpDown

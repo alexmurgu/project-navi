@@ -88,7 +88,7 @@ export function TransactionCard({
               {formatCurrency(transaction.amount)}
             </p>
           </div>
-          
+
           <div className="flex items-center gap-2 mt-0.5">
             <p className="text-[10px] font-sans font-medium uppercase tracking-[0.15em] text-navi-gray/60 truncate">
               {transaction.category} • {format(date, "EEEE, h:mm a")}

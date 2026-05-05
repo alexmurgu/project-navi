@@ -13,7 +13,12 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CategoryIcon, type CategoryConfig, getCategoryConfig, withAlpha } from "@/lib/category-visuals";
+import {
+  CategoryIcon,
+  type CategoryConfig,
+  getCategoryConfig,
+  withAlpha,
+} from "@/lib/category-visuals";
 
 interface CategoryComboboxProps {
   value: string;
@@ -47,7 +52,7 @@ export function CategoryCombobox({
 }: CategoryComboboxProps) {
   const finalOptions = categories || legacyOptions || [];
   const finalOnChange = onValueChange || legacyOnChange || (() => {});
-  
+
   const listboxId = React.useId();
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
@@ -85,17 +90,25 @@ export function CategoryCombobox({
           >
             <div className="flex items-center gap-3 overflow-hidden">
               {value && (
-                <div 
+                <div
                   className="size-6 rounded-lg flex items-center justify-center shrink-0"
                   style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
                 >
-                  <CategoryIcon category={value} config={config} className="size-3.5" color={color} strokeWidth={1.5} />
+                  <CategoryIcon
+                    category={value}
+                    config={config}
+                    className="size-3.5"
+                    color={color}
+                    strokeWidth={1.5}
+                  />
                 </div>
               )}
               <span
                 className={cn(
                   "truncate",
-                  value ? "text-navi-dark" : "text-navi-gray/40 font-sans uppercase text-[10px] tracking-widest",
+                  value
+                    ? "text-navi-dark"
+                    : "text-navi-gray/40 font-sans uppercase text-[10px] tracking-widest",
                 )}
               >
                 {value || placeholder}
@@ -139,13 +152,21 @@ export function CategoryCombobox({
                     }}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-navi-surface data-[selected=true]:bg-navi-surface transition-colors"
                   >
-                    <div 
+                    <div
                       className="size-8 rounded-xl flex items-center justify-center shrink-0"
                       style={{ backgroundColor: withAlpha(itemColor, 0.05), color: itemColor }}
                     >
-                      <CategoryIcon category={cat} config={itemConfig} className="size-4" color={itemColor} strokeWidth={1.2} />
+                      <CategoryIcon
+                        category={cat}
+                        config={itemConfig}
+                        className="size-4"
+                        color={itemColor}
+                        strokeWidth={1.2}
+                      />
                     </div>
-                    <span className="flex-1 font-display font-medium text-sm text-navi-dark">{cat}</span>
+                    <span className="flex-1 font-display font-medium text-sm text-navi-dark">
+                      {cat}
+                    </span>
                     {value === cat && <Check className="size-4 text-navi-blue" strokeWidth={2} />}
                   </CommandItem>
                 );
@@ -165,7 +186,9 @@ export function CategoryCombobox({
                   <div className="size-8 rounded-xl bg-navi-blue/10 flex items-center justify-center shrink-0">
                     <PlusCircle className="size-4" strokeWidth={1.5} />
                   </div>
-                  <span className="flex-1 font-display font-medium text-sm">Create &quot;{searchValue}&quot;</span>
+                  <span className="flex-1 font-display font-medium text-sm">
+                    Create &quot;{searchValue}&quot;
+                  </span>
                 </CommandItem>
               </CommandGroup>
             )}

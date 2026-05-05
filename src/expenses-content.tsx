@@ -1,20 +1,19 @@
 import React, { useMemo, useEffect } from "react";
-import {
-  Search,
-  Plus,
-  ArrowUpDown,
-  ChevronDown,
-} from "lucide-react";
+import { Search, Plus, ArrowUpDown, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import { TransactionCard } from "@/components/transaction-card";
-import {
-  type CategoryConfig,
-} from "@/lib/category-visuals";
+import { type CategoryConfig } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { addExpense, updateExpense, deleteExpense, updateTransactionStatus, addIncome } from "./actions";
+import {
+  addExpense,
+  updateExpense,
+  deleteExpense,
+  updateTransactionStatus,
+  addIncome,
+} from "./actions";
 
 interface User {
   id: string;
@@ -51,19 +50,16 @@ const formatCurrency = (amountCents: number) => {
 
 export function ExpensesContent({ data }: PageProps) {
   const queryClient = useQueryClient();
-  const [state, dispatch] = React.useReducer(
-    (s: any, a: any) => ({ ...s, ...a }),
-    {
-      expenseSheetOpen: false,
-      incomeSheetOpen: false,
-      selectedUserId: "family",
-      expenseCategory: "",
-      editingItem: null,
-      tableSearch: "",
-      visibleCount: INITIAL_PAGE_SIZE,
-      sortDirection: "desc",
-    }
-  );
+  const [state, dispatch] = React.useReducer((s: any, a: any) => ({ ...s, ...a }), {
+    expenseSheetOpen: false,
+    incomeSheetOpen: false,
+    selectedUserId: "family",
+    expenseCategory: "",
+    editingItem: null,
+    tableSearch: "",
+    visibleCount: INITIAL_PAGE_SIZE,
+    sortDirection: "desc",
+  });
 
   const availableCategories = data.expenseCategories;
   const categoryConfigMap = useMemo(() => {
@@ -112,7 +108,6 @@ export function ExpensesContent({ data }: PageProps) {
     },
   });
 
-
   const filteredHistory = useMemo(() => {
     return data.expenses
       .filter((item) => {
@@ -147,8 +142,6 @@ export function ExpensesContent({ data }: PageProps) {
       expenseSheetOpen: true,
     });
   };
-
-
 
   useEffect(() => {
     const handleQuickAddExpense = () => {
@@ -213,7 +206,9 @@ export function ExpensesContent({ data }: PageProps) {
           />
         </div>
         <button
-          onClick={() => dispatch({ sortDirection: state.sortDirection === "asc" ? "desc" : "asc" })}
+          onClick={() =>
+            dispatch({ sortDirection: state.sortDirection === "asc" ? "desc" : "asc" })
+          }
           className="size-14 rounded-xl bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all shadow-inner"
         >
           <ArrowUpDown

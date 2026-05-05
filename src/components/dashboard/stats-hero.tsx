@@ -31,7 +31,7 @@ export function StatsHero({ balance, monthlyExp, income, formatCurrency }: Stats
         <div className="h-16 w-px bg-white/10" />
         <div className="space-y-2 text-right">
           <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
-            Income (Total)
+            Income (Monthly)
           </p>
           <p className="text-[32px] md:text-[48px] font-display font-medium tracking-tight">
             {formatCurrency(income)}

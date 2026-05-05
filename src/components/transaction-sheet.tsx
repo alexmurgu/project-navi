@@ -1,15 +1,7 @@
 import React, { useReducer, useEffect } from "react";
-import { 
-  Sheet, 
-  SheetContent, 
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { 
-  Trash2, 
-  Save, 
-  X,
-  Plus,
-} from "lucide-react";
+import { Trash2, Save, X, Plus } from "lucide-react";
 import { type CategoryConfig } from "@/lib/category-visuals";
 import { UserSelector } from "./transaction/user-selector";
 import { CategoryPicker } from "./transaction/category-picker";
@@ -106,7 +98,7 @@ export function TransactionSheet({
         draftIcon: null,
         isRecurrent: editingItem?.isRecurrent || false,
       };
-      // We purposefully do not use useEffect directly for this state sync 
+      // We purposefully do not use useEffect directly for this state sync
       // when editingItem changes to avoid simulating an event handler warning.
       dispatch({ type: "RESET", payload: initialState });
     }
@@ -129,7 +121,9 @@ export function TransactionSheet({
       userId: state.selectedUserId === "family" ? null : state.selectedUserId,
       status: mode === "expense" && !state.isRecurrent ? "paid" : state.status,
       isRecurrent: state.isRecurrent,
-      customization: state.isCustomizing ? { color: state.draftColor, icon: state.draftIcon } : undefined,
+      customization: state.isCustomizing
+        ? { color: state.draftColor, icon: state.draftIcon }
+        : undefined,
     });
   };
 
@@ -145,44 +139,60 @@ export function TransactionSheet({
             {editingItem ? "Refine Entry" : `New ${mode}`}
           </h2>
           <p className="ml-1 text-[11px] font-sans font-medium uppercase tracking-[0.2em] text-navi-gray/60">
-            {editingItem ? "Update existing transaction records" : "Record a new financial movement"}
+            {editingItem
+              ? "Update existing transaction records"
+              : "Record a new financial movement"}
           </p>
         </div>
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 pt-0 space-y-10 sm:space-y-12">
           <div className="pb-10 space-y-10 sm:space-y-12">
-            <UserSelector 
-              users={users} 
-              selectedUserId={state.selectedUserId} 
-              onSelect={(val) => dispatch({ type: "SET_FIELD", field: "selectedUserId", value: val })} 
+            <UserSelector
+              users={users}
+              selectedUserId={state.selectedUserId}
+              onSelect={(val) =>
+                dispatch({ type: "SET_FIELD", field: "selectedUserId", value: val })
+              }
             />
 
-            <CategoryPicker 
+            <CategoryPicker
               category={state.category}
-              onCategoryChange={(val) => dispatch({ type: "SET_FIELD", field: "category", value: val })}
+              onCategoryChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "category", value: val })
+              }
               availableCategories={availableCategories}
               categoryConfigs={categoryConfigs}
               isCustomizing={state.isCustomizing}
-              onCustomizingChange={(val) => dispatch({ type: "SET_FIELD", field: "isCustomizing", value: val })}
+              onCustomizingChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "isCustomizing", value: val })
+              }
               draftColor={state.draftColor}
-              onDraftColorChange={(val) => dispatch({ type: "SET_FIELD", field: "draftColor", value: val })}
+              onDraftColorChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "draftColor", value: val })
+              }
               draftIcon={state.draftIcon}
-              onDraftIconChange={(val) => dispatch({ type: "SET_FIELD", field: "draftIcon", value: val })}
+              onDraftIconChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "draftIcon", value: val })
+              }
             />
 
-            <TransactionForm 
+            <TransactionForm
               mode={mode}
               amount={state.amount}
               onAmountChange={(val) => dispatch({ type: "SET_FIELD", field: "amount", value: val })}
               description={state.description}
-              onDescriptionChange={(val) => dispatch({ type: "SET_FIELD", field: "description", value: val })}
+              onDescriptionChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "description", value: val })
+              }
               date={state.date}
               onDateChange={(val) => dispatch({ type: "SET_FIELD", field: "date", value: val })}
               status={state.status}
               onStatusChange={(val) => dispatch({ type: "SET_FIELD", field: "status", value: val })}
               isRecurrent={state.isRecurrent}
-              onRecurrentChange={(val) => dispatch({ type: "SET_FIELD", field: "isRecurrent", value: val })}
+              onRecurrentChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "isRecurrent", value: val })
+              }
               onSuggestionSelect={(suggestion) => {
                 if (suggestion.category) {
                   dispatch({ type: "SET_FIELD", field: "category", value: suggestion.category });

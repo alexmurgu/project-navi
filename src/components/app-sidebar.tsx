@@ -49,9 +49,21 @@ export function AppSidebar() {
             <SidebarMenu className="gap-3">
               {[
                 { to: "/", icon: <Home className="size-5" strokeWidth={1} />, label: "Home" }, // Terminal -> Home
-                { to: "/incomes", icon: <ArrowUpCircle className="size-5" strokeWidth={1} />, label: "Income" },
-                { to: "/expenses", icon: <TrendingDown className="size-5" strokeWidth={1} />, label: "Expenses" },
-                { to: "/import", icon: <FileUp className="size-5" strokeWidth={1} />, label: "Import" },
+                {
+                  to: "/incomes",
+                  icon: <ArrowUpCircle className="size-5" strokeWidth={1} />,
+                  label: "Income",
+                },
+                {
+                  to: "/expenses",
+                  icon: <TrendingDown className="size-5" strokeWidth={1} />,
+                  label: "Expenses",
+                },
+                {
+                  to: "/import",
+                  icon: <FileUp className="size-5" strokeWidth={1} />,
+                  label: "Import",
+                },
               ].map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton

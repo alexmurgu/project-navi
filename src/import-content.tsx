@@ -106,10 +106,14 @@ export function ImportContent({
             let amount = credit ? parseFloat(credit) : parseFloat(debit);
             let type: "expense" | "income" = credit ? "income" : "expense";
             const parts = row[0].split("/");
-            const formattedDate =
-              parts.length === 3
-                ? `${parts[2]}-${parts[1]}-${parts[0]}`
-                : new Date().toISOString().split("T")[0];
+            let dateObj: Date;
+            if (parts.length === 3) {
+              dateObj = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            } else {
+              dateObj = new Date();
+              dateObj.setHours(0, 0, 0, 0);
+            }
+            const formattedDate = dateObj.toISOString();
             return {
               id: Math.random().toString(36).substr(2, 9),
               date: formattedDate,
@@ -256,8 +260,14 @@ export function ImportContent({
                         <TableCell className="p-2">
                           <Input
                             type="date"
-                            value={tx.date}
-                            onChange={(e) => updateTransaction(tx.id, "date", e.target.value)}
+                            value={tx.date.split("T")[0]}
+                            onChange={(e) => {
+                              const [y, m, d] = e.target.value.split("-").map(Number);
+                              if (y && m && d) {
+                                const dateObj = new Date(y, m - 1, d);
+                                updateTransaction(tx.id, "date", dateObj.toISOString());
+                              }
+                            }}
                             className="rounded-lg h-9 shadow-sm"
                           />
                         </TableCell>

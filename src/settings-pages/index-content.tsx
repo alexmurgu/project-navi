@@ -65,7 +65,7 @@ export function SettingsContent() {
               Management
             </h3>
           </div>
-          
+
           <div className="grid gap-4 md:grid-cols-2">
             {managementTiles.map((tile) => {
               const Icon = tile.icon;
@@ -76,12 +76,12 @@ export function SettingsContent() {
                   className="navi-card flex items-center justify-between p-6 border-none overflow-hidden group"
                 >
                   <div className="flex items-center gap-6 relative z-10">
-                    <div 
+                    <div
                       className="size-14 rounded-[18px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 duration-500 border"
-                      style={{ 
+                      style={{
                         backgroundColor: withAlpha(tile.color, 0.05),
                         borderColor: withAlpha(tile.color, 0.1),
-                        color: tile.color 
+                        color: tile.color,
                       }}
                     >
                       <Icon className="size-6" strokeWidth={1.2} />
@@ -95,7 +95,10 @@ export function SettingsContent() {
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="relative z-10 size-5 text-navi-gray/40 transition-transform group-hover:translate-x-1" strokeWidth={1.2} />
+                  <ChevronRight
+                    className="relative z-10 size-5 text-navi-gray/40 transition-transform group-hover:translate-x-1"
+                    strokeWidth={1.2}
+                  />
                 </Link>
               );
             })}
@@ -115,17 +118,14 @@ export function SettingsContent() {
             {generalSettings.map((item) => {
               const Icon = item.icon;
               return (
-                <div
-                  key={item.title}
-                  className="navi-card flex items-center justify-between p-6"
-                >
+                <div key={item.title} className="navi-card flex items-center justify-between p-6">
                   <div className="flex items-center gap-6">
-                    <div 
+                    <div
                       className="size-12 rounded-[18px] flex items-center justify-center border"
-                      style={{ 
+                      style={{
                         backgroundColor: withAlpha(item.color, 0.05),
                         borderColor: withAlpha(item.color, 0.1),
-                        color: item.color 
+                        color: item.color,
                       }}
                     >
                       <Icon className="size-5" strokeWidth={1.2} />
@@ -161,4 +161,3 @@ export function SettingsContent() {
     </div>
   );
 }
-
