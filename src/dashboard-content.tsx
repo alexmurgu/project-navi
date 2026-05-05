@@ -66,6 +66,7 @@ export function DashboardContent({ data }: PageProps) {
     selectedUserId: "family",
     expenseCategory: "",
     incomeCategory: "",
+    selectedDate: new Date(),
   });
 
   const availableExpenseCategories = data.expenseCategories;
@@ -123,9 +124,8 @@ export function DashboardContent({ data }: PageProps) {
     const paidIncomes = data.incomes.filter((i) => (i as any).status !== "pending");
     const paidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
 
-    const now = new Date();
-    const start = startOfMonth(now);
-    const end = endOfMonth(now);
+    const start = startOfMonth(state.selectedDate);
+    const end = endOfMonth(state.selectedDate);
 
     const monthlyIncome = paidIncomes
       .filter((i) => isWithinInterval(new Date(i.date), { start, end }))
@@ -140,10 +140,17 @@ export function DashboardContent({ data }: PageProps) {
       monthlyExp,
       balance: monthlyIncome - monthlyExp,
     };
-  }, [data]);
+  }, [data, state.selectedDate]);
 
   const groupedRecentActivity = useMemo(() => {
-    const sorted = [...allItems]
+    const start = startOfMonth(state.selectedDate);
+    const end = endOfMonth(state.selectedDate);
+
+    const filtered = allItems.filter((item) =>
+      isWithinInterval(new Date(item.date), { start, end }),
+    );
+
+    const sorted = [...filtered]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 10);
     const groups: { title: string; items: Transaction[] }[] = [];
@@ -156,12 +163,11 @@ export function DashboardContent({ data }: PageProps) {
       else groups.push({ title, items: [item] });
     });
     return groups;
-  }, [allItems]);
+  }, [allItems, state.selectedDate]);
 
   const currentMonthCategoryData = useMemo(() => {
-    const now = new Date();
-    const start = startOfMonth(now);
-    const end = endOfMonth(now);
+    const start = startOfMonth(state.selectedDate);
+    const end = endOfMonth(state.selectedDate);
     const map = new Map<string, { amount: number; count: number }>();
 
     data.expenses
@@ -184,7 +190,7 @@ export function DashboardContent({ data }: PageProps) {
     const total = items.reduce((acc, item) => acc + item.amount, 0);
 
     return { items, total };
-  }, [data.expenses]);
+  }, [data.expenses, state.selectedDate]);
 
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
@@ -242,6 +248,8 @@ export function DashboardContent({ data }: PageProps) {
         monthlyExp={stats.monthlyExp}
         income={stats.income}
         formatCurrency={formatCurrency}
+        selectedDate={state.selectedDate}
+        onDateChange={(date) => dispatch({ selectedDate: date })}
       />
 
       <div className="p-6 md:p-12 space-y-16">
