@@ -1,8 +1,9 @@
 import React, { useMemo, useEffect } from "react";
-import { Search, Plus, ArrowUpDown, ChevronDown } from "lucide-react";
+import { Search, Plus, ChevronDown, Calendar } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import { TransactionCard } from "@/components/transaction-card";
 import { type CategoryConfig } from "@/lib/category-visuals";
@@ -59,6 +60,7 @@ export function ExpensesContent({ data }: PageProps) {
     tableSearch: "",
     visibleCount: INITIAL_PAGE_SIZE,
     sortDirection: "desc",
+    selectedDate: new Date(),
   });
 
   const availableCategories = data.expenseCategories;
@@ -109,23 +111,25 @@ export function ExpensesContent({ data }: PageProps) {
   });
 
   const filteredHistory = useMemo(() => {
-    return data.expenses
-      .filter((item) => {
-        if (state.tableSearch) {
-          const search = state.tableSearch.toLowerCase();
-          return (
-            item.description.toLowerCase().includes(search) ||
-            item.category.toLowerCase().includes(search)
-          );
-        }
-        return true;
-      })
-      .sort((a, b) => {
-        const valA = new Date(a.date).getTime();
-        const valB = new Date(b.date).getTime();
-        return state.sortDirection === "asc" ? valA - valB : valB - valA;
-      });
-  }, [data.expenses, state.tableSearch, state.sortDirection]);
+    let filtered = data.expenses.filter((item) => {
+      if (state.tableSearch) {
+        const search = state.tableSearch.toLowerCase();
+        return (
+          item.description.toLowerCase().includes(search) ||
+          item.category.toLowerCase().includes(search)
+        );
+      }
+      return true;
+    });
+
+    filtered = filterTransactionsByMonth(filtered, state.selectedDate);
+
+    return filtered.sort((a, b) => {
+      const valA = new Date(a.date).getTime();
+      const valB = new Date(b.date).getTime();
+      return state.sortDirection === "asc" ? valA - valB : valB - valA;
+    });
+  }, [data.expenses, state.tableSearch, state.sortDirection, state.selectedDate]);
 
   const paginatedHistory = useMemo(
     () => filteredHistory.slice(0, state.visibleCount),
@@ -205,43 +209,53 @@ export function ExpensesContent({ data }: PageProps) {
             onChange={(e) => dispatch({ tableSearch: e.target.value })}
           />
         </div>
-        <button
-          onClick={() =>
-            dispatch({ sortDirection: state.sortDirection === "asc" ? "desc" : "asc" })
-          }
-          className="size-14 rounded-xl bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-foreground transition-all shadow-inner"
-        >
-          <ArrowUpDown
-            className={cn(
-              "size-6 transition-transform duration-500",
-              state.sortDirection === "asc" ? "rotate-0" : "rotate-180",
-            )}
-          />
-        </button>
+        <MonthSelector
+          selectedDate={state.selectedDate}
+          onDateChange={(date) => dispatch({ selectedDate: date })}
+          variant="icon"
+          align="end"
+        />
       </div>
 
       {/* Redesigned List */}
-      <div className="flex flex-col gap-4">
-        {paginatedHistory.map((item) => (
-          <TransactionCard
-            key={item.id}
-            transaction={{ ...item, type: "expense" }}
-            categoryConfigMap={categoryConfigMap}
-            onClick={() => handleEdit(item)}
-            onStatusUpdate={
-              item.status === "pending"
-                ? (status) =>
-                    updateStatusMutation.mutate({
-                      id: item.id,
-                      type: "expense",
-                      status,
-                    })
-                : undefined
-            }
-            formatCurrency={formatCurrency}
-          />
-        ))}
-      </div>
+      {filteredHistory.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-secondary/5 rounded-[40px] border border-dashed border-secondary/20">
+          <div className="size-20 rounded-full bg-secondary/10 flex items-center justify-center mb-8">
+            <Calendar className="size-10 text-muted-foreground/30" />
+          </div>
+          <h3 className="text-2xl font-black text-foreground/80 mb-3 tracking-tight italic uppercase">
+            Empty Month
+          </h3>
+          <p className="text-sm font-bold text-muted-foreground/40 max-w-[300px] leading-relaxed uppercase tracking-widest">
+            There are no expenses recorded for{" "}
+            <span className="text-foreground/60 font-black">
+              {format(state.selectedDate, "MMMM yyyy")}
+            </span>
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {paginatedHistory.map((item) => (
+            <TransactionCard
+              key={item.id}
+              transaction={{ ...item, type: "expense" }}
+              categoryConfigMap={categoryConfigMap}
+              onClick={() => handleEdit(item)}
+              onStatusUpdate={
+                item.status === "pending"
+                  ? (status) =>
+                      updateStatusMutation.mutate({
+                        id: item.id,
+                        type: "expense",
+                        status,
+                      })
+                  : undefined
+              }
+              formatCurrency={formatCurrency}
+            />
+          ))}
+        </div>
+      )}
 
       {hasMore && (
         <div className="pt-10 flex justify-center">
