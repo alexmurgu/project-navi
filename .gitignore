@@ -39,9 +39,6 @@ next-env.d.ts
 .sublime-workspace
 
 # Databases
-local.db
 local.db-journal
 local.db-shm
 local.db-wal
-*.db
-*.sqlite
