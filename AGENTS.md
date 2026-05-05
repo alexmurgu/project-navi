@@ -3,6 +3,7 @@
 ## Task Completion Requirements
 
 - All of `bun run format`, `bun run lint` must pass before considering tasks completed.
+- All database schema changes must be applied using `bunx drizzle-kit push`. Never perform manual edits to the database files.
 
 ## Project Snapshot
 
