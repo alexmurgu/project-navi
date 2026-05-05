@@ -1,8 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { TransactionCard } from "@/components/transaction-card";
 import { type CategoryConfig } from "@/lib/category-visuals";
-import { ArrowRightLeft, Settings2 } from "lucide-react";
+import { ArrowRightLeft, Settings2, Search } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { Input } from "@/components/ui/input";
+import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
 
 interface PageProps {
   data: {
@@ -27,6 +29,9 @@ const formatCurrency = (amountCents: number) => {
 };
 
 export function AccountActivityContent({ data, account }: PageProps) {
+  const [tableSearch, setTableSearch] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
     data.categoryConfigs.forEach((config) => {
@@ -75,73 +80,105 @@ export function AccountActivityContent({ data, account }: PageProps) {
         });
       });
 
-    return accountTransactions.sort(
+    let filtered = accountTransactions;
+
+    if (tableSearch) {
+      const search = tableSearch.toLowerCase();
+      filtered = filtered.filter(
+        (item) =>
+          item.description.toLowerCase().includes(search) ||
+          item.category.toLowerCase().includes(search),
+      );
+    }
+
+    filtered = filterTransactionsByMonth(filtered, selectedDate);
+
+    return filtered.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
-  }, [account.id, data]);
+  }, [account.id, account.type, data, tableSearch, selectedDate]);
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-background antialiased p-6 md:p-12 pb-32">
-      {/* Hero Section */}
-      <div className="mb-12 pt-4">
-        <div className="p-8 md:p-12 rounded-[40px] bg-foreground text-background shadow-2xl relative overflow-hidden group">
-          <div className="relative z-10">
-            <div className="flex items-start justify-between mb-12">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="size-2 rounded-full" style={{ backgroundColor: account.color }} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">
-                    {account.type === "credit" ? "Credit Card" : "Savings Account"}
-                  </span>
-                </div>
-                <h1 className="text-3xl md:text-5xl font-display font-medium tracking-tight uppercase italic">
-                  {account.name}
-                </h1>
-              </div>
-              <Link
-                to={account.type === "credit" ? "/settings/credit-cards" : "/settings"}
-                className="size-14 rounded-2xl bg-background/10 flex items-center justify-center text-background/60 hover:text-background hover:bg-background/20 transition-all active:scale-95"
-              >
-                <Settings2 className="size-6" strokeWidth={1.5} />
-              </Link>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-2">
-                Available Funds
-              </p>
-              <h2 className="text-4xl md:text-7xl font-display font-medium tracking-tighter italic">
-                {formatCurrency(
-                  account.type === "credit" ? -account.currentBalance : account.currentBalance,
-                )}
-              </h2>
-            </div>
-
-            {(account.limit || account.targetAmount) && (
-              <div className="mt-12 flex items-center gap-4">
-                <div className="flex-1 h-1.5 bg-background/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-background/40 rounded-full transition-all duration-1000"
-                    style={{
-                      width: `${Math.min(
-                        100,
-                        (account.currentBalance / (account.limit || account.targetAmount || 1)) * 100,
-                      )}%`,
-                    }}
-                  />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-widest opacity-40 whitespace-nowrap">
-                  {((account.currentBalance / (account.limit || account.targetAmount || 1)) * 100).toFixed(0)}%{" "}
-                  {account.type === "credit" ? "Limit" : "Target"}
-                </span>
-              </div>
-            )}
+      {/* Dynamic Header */}
+      <div className="flex items-start justify-between pt-4 mb-10">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="size-2 rounded-full" style={{ backgroundColor: account.color }} />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40">
+              {account.type === "credit" ? "Credit Card" : "Savings Account"}
+            </span>
           </div>
-          <div
-            className="absolute -right-10 -bottom-10 size-64 opacity-10 blur-3xl transition-all duration-1000 group-hover:scale-150 group-hover:opacity-20"
-            style={{ backgroundColor: account.color }}
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground uppercase italic truncate max-w-[250px] md:max-w-none">
+            {account.name}
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link
+            to={account.type === "credit" ? "/settings/credit-cards" : "/settings"}
+            className="size-12 md:size-14 rounded-2xl bg-secondary/20 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-all active:scale-95"
+          >
+            <Settings2 className="size-5 md:size-6" strokeWidth={1.5} />
+          </Link>
+        </div>
+      </div>
+
+      {/* Account Stats */}
+      <section className="grid gap-4 md:grid-cols-2 mb-10">
+        <div className="rounded-2xl bg-secondary/20 p-6 flex flex-col justify-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/40">
+            Available Funds
+          </p>
+          <p className="mt-2 text-3xl md:text-4xl font-black tracking-tight text-foreground">
+            {formatCurrency(
+              account.type === "credit" ? -account.currentBalance : account.currentBalance,
+            )}
+          </p>
+        </div>
+
+        {(account.limit || account.targetAmount) && (
+          <div className="rounded-2xl bg-secondary/20 p-6 flex flex-col justify-center">
+            <div className="flex items-end justify-between mb-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/40">
+                {account.type === "credit" ? "Limit Progress" : "Goal Progress"}
+              </p>
+              <span className="text-xl font-black tracking-tight text-foreground/80">
+                {((account.currentBalance / (account.limit || account.targetAmount || 1)) * 100).toFixed(0)}%
+              </span>
+            </div>
+            <div className="h-2 bg-secondary/30 rounded-full overflow-hidden w-full">
+              <div
+                className="h-full rounded-full transition-all duration-1000"
+                style={{
+                  backgroundColor: account.color,
+                  width: `${Math.min(
+                    100,
+                    (account.currentBalance / (account.limit || account.targetAmount || 1)) * 100,
+                  )}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Modern Search/Filter */}
+      <div className="flex gap-3 mb-10 mt-12">
+        <div className="relative flex-1 group">
+          <Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground opacity-30 group-focus-within:opacity-100 transition-opacity" />
+          <Input
+            placeholder="Search within this view..."
+            className="h-14 pl-14 rounded-xl bg-secondary/30 border-none shadow-inner text-base font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+            value={tableSearch}
+            onChange={(e) => setTableSearch(e.target.value)}
           />
         </div>
+        <MonthSelector
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          variant="icon"
+          align="end"
+        />
       </div>
 
       {/* Activity List */}
