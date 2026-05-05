@@ -71,6 +71,7 @@ export function AccountActivityContent({ data, account }: PageProps) {
           category: "Transfer",
           type: isFrom ? "expense" : "income",
           isTransfer: true,
+          accountType: account.type === "credit" ? "credit" : "main",
         });
       });
 

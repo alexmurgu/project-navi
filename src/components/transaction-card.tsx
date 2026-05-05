@@ -19,6 +19,7 @@ interface Transaction {
   userName: string;
   type: "expense" | "income";
   status?: "pending" | "paid";
+  accountType?: "main" | "credit";
 }
 
 interface TransactionCardProps {
@@ -96,6 +97,11 @@ export function TransactionCard({
             {transaction.status === "pending" && transaction.type === "expense" && (
               <span className="px-1.5 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[8px] font-display font-medium uppercase tracking-widest shrink-0">
                 Pending
+              </span>
+            )}
+            {transaction.accountType === "credit" && (
+              <span className="px-1.5 py-0.5 rounded-full bg-navi-dark/5 text-navi-dark/40 text-[8px] font-display font-medium uppercase tracking-widest shrink-0 border border-navi-dark/10">
+                Credit
               </span>
             )}
           </div>

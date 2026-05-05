@@ -168,6 +168,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
         userId: t.userId,
         userName: "Family Wide",
         isTransfer: true,
+        accountType: t.fromType === "credit" ? "credit" : "main",
       };
     });
 
@@ -186,6 +187,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
         userId: t.userId,
         userName: "Family Wide",
         isTransfer: true,
+        accountType: t.toType === "credit" ? "credit" : "main",
       };
     });
 
