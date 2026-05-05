@@ -16,7 +16,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { MobileNav } from "@/components/mobile-nav";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Plus } from "lucide-react";
 import { NotFound } from "@/components/not-found";
 import { RouteError } from "@/components/route-error";
 import { fetchSession } from "@/actions";
@@ -185,6 +185,18 @@ function RootLayout() {
               <div className="lg:hidden">
                 <MobileNav />
               </div>
+            )}
+
+            {/* Desktop FAB - Only visible on LG+ */}
+            {user && (
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("open-quick-add-choice"))}
+                className="fixed bottom-12 right-12 z-50 hidden lg:flex size-16 items-center justify-center rounded-full bg-navi-dark text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] transition-all duration-500 hover:scale-110 active:scale-95 group"
+                aria-label="Add entry"
+              >
+                <Plus className="size-8 transition-transform duration-500 group-hover:rotate-90" />
+              </button>
             )}
           </SidebarInset>
         </SidebarProvider>
