@@ -205,9 +205,13 @@ export function DashboardContent({ data }: PageProps) {
   ) as Transaction[];
 
   const stats = useMemo(() => {
-    const paidIncomes = data.incomes.filter((i) => (i as any).status !== "pending");
+    const paidIncomes = data.incomes.filter(
+      (i) => (i as any).status !== "pending" && !(i as any).isTransfer,
+    );
     const allPaidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
-    const mainPaidExpenses = allPaidExpenses.filter((e) => (e as any).accountType !== "credit");
+    const mainPaidExpenses = allPaidExpenses.filter(
+      (e) => (e as any).accountType !== "credit" && !(e as any).isTransfer,
+    );
 
     const start = startOfMonth(state.selectedDate);
     const end = endOfMonth(state.selectedDate);
@@ -218,6 +222,7 @@ export function DashboardContent({ data }: PageProps) {
 
     const monthlyExp = allPaidExpenses
       .filter((e) => isWithinInterval(new Date(e.date), { start, end }))
+      .filter((e) => !(e as any).isTransfer)
       .reduce((acc, curr) => acc + curr.amount, 0);
 
     const totalIncomeToDate = paidIncomes
@@ -278,7 +283,9 @@ export function DashboardContent({ data }: PageProps) {
     data.expenses
       .filter(
         (exp) =>
-          (exp as any).status !== "pending" && isWithinInterval(new Date(exp.date), { start, end }),
+          (exp as any).status !== "pending" &&
+          isWithinInterval(new Date(exp.date), { start, end }) &&
+          !(exp as any).isTransfer,
       )
       .forEach((exp) => {
         const current = map.get(exp.category) || { amount: 0, count: 0 };
