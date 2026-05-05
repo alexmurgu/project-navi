@@ -29,6 +29,7 @@ interface TransactionSheetProps {
   onSubmit: (data: any) => void;
   onDelete?: (id: string) => void;
   saving?: boolean;
+  creditCards?: any[];
 }
 
 interface FormState {
@@ -42,6 +43,8 @@ interface FormState {
   draftColor: string;
   draftIcon: string | null;
   isRecurrent: boolean;
+  accountType: "main" | "credit";
+  accountId: string | null;
 }
 
 type FormAction =
@@ -70,6 +73,7 @@ export function TransactionSheet({
   onDelete,
   saving,
   availableCategories,
+  creditCards = [],
 }: TransactionSheetProps) {
   const [state, dispatch] = useReducer(transactionReducer, {
     amount: "",
@@ -82,6 +86,8 @@ export function TransactionSheet({
     draftColor: "#494fdf",
     draftIcon: null,
     isRecurrent: false,
+    accountType: "main",
+    accountId: null,
   });
 
   const initializeForm = React.useCallback(() => {
@@ -97,6 +103,8 @@ export function TransactionSheet({
         draftColor: "#494fdf",
         draftIcon: null,
         isRecurrent: editingItem?.isRecurrent || false,
+        accountType: editingItem?.accountType || "main",
+        accountId: editingItem?.accountId || null,
       };
       // We purposefully do not use useEffect directly for this state sync
       // when editingItem changes to avoid simulating an event handler warning.
@@ -121,6 +129,8 @@ export function TransactionSheet({
       userId: state.selectedUserId === "family" ? null : state.selectedUserId,
       status: mode === "expense" && !state.isRecurrent ? "paid" : state.status,
       isRecurrent: state.isRecurrent,
+      accountType: state.accountType,
+      accountId: state.accountId,
       customization: state.isCustomizing
         ? { color: state.draftColor, icon: state.draftIcon }
         : undefined,
@@ -204,6 +214,15 @@ export function TransactionSheet({
                   dispatch({ type: "SET_FIELD", field: "category", value: suggestion.category });
                 }
               }}
+              creditCards={creditCards}
+              accountType={state.accountType}
+              onAccountTypeChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "accountType", value: val })
+              }
+              accountId={state.accountId}
+              onAccountIdChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "accountId", value: val })
+              }
             />
           </div>
         </div>

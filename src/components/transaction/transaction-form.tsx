@@ -23,6 +23,11 @@ interface TransactionFormProps {
   isRecurrent: boolean;
   onRecurrentChange: (val: boolean) => void;
   onSuggestionSelect?: (suggestion: any) => void;
+  creditCards?: any[];
+  accountType?: "main" | "credit";
+  onAccountTypeChange?: (val: "main" | "credit") => void;
+  accountId?: string | null;
+  onAccountIdChange?: (val: string | null) => void;
 }
 
 export function TransactionForm({
@@ -38,6 +43,11 @@ export function TransactionForm({
   isRecurrent,
   onRecurrentChange,
   onSuggestionSelect,
+  creditCards = [],
+  accountType = "main",
+  onAccountTypeChange,
+  accountId,
+  onAccountIdChange,
 }: TransactionFormProps) {
   const showStatus = mode === "income" || isRecurrent;
 
@@ -198,6 +208,73 @@ export function TransactionForm({
           </Popover>
         </div>
       </div>
+
+      {/* Account Selection */}
+      {mode === "expense" && (
+        <div className="space-y-4 pt-2">
+          <Label className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60 px-2">
+            Payment Source
+          </Label>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                onAccountTypeChange?.("main");
+                onAccountIdChange?.(null);
+              }}
+              className={cn(
+                "flex items-center gap-4 h-14 w-full rounded-2xl border px-5 transition-all active:scale-[0.98]",
+                accountType === "main"
+                  ? "bg-navi-dark border-navi-dark text-white shadow-lg shadow-navi-dark/20"
+                  : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50",
+              )}
+            >
+              <div
+                className={cn(
+                  "size-7 rounded-full flex items-center justify-center",
+                  accountType === "main" ? "bg-white/20" : "bg-white shadow-sm",
+                )}
+              >
+                <div className="size-2 rounded-full bg-navi-dark" />
+              </div>
+              <span className="text-sm font-display font-medium uppercase tracking-widest">
+                Main Balance
+              </span>
+            </button>
+
+            {creditCards.map((cc) => (
+              <button
+                key={cc.id}
+                type="button"
+                onClick={() => {
+                  onAccountTypeChange?.("credit");
+                  onAccountIdChange?.(cc.id);
+                }}
+                className={cn(
+                  "flex items-center gap-4 h-14 w-full rounded-2xl border px-5 transition-all active:scale-[0.98]",
+                  accountType === "credit" && accountId === cc.id
+                    ? "bg-navi-dark border-navi-dark text-white shadow-lg shadow-navi-dark/20"
+                    : "bg-navi-surface border-transparent text-navi-dark hover:bg-white/50",
+                )}
+              >
+                <div
+                  className={cn(
+                    "size-7 rounded-full flex items-center justify-center",
+                    accountType === "credit" && accountId === cc.id
+                      ? "bg-white/20"
+                      : "bg-white shadow-sm",
+                  )}
+                >
+                  <div className="size-2 rounded-full" style={{ backgroundColor: cc.color }} />
+                </div>
+                <span className="text-sm font-display font-medium uppercase tracking-widest">
+                  {cc.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recurrent Toggle */}
       {mode === "expense" && (

@@ -28,15 +28,16 @@ interface TransferSheetProps {
   availableBalance: number;
   onSubmit: (data: any) => void;
   saving?: boolean;
+  creditCards?: any[];
 }
 
 interface FormState {
   amount: string;
   description: string;
   date: Date | undefined;
-  fromType: "main" | "savings";
+  fromType: "main" | "savings" | "credit";
   fromId: string | null;
-  toType: "main" | "savings";
+  toType: "main" | "savings" | "credit";
   toId: string | null;
   selectedUserId: string;
 }
@@ -64,6 +65,7 @@ export function TransferSheet({
   availableBalance,
   onSubmit,
   saving,
+  creditCards = [],
 }: TransferSheetProps) {
   const [state, dispatch] = useReducer(transferReducer, {
     amount: "",
@@ -97,7 +99,9 @@ export function TransferSheet({
   const amountCents = state.amount ? Math.round(parseFloat(state.amount) * 100) : 0;
   const sourceBalance = state.fromType === "main" 
     ? availableBalance 
-    : savingsAccounts.find(sa => sa.id === state.fromId)?.currentBalance || 0;
+    : state.fromType === "savings"
+      ? savingsAccounts.find(sa => sa.id === state.fromId)?.currentBalance || 0
+      : creditCards.find(cc => cc.id === state.fromId)?.limit || 99999999; // Credit cards use limit or arbitrary high for now
   
   const isOverBalance = amountCents > sourceBalance;
 
@@ -170,12 +174,14 @@ export function TransferSheet({
                   </p>
                   <select
                     className="w-full bg-transparent font-display font-medium text-[18px] outline-none appearance-none cursor-pointer"
-                    value={state.fromType === "main" ? "main" : state.fromId || ""}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === "main") {
                         dispatch({ type: "SET_FIELD", field: "fromType", value: "main" });
                         dispatch({ type: "SET_FIELD", field: "fromId", value: null });
+                      } else if (val.startsWith("cc_")) {
+                        dispatch({ type: "SET_FIELD", field: "fromType", value: "credit" });
+                        dispatch({ type: "SET_FIELD", field: "fromId", value: val.replace("cc_", "") });
                       } else {
                         dispatch({ type: "SET_FIELD", field: "fromType", value: "savings" });
                         dispatch({ type: "SET_FIELD", field: "fromId", value: val });
@@ -183,11 +189,20 @@ export function TransferSheet({
                     }}
                   >
                     <option value="main">Main Balance ({availableBalance / 100}€)</option>
-                    {savingsAccounts.map((sa) => (
-                      <option key={sa.id} value={sa.id}>
-                        {sa.name} ({sa.currentBalance / 100}€)
-                      </option>
-                    ))}
+                    <optgroup label="Savings Goals">
+                      {savingsAccounts.map((sa) => (
+                        <option key={sa.id} value={sa.id}>
+                          {sa.name} ({sa.currentBalance / 100}€)
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Credit Cards">
+                      {creditCards.map((cc) => (
+                        <option key={cc.id} value={`cc_${cc.id}`}>
+                          {cc.name} (Debt: {cc.currentBalance / 100}€)
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                 </div>
 
@@ -206,12 +221,14 @@ export function TransferSheet({
                   </p>
                   <select
                     className="w-full bg-transparent font-display font-medium text-[18px] outline-none appearance-none cursor-pointer"
-                    value={state.toType === "main" ? "main" : state.toId || ""}
                     onChange={(e) => {
                       const val = e.target.value;
                       if (val === "main") {
                         dispatch({ type: "SET_FIELD", field: "toType", value: "main" });
                         dispatch({ type: "SET_FIELD", field: "toId", value: null });
+                      } else if (val.startsWith("cc_")) {
+                        dispatch({ type: "SET_FIELD", field: "toType", value: "credit" });
+                        dispatch({ type: "SET_FIELD", field: "toId", value: val.replace("cc_", "") });
                       } else {
                         dispatch({ type: "SET_FIELD", field: "toType", value: "savings" });
                         dispatch({ type: "SET_FIELD", field: "toId", value: val });
@@ -219,11 +236,20 @@ export function TransferSheet({
                     }}
                   >
                     <option value="main">Main Balance</option>
-                    {savingsAccounts.map((sa) => (
-                      <option key={sa.id} value={sa.id}>
-                        {sa.name}
-                      </option>
-                    ))}
+                    <optgroup label="Savings Goals">
+                      {savingsAccounts.map((sa) => (
+                        <option key={sa.id} value={sa.id}>
+                          {sa.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Credit Cards">
+                      {creditCards.map((cc) => (
+                        <option key={cc.id} value={`cc_${cc.id}`}>
+                          {cc.name}
+                        </option>
+                      ))}
+                    </optgroup>
                   </select>
                 </div>
               </div>

@@ -12,6 +12,8 @@
   --color-navi-surface: oklch(96.5% 0 0); /* #f4f4f4 */
   --color-navi-gray: oklch(64.6% 0.015 258.1); /* #8d969e */
   --color-navi-border: oklch(84.4% 0.005 258.1); /* #c9c9cd */
+  --color-popover: oklch(100% 0 0);
+  --color-popover-foreground: oklch(20.9% 0.015 258.1);
 
   --font-display: "Aeonik Pro", "Inter", sans-serif;
   --font-sans: "Inter", "Arial", sans-serif;

@@ -1,5 +1,4 @@
 import React, { useMemo, useEffect } from "react";
-import {} from "lucide-react";
 import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval, isAfter } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -18,6 +17,9 @@ import {
   deleteSavingsAccount,
   addTransfer,
   deleteTransfer,
+  addCreditCard,
+  updateCreditCard,
+  deleteCreditCard,
 } from "./actions";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import { StatsHero } from "@/components/dashboard/stats-hero";
@@ -26,6 +28,8 @@ import { RecentActivity } from "@/components/dashboard/recent-activity";
 import { SavingsSection } from "@/components/dashboard/savings-section";
 import { TransferSheet } from "@/components/transfer-sheet";
 import { SavingsAccountSheet } from "@/components/savings-account-sheet";
+import { CreditCardSheet } from "@/components/credit-card-sheet";
+import { CreditCardsSection } from "@/components/dashboard/credit-cards-section";
 
 interface User {
   id: string;
@@ -58,6 +62,7 @@ interface PageProps {
     categoryConfigs: CategoryConfig[];
     savingsAccounts: any[];
     transfers: any[];
+    creditCards: any[];
   };
 }
 
@@ -81,6 +86,8 @@ export function DashboardContent({ data }: PageProps) {
     savingsSheetOpen: false,
     transferSheetOpen: false,
     editingSavingsAccount: null,
+    creditCardSheetOpen: false,
+    editingCreditCard: null,
   });
 
   const availableExpenseCategories = data.expenseCategories;
@@ -149,12 +156,35 @@ export function DashboardContent({ data }: PageProps) {
       dispatch({ savingsSheetOpen: false });
     },
   });
-
   const addTransferMutation = useMutation({
     mutationFn: (d: any) => addTransfer({ data: d }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       dispatch({ transferSheetOpen: false });
+    },
+  });
+
+  const addCreditCardMutation = useMutation({
+    mutationFn: (d: any) => addCreditCard({ data: d }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ creditCardSheetOpen: false });
+    },
+  });
+
+  const updateCreditCardMutation = useMutation({
+    mutationFn: (d: any) => updateCreditCard({ data: d }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ creditCardSheetOpen: false });
+    },
+  });
+
+  const deleteCreditCardMutation = useMutation({
+    mutationFn: (id: string) => deleteCreditCard({ data: id }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ creditCardSheetOpen: false });
     },
   });
 
@@ -168,7 +198,8 @@ export function DashboardContent({ data }: PageProps) {
 
   const stats = useMemo(() => {
     const paidIncomes = data.incomes.filter((i) => (i as any).status !== "pending");
-    const paidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
+    const allPaidExpenses = data.expenses.filter((e) => (e as any).status !== "pending");
+    const mainPaidExpenses = allPaidExpenses.filter((e) => (e as any).accountType !== "credit");
 
     const start = startOfMonth(state.selectedDate);
     const end = endOfMonth(state.selectedDate);
@@ -177,7 +208,7 @@ export function DashboardContent({ data }: PageProps) {
       .filter((i) => isWithinInterval(new Date(i.date), { start, end }))
       .reduce((acc, curr) => acc + curr.amount, 0);
 
-    const monthlyExp = paidExpenses
+    const monthlyExp = allPaidExpenses
       .filter((e) => isWithinInterval(new Date(e.date), { start, end }))
       .reduce((acc, curr) => acc + curr.amount, 0);
 
@@ -185,7 +216,7 @@ export function DashboardContent({ data }: PageProps) {
       .filter((i) => !isAfter(new Date(i.date), end))
       .reduce((acc, curr) => acc + curr.amount, 0);
 
-    const totalExpToDate = paidExpenses
+    const totalMainExpToDate = mainPaidExpenses
       .filter((e) => !isAfter(new Date(e.date), end))
       .reduce((acc, curr) => acc + curr.amount, 0);
 
@@ -194,7 +225,7 @@ export function DashboardContent({ data }: PageProps) {
     return {
       income: monthlyIncome,
       monthlyExp,
-      balance: totalIncomeToDate - totalExpToDate,
+      balance: totalIncomeToDate - totalMainExpToDate,
       totalSavings,
     };
   }, [data, state.selectedDate]);
@@ -297,13 +328,22 @@ export function DashboardContent({ data }: PageProps) {
       });
     };
 
+    const handleQuickAddCreditCard = () => {
+      dispatch({
+        editingCreditCard: null,
+        creditCardSheetOpen: true,
+      });
+    };
+
     window.addEventListener("open-quick-add-expense", handleQuickAddExpense);
     window.addEventListener("open-quick-add-income", handleQuickAddIncome);
     window.addEventListener("open-quick-add-transfer", handleQuickAddTransfer);
+    window.addEventListener("open-add-credit-card", handleQuickAddCreditCard);
     return () => {
       window.removeEventListener("open-quick-add-expense", handleQuickAddExpense);
       window.removeEventListener("open-quick-add-income", handleQuickAddIncome);
       window.removeEventListener("open-quick-add-transfer", handleQuickAddTransfer);
+      window.removeEventListener("open-add-credit-card", handleQuickAddCreditCard);
     };
   }, []);
 
@@ -322,6 +362,11 @@ export function DashboardContent({ data }: PageProps) {
         <SavingsSection
           accounts={data.savingsAccounts}
           onEditAccount={(sa) => dispatch({ editingSavingsAccount: sa, savingsSheetOpen: true })}
+          formatCurrency={formatCurrency}
+        />
+        <CreditCardsSection
+          cards={data.creditCards}
+          onEditCard={(cc) => dispatch({ editingCreditCard: cc, creditCardSheetOpen: true })}
           formatCurrency={formatCurrency}
         />
         <CategoryBreakdown
@@ -359,6 +404,7 @@ export function DashboardContent({ data }: PageProps) {
         availableCategories={availableExpenseCategories}
         setAvailableCategories={() => {}} // No-op, managed by dashboard refetch
         categoryConfigs={data.categoryConfigs}
+        creditCards={data.creditCards}
         onSubmit={(d) => {
           const payload = {
             ...d,
@@ -437,9 +483,25 @@ export function DashboardContent({ data }: PageProps) {
         onOpenChange={(open) => dispatch({ transferSheetOpen: open })}
         users={data.users}
         savingsAccounts={data.savingsAccounts}
+        creditCards={data.creditCards}
         availableBalance={stats.balance}
         onSubmit={(d) => addTransferMutation.mutate(d)}
         saving={addTransferMutation.isPending}
+      />
+
+      <CreditCardSheet
+        open={state.creditCardSheetOpen}
+        onOpenChange={(open) => dispatch({ creditCardSheetOpen: open })}
+        editingItem={state.editingCreditCard}
+        onSubmit={(d) => {
+          if (state.editingCreditCard) {
+            updateCreditCardMutation.mutate(d);
+          } else {
+            addCreditCardMutation.mutate(d);
+          }
+        }}
+        onDelete={(id) => deleteCreditCardMutation.mutate(id)}
+        saving={addCreditCardMutation.isPending || updateCreditCardMutation.isPending}
       />
     </div>
   );

@@ -125,6 +125,10 @@ export const expense = sqliteTable("expense", {
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),
+  accountType: text("account_type", { enum: ["main", "credit"] })
+    .notNull()
+    .default("main"),
+  accountId: text("account_id"), // ID of creditCard
 });
 
 export const income = sqliteTable("income", {
@@ -168,6 +172,24 @@ export const savingsAccount = sqliteTable("savings_account", {
     .$onUpdate(() => new Date()),
 });
 
+export const creditCard = sqliteTable("credit_card", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  icon: text("icon"),
+  color: text("color").notNull().default("#f43f5e"), // Default Rose
+  limit: integer("limit"), // in cents
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date())
+    .$onUpdate(() => new Date()),
+});
+
 export const transfer = sqliteTable("transfer", {
   id: text("id")
     .primaryKey()
@@ -178,14 +200,10 @@ export const transfer = sqliteTable("transfer", {
   date: integer("date", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
-  fromType: text("from_type", { enum: ["main", "savings"] }).notNull(),
-  fromId: text("from_id").references(() => savingsAccount.id, {
-    onDelete: "cascade",
-  }), // ID of savingsAccount if from_type is "savings"
-  toType: text("to_type", { enum: ["main", "savings"] }).notNull(),
-  toId: text("to_id").references(() => savingsAccount.id, {
-    onDelete: "cascade",
-  }), // ID of savingsAccount if to_type is "savings"
+  fromType: text("from_type", { enum: ["main", "savings", "credit"] }).notNull(),
+  fromId: text("from_id"), // ID of savingsAccount or creditCard
+  toType: text("to_type", { enum: ["main", "savings", "credit"] }).notNull(),
+  toId: text("to_id"), // ID of savingsAccount or creditCard
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -201,6 +219,7 @@ export const userRelations = relations(user, ({ many }) => ({
   expenses: many(expense),
   incomes: many(income),
   savingsAccounts: many(savingsAccount),
+  creditCards: many(creditCard),
   transfers: many(transfer),
 }));
 
@@ -218,12 +237,6 @@ export const accountRelations = relations(account, ({ one }) => ({
   }),
 }));
 
-export const expenseRelations = relations(expense, ({ one }) => ({
-  user: one(user, {
-    fields: [expense.userId],
-    references: [user.id],
-  }),
-}));
 
 export const incomeRelations = relations(income, ({ one }) => ({
   user: one(user, {
@@ -232,13 +245,26 @@ export const incomeRelations = relations(income, ({ one }) => ({
   }),
 }));
 
-export const savingsAccountRelations = relations(savingsAccount, ({ one, many }) => ({
+export const creditCardRelations = relations(creditCard, ({ one, many }) => ({
   user: one(user, {
-    fields: [savingsAccount.userId],
+    fields: [creditCard.userId],
     references: [user.id],
   }),
+  expenses: many(expense),
   transfersFrom: many(transfer, { relationName: "fromAccount" }),
   transfersTo: many(transfer, { relationName: "toAccount" }),
+}));
+
+
+export const expenseRelations = relations(expense, ({ one }) => ({
+  user: one(user, {
+    fields: [expense.userId],
+    references: [user.id],
+  }),
+  creditCard: one(creditCard, {
+    fields: [expense.accountId],
+    references: [creditCard.id],
+  }),
 }));
 
 export const transferRelations = relations(transfer, ({ one }) => ({
@@ -254,6 +280,16 @@ export const transferRelations = relations(transfer, ({ one }) => ({
   toAccount: one(savingsAccount, {
     fields: [transfer.toId],
     references: [savingsAccount.id],
+    relationName: "toAccount",
+  }),
+  fromCreditCard: one(creditCard, {
+    fields: [transfer.fromId],
+    references: [creditCard.id],
+    relationName: "fromAccount",
+  }),
+  toCreditCard: one(creditCard, {
+    fields: [transfer.toId],
+    references: [creditCard.id],
     relationName: "toAccount",
   }),
 }));

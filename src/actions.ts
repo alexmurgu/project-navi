@@ -6,6 +6,7 @@ import {
   user as userSchema,
   categoryConfig,
   savingsAccount,
+  creditCard,
   transfer,
 } from "./db/schema";
 import { eq, sql, and, isNotNull, desc, like } from "drizzle-orm";
@@ -113,6 +114,8 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
       status: expense.status,
       recurrenceId: expense.recurrenceId,
       userId: expense.userId,
+      accountType: expense.accountType,
+      accountId: expense.accountId,
       userName: sql<string>`COALESCE(${userSchema.name}, 'Family Wide')`,
     })
     .from(expense)
@@ -136,25 +139,33 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
   const configs = await db.select().from(categoryConfig);
 
   const savings = await db.select().from(savingsAccount);
+  const creditCards = await db.select().from(creditCard);
   const allTransfers = await db.select().from(transfer);
 
   const savingsIds = new Set(savings.map((s) => s.id));
+  const creditCardIds = new Set(creditCards.map((c) => c.id));
   const validTransfers = allTransfers.filter((t) => {
     if (t.fromType === "savings" && !savingsIds.has(t.fromId!)) return false;
     if (t.toType === "savings" && !savingsIds.has(t.toId!)) return false;
+    if (t.fromType === "credit" && !creditCardIds.has(t.fromId!)) return false;
+    if (t.toType === "credit" && !creditCardIds.has(t.toId!)) return false;
     return true;
   });
 
   // Synthesize transfers into expenses/incomes for transparency and simpler math
-  const transferExpenses = validTransfers
-    .filter((t) => t.fromType === "main" && t.toType === "savings")
+  const transferIncomes = validTransfers
+    .filter(
+      (t) =>
+        (t.fromType === "savings" || t.fromType === "credit") && t.toType === "main",
+    )
     .map((t) => {
-      const sa = savings.find((s) => s.id === t.toId);
+      const sa = savings.find((s) => s.id === t.fromId);
+      const cc = creditCards.find((c) => c.id === t.fromId);
       return {
         id: t.id,
-        description: `Transfer: ${sa?.name || "Savings"}`,
+        description: `From ${sa?.name || cc?.name || "Account"}`,
         amount: t.amount,
-        category: "Savings",
+        category: "Transfer",
         date: t.date,
         status: "paid" as const,
         userId: t.userId,
@@ -163,15 +174,19 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
       };
     });
 
-  const transferIncomes = validTransfers
-    .filter((t) => t.fromType === "savings" && t.toType === "main")
+  const transferExpenses = validTransfers
+    .filter(
+      (t) =>
+        t.fromType === "main" && (t.toType === "savings" || t.toType === "credit"),
+    )
     .map((t) => {
-      const sa = savings.find((s) => s.id === t.fromId);
+      const sa = savings.find((s) => s.id === t.toId);
+      const cc = creditCards.find((c) => c.id === t.toId);
       return {
         id: t.id,
-        description: `From Savings: ${sa?.name || "Savings"}`,
+        description: `Transfer: ${sa?.name || cc?.name || "Account"}`,
         amount: t.amount,
-        category: "Savings",
+        category: "Transfer",
         date: t.date,
         status: "paid" as const,
         userId: t.userId,
@@ -197,6 +212,23 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
     };
   });
 
+  const creditCardsWithBalances = creditCards.map((cc) => {
+    const expensesAmount = expenses
+      .filter((e) => e.accountType === "credit" && e.accountId === cc.id)
+      .reduce((acc, e) => acc + e.amount, 0);
+    const paymentsToAmount = validTransfers
+      .filter((t) => t.toType === "credit" && t.toId === cc.id)
+      .reduce((acc, t) => acc + t.amount, 0);
+    const transfersFromAmount = validTransfers
+      .filter((t) => t.fromType === "credit" && t.fromId === cc.id)
+      .reduce((acc, t) => acc + t.amount, 0);
+
+    return {
+      ...cc,
+      currentBalance: expensesAmount - paymentsToAmount + transfersFromAmount,
+    };
+  });
+
   return {
     user: session.user,
     users,
@@ -206,6 +238,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
     incomeCategories: Array.from(new Set(allIncomes.map((i) => i.category))),
     categoryConfigs: configs,
     savingsAccounts: savingsWithBalances,
+    creditCards: creditCardsWithBalances,
     transfers: validTransfers,
   };
 });
@@ -227,6 +260,8 @@ export const addExpense = createServerFn({ method: "POST" })
       date: parseDate(data.date) || new Date(),
       status: data.status || "paid",
       recurrenceId,
+      accountType: data.accountType || "main",
+      accountId: data.accountId || null,
     });
     return { success: true };
   });
@@ -259,6 +294,8 @@ export const updateExpense = createServerFn({ method: "POST" }) // Start uses PO
         ...(updateData.date && { date: parseDate(updateData.date) }),
         status: updateData.status || "paid",
         recurrenceId,
+        accountType: updateData.accountType || "main",
+        accountId: updateData.accountId || null,
       })
       .where(eq(expense.id, id));
     return { success: true };
@@ -361,6 +398,8 @@ export const bulkImportTransactions = createServerFn({ method: "POST" })
           isMonthly: tx.isMonthly || false,
           date: parseDate(tx.date) || new Date(),
           status: tx.status || "paid",
+          accountType: tx.accountType || "main",
+          accountId: tx.accountId || null,
         });
       } else {
         await db.insert(income).values({
@@ -448,6 +487,53 @@ export const deleteTransfer = createServerFn({ method: "POST" })
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
     await db.delete(transfer).where(eq(transfer.id, id));
+    return { success: true };
+  });
+
+// --- Credit Card Actions ---
+
+export const addCreditCard = createServerFn({ method: "POST" })
+  .inputValidator((data: any) => data)
+  .handler(async ({ data }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    await db.insert(creditCard).values({
+      userId: session.user.id,
+      name: data.name,
+      icon: data.icon,
+      color: data.color || "#f43f5e",
+      limit: data.limit ? Math.round(data.limit) : null,
+    });
+    return { success: true };
+  });
+
+export const updateCreditCard = createServerFn({ method: "POST" })
+  .inputValidator((data: any) => data)
+  .handler(async ({ data }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    const { id, ...updateData } = data;
+    await db
+      .update(creditCard)
+      .set({
+        name: updateData.name,
+        icon: updateData.icon,
+        color: updateData.color,
+        limit: updateData.limit ? Math.round(updateData.limit) : null,
+      })
+      .where(eq(creditCard.id, id));
+    return { success: true };
+  });
+
+export const deleteCreditCard = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    await db.delete(creditCard).where(eq(creditCard.id, id));
     return { success: true };
   });
 
