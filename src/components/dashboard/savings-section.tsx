@@ -68,7 +68,7 @@ export function SavingsSection({
                 </div>
                 
                 {sa.targetAmount && (
-                  <div className="h-[3px] w-full bg-navi-dark/[0.04] rounded-full overflow-hidden">
+                  <div className="h-[3px] w-full bg-navi-dark/4 rounded-full overflow-hidden">
                     <div 
                       className="h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]"
                       style={{ 
