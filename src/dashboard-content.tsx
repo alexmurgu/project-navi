@@ -228,12 +228,21 @@ export function DashboardContent({ data }: PageProps) {
       .filter((e) => !isAfter(new Date(e.date), end))
       .reduce((acc, curr) => acc + curr.amount, 0);
 
+    const totalTransfersToDate = data.transfers
+      .filter((t) => !isAfter(new Date(t.date), end))
+      .reduce((acc, t) => {
+        let net = acc;
+        if (t.fromType === "main") net -= t.amount;
+        if (t.toType === "main") net += t.amount;
+        return net;
+      }, 0);
+
     const totalSavings = data.savingsAccounts.reduce((acc, sa) => acc + sa.currentBalance, 0);
 
     return {
       income: monthlyIncome,
       monthlyExp,
-      balance: totalIncomeToDate - totalMainExpToDate,
+      balance: totalIncomeToDate - totalMainExpToDate + totalTransfersToDate,
       totalSavings,
     };
   }, [data, state.selectedDate]);
