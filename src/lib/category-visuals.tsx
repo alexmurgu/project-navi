@@ -110,9 +110,11 @@ export const getCategoryFallbackIcon = (category: string, kind?: CategoryKind) =
     if (c.includes("salary") || c.includes("wage") || c.includes("work")) return Briefcase;
     if (c.includes("investment") || c.includes("dividend")) return Landmark;
     if (c.includes("gift") || c.includes("bonus")) return Gift;
+    if (c.includes("savings")) return PiggyBank;
     return Navigation;
   }
 
+  if (c.includes("savings")) return PiggyBank;
   if (c.includes("food") || c.includes("eat") || c.includes("restaurant")) return Utensils;
   if (c.includes("shopping") || c.includes("cloth")) return ShoppingBag;
   if (c.includes("coffee") || c.includes("drink")) return Coffee;

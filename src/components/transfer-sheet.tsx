@@ -1,0 +1,300 @@
+import React, { useReducer, useEffect } from "react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { X, Plus, ArrowRightLeft, AlertCircle } from "lucide-react";
+import { UserSelector } from "./transaction/user-selector";
+import { TransactionForm } from "./transaction/transaction-form";
+import { cn } from "@/lib/utils";
+
+interface User {
+  id: string;
+  name: string;
+  email?: string;
+}
+
+interface SavingsAccount {
+  id: string;
+  name: string;
+  color: string;
+  icon: string | null;
+  currentBalance: number;
+}
+
+interface TransferSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  users: User[];
+  savingsAccounts: SavingsAccount[];
+  availableBalance: number;
+  onSubmit: (data: any) => void;
+  saving?: boolean;
+}
+
+interface FormState {
+  amount: string;
+  description: string;
+  date: Date | undefined;
+  fromType: "main" | "savings";
+  fromId: string | null;
+  toType: "main" | "savings";
+  toId: string | null;
+  selectedUserId: string;
+}
+
+type FormAction =
+  | { type: "RESET"; payload: FormState }
+  | { type: "SET_FIELD"; field: keyof FormState; value: any };
+
+function transferReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "RESET":
+      return action.payload;
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    default:
+      return state;
+  }
+}
+
+export function TransferSheet({
+  open,
+  onOpenChange,
+  users,
+  savingsAccounts,
+  availableBalance,
+  onSubmit,
+  saving,
+}: TransferSheetProps) {
+  const [state, dispatch] = useReducer(transferReducer, {
+    amount: "",
+    description: "Transfer to Savings",
+    date: new Date(),
+    fromType: "main",
+    fromId: null,
+    toType: "savings",
+    toId: savingsAccounts[0]?.id || null,
+    selectedUserId: "family",
+  });
+
+  useEffect(() => {
+    if (open) {
+      dispatch({
+        type: "RESET",
+        payload: {
+          amount: "",
+          description: "Transfer to Savings",
+          date: new Date(),
+          fromType: "main",
+          fromId: null,
+          toType: "savings",
+          toId: savingsAccounts[0]?.id || null,
+          selectedUserId: "family",
+        },
+      });
+    }
+  }, [open, savingsAccounts]);
+
+  const amountCents = state.amount ? Math.round(parseFloat(state.amount) * 100) : 0;
+  const sourceBalance = state.fromType === "main" 
+    ? availableBalance 
+    : savingsAccounts.find(sa => sa.id === state.fromId)?.currentBalance || 0;
+  
+  const isOverBalance = amountCents > sourceBalance;
+
+  const handleSave = () => {
+    if (isNaN(amountCents) || isOverBalance) return;
+
+    onSubmit({
+      amount: amountCents,
+      description: state.description,
+      date: state.date?.toISOString(),
+      fromType: state.fromType,
+      fromId: state.fromId,
+      toType: state.toType,
+      toId: state.toId,
+      userId: state.selectedUserId === "family" ? null : state.selectedUserId,
+    });
+  };
+
+  const swapSources = () => {
+    dispatch({ type: "SET_FIELD", field: "fromType", value: state.toType });
+    dispatch({ type: "SET_FIELD", field: "fromId", value: state.toId });
+    dispatch({ type: "SET_FIELD", field: "toType", value: state.fromType });
+    dispatch({ type: "SET_FIELD", field: "toId", value: state.fromId });
+    dispatch({
+      type: "SET_FIELD",
+      field: "description",
+      value: state.fromType === "main" ? "Transfer from Savings" : "Transfer to Savings",
+    });
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="bottom"
+        className="h-full max-h-[90dvh] sm:h-fit sm:max-h-[95dvh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
+      >
+        <div className="p-6 sm:p-8 pb-2 text-left shrink-0">
+          <h2 className="text-[28px] sm:text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
+            Move Funds
+          </h2>
+          <p className="ml-1 text-[11px] font-sans font-medium uppercase tracking-[0.2em] text-navi-gray/60">
+            Transfer between main balance and savings
+          </p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 pt-0 space-y-10 sm:space-y-12">
+          <div className="pb-10 space-y-10 sm:space-y-12">
+            <UserSelector
+              users={users}
+              selectedUserId={state.selectedUserId}
+              onSelect={(val) =>
+                dispatch({ type: "SET_FIELD", field: "selectedUserId", value: val })
+              }
+            />
+
+            {/* Source & Destination Picker */}
+            <div className="space-y-6">
+              <h3 className="text-[10px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60 px-2">
+                Transfer Details
+              </h3>
+
+              <div className="flex flex-col gap-4 relative">
+                {/* From */}
+                <div className={cn(
+                  "p-5 rounded-premium border transition-colors space-y-3",
+                  isOverBalance ? "bg-navi-danger/5 border-navi-danger/20" : "bg-navi-surface/30 border-navi-border/10"
+                )}>
+                  <p className="text-[9px] font-display font-medium uppercase tracking-widest text-navi-gray/40">
+                    From
+                  </p>
+                  <select
+                    className="w-full bg-transparent font-display font-medium text-[18px] outline-none appearance-none cursor-pointer"
+                    value={state.fromType === "main" ? "main" : state.fromId || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "main") {
+                        dispatch({ type: "SET_FIELD", field: "fromType", value: "main" });
+                        dispatch({ type: "SET_FIELD", field: "fromId", value: null });
+                      } else {
+                        dispatch({ type: "SET_FIELD", field: "fromType", value: "savings" });
+                        dispatch({ type: "SET_FIELD", field: "fromId", value: val });
+                      }
+                    }}
+                  >
+                    <option value="main">Main Balance ({availableBalance / 100}€)</option>
+                    {savingsAccounts.map((sa) => (
+                      <option key={sa.id} value={sa.id}>
+                        {sa.name} ({sa.currentBalance / 100}€)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Swap Button */}
+                <button
+                  onClick={swapSources}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-10 rounded-full bg-white border border-navi-border/20 shadow-sm flex items-center justify-center z-10 hover:scale-110 transition-transform active:scale-95"
+                >
+                  <ArrowRightLeft className="size-4 text-navi-dark rotate-90" />
+                </button>
+
+                {/* To */}
+                <div className="p-5 rounded-premium bg-navi-surface/30 border border-navi-border/10 space-y-3">
+                  <p className="text-[9px] font-display font-medium uppercase tracking-widest text-navi-gray/40">
+                    To
+                  </p>
+                  <select
+                    className="w-full bg-transparent font-display font-medium text-[18px] outline-none appearance-none cursor-pointer"
+                    value={state.toType === "main" ? "main" : state.toId || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "main") {
+                        dispatch({ type: "SET_FIELD", field: "toType", value: "main" });
+                        dispatch({ type: "SET_FIELD", field: "toId", value: null });
+                      } else {
+                        dispatch({ type: "SET_FIELD", field: "toType", value: "savings" });
+                        dispatch({ type: "SET_FIELD", field: "toId", value: val });
+                      }
+                    }}
+                  >
+                    <option value="main">Main Balance</option>
+                    {savingsAccounts.map((sa) => (
+                      <option key={sa.id} value={sa.id}>
+                        {sa.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <TransactionForm
+              mode="income"
+              amount={state.amount}
+              onAmountChange={(val) => dispatch({ type: "SET_FIELD", field: "amount", value: val })}
+              description={state.description}
+              onDescriptionChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "description", value: val })
+              }
+              date={state.date}
+              onDateChange={(val) => dispatch({ type: "SET_FIELD", field: "date", value: val })}
+              status="paid"
+              onStatusChange={() => {}}
+              isRecurrent={false}
+              onRecurrentChange={() => {}}
+            />
+
+            {isOverBalance && (
+              <div className="mx-2 p-4 rounded-card bg-navi-danger/10 border border-navi-danger/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <AlertCircle className="size-5 text-navi-danger shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[13px] font-display font-medium text-navi-danger uppercase tracking-tight">Insufficient Funds</p>
+                  <p className="text-[11px] font-sans text-navi-danger/70 leading-relaxed">
+                    You only have {(sourceBalance / 100).toFixed(2)}€ available in your {state.fromType === "main" ? "main account" : "savings account"}.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="p-6 sm:p-8 border-t border-navi-border/20 bg-white shrink-0">
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              variant="secondary"
+              className="h-16 rounded-full font-display font-medium uppercase tracking-[0.2em]"
+              onClick={() => onOpenChange(false)}
+            >
+              <X className="size-5" />
+              <span>Dismiss</span>
+            </Button>
+
+            <Button
+              className={cn(
+                "h-16 rounded-full font-display font-medium uppercase tracking-[0.2em] shadow-[0_20px_40px_-15px_rgba(8,59,58,0.3)] transition-all",
+                isOverBalance ? "bg-navi-gray/20 text-navi-gray/40 cursor-not-allowed" : "bg-navi-dark text-white hover:opacity-95 active:scale-[0.98]"
+              )}
+              onClick={handleSave}
+              disabled={
+                saving ||
+                !state.amount ||
+                isOverBalance ||
+                (state.fromType === state.toType && state.fromId === state.toId)
+              }
+            >
+              {saving ? (
+                <span className="animate-pulse">Syncing...</span>
+              ) : (
+                <>
+                  <Plus className="size-5" />
+                  <span>Confirm</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}

@@ -1,6 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "./db";
-import { expense, income, user as userSchema, categoryConfig } from "./db/schema";
+import {
+  expense,
+  income,
+  user as userSchema,
+  categoryConfig,
+  savingsAccount,
+  transfer,
+} from "./db/schema";
 import { eq, sql, and, isNotNull, desc, like } from "drizzle-orm";
 import { auth } from "./auth";
 import { getRequest } from "@tanstack/react-start/server";
@@ -128,17 +135,78 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
   const users = await db.select({ id: userSchema.id, name: userSchema.name }).from(userSchema);
   const configs = await db.select().from(categoryConfig);
 
-  const expenseCategories = Array.from(new Set(expenses.map((e) => e.category)));
-  const incomeCategories = Array.from(new Set(incomes.map((i) => i.category)));
+  const savings = await db.select().from(savingsAccount);
+  const allTransfers = await db.select().from(transfer);
+
+  const savingsIds = new Set(savings.map((s) => s.id));
+  const validTransfers = allTransfers.filter((t) => {
+    if (t.fromType === "savings" && !savingsIds.has(t.fromId!)) return false;
+    if (t.toType === "savings" && !savingsIds.has(t.toId!)) return false;
+    return true;
+  });
+
+  // Synthesize transfers into expenses/incomes for transparency and simpler math
+  const transferExpenses = validTransfers
+    .filter((t) => t.fromType === "main" && t.toType === "savings")
+    .map((t) => {
+      const sa = savings.find((s) => s.id === t.toId);
+      return {
+        id: t.id,
+        description: `Transfer: ${sa?.name || "Savings"}`,
+        amount: t.amount,
+        category: "Savings",
+        date: t.date,
+        status: "paid" as const,
+        userId: t.userId,
+        userName: "Family Wide",
+        isTransfer: true,
+      };
+    });
+
+  const transferIncomes = validTransfers
+    .filter((t) => t.fromType === "savings" && t.toType === "main")
+    .map((t) => {
+      const sa = savings.find((s) => s.id === t.fromId);
+      return {
+        id: t.id,
+        description: `From Savings: ${sa?.name || "Savings"}`,
+        amount: t.amount,
+        category: "Savings",
+        date: t.date,
+        status: "paid" as const,
+        userId: t.userId,
+        userName: "Family Wide",
+        isTransfer: true,
+      };
+    });
+
+  const allExpenses = [...expenses, ...transferExpenses];
+  const allIncomes = [...incomes, ...transferIncomes];
+
+  // Calculate balances for savings accounts
+  const savingsWithBalances = savings.map((sa) => {
+    const toAmount = validTransfers
+      .filter((t) => t.toType === "savings" && t.toId === sa.id)
+      .reduce((acc, t) => acc + t.amount, 0);
+    const fromAmount = validTransfers
+      .filter((t) => t.fromType === "savings" && t.fromId === sa.id)
+      .reduce((acc, t) => acc + t.amount, 0);
+    return {
+      ...sa,
+      currentBalance: toAmount - fromAmount,
+    };
+  });
 
   return {
     user: session.user,
     users,
-    expenses,
-    incomes,
-    expenseCategories,
-    incomeCategories,
+    expenses: allExpenses,
+    incomes: allIncomes,
+    expenseCategories: Array.from(new Set(allExpenses.map((e) => e.category))),
+    incomeCategories: Array.from(new Set(allIncomes.map((i) => i.category))),
     categoryConfigs: configs,
+    savingsAccounts: savingsWithBalances,
+    transfers: validTransfers,
   };
 });
 
@@ -305,6 +373,81 @@ export const bulkImportTransactions = createServerFn({ method: "POST" })
         });
       }
     }
+    return { success: true };
+  });
+
+// --- Savings & Transfer Actions ---
+
+export const addSavingsAccount = createServerFn({ method: "POST" })
+  .inputValidator((data: any) => data)
+  .handler(async ({ data }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    await db.insert(savingsAccount).values({
+      userId: session.user.id,
+      name: data.name,
+      icon: data.icon,
+      color: data.color || "#494fdf",
+      targetAmount: data.targetAmount ? Math.round(data.targetAmount) : null,
+    });
+    return { success: true };
+  });
+
+export const updateSavingsAccount = createServerFn({ method: "POST" })
+  .inputValidator((data: any) => data)
+  .handler(async ({ data }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    const { id, ...updateData } = data;
+    await db
+      .update(savingsAccount)
+      .set({
+        name: updateData.name,
+        icon: updateData.icon,
+        color: updateData.color,
+        targetAmount: updateData.targetAmount ? Math.round(updateData.targetAmount) : null,
+      })
+      .where(eq(savingsAccount.id, id));
+    return { success: true };
+  });
+
+export const deleteSavingsAccount = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    await db.delete(savingsAccount).where(eq(savingsAccount.id, id));
+    return { success: true };
+  });
+
+export const addTransfer = createServerFn({ method: "POST" })
+  .inputValidator((data: any) => data)
+  .handler(async ({ data }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    await db.insert(transfer).values({
+      userId: session.user.id,
+      amount: Math.round(data.amount),
+      description: data.description,
+      date: parseDate(data.date) || new Date(),
+      fromType: data.fromType,
+      fromId: data.fromId || null,
+      toType: data.toType,
+      toId: data.toId || null,
+    });
+    return { success: true };
+  });
+
+export const deleteTransfer = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+    await db.delete(transfer).where(eq(transfer.id, id));
     return { success: true };
   });
 

@@ -136,12 +136,18 @@ export function TransactionSheet({
         {/* Header Section */}
         <div className="p-6 sm:p-8 pb-2 text-left shrink-0">
           <h2 className="text-[28px] sm:text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
-            {editingItem ? "Refine Entry" : `New ${mode}`}
+            {editingItem?.isTransfer
+              ? "Savings Movement"
+              : editingItem
+                ? "Refine Entry"
+                : `New ${mode}`}
           </h2>
           <p className="ml-1 text-[11px] font-sans font-medium uppercase tracking-[0.2em] text-navi-gray/60">
-            {editingItem
-              ? "Update existing transaction records"
-              : "Record a new financial movement"}
+            {editingItem?.isTransfer
+              ? "Transfer between main balance and goals"
+              : editingItem
+                ? "Update existing transaction records"
+                : "Record a new financial movement"}
           </p>
         </div>
 
@@ -217,14 +223,20 @@ export function TransactionSheet({
             <Button
               className="col-span-1 h-16 rounded-full bg-navi-dark text-white font-display font-medium uppercase tracking-[0.2em] shadow-[0_20px_40px_-15px_rgba(8,59,58,0.3)] hover:opacity-95 active:scale-[0.98] transition-all"
               onClick={handleSave}
-              disabled={saving || !state.amount}
+              disabled={saving || !state.amount || editingItem?.isTransfer}
             >
               {saving ? (
                 <span className="animate-pulse">Syncing...</span>
               ) : (
                 <>
                   {editingItem ? <Save className="size-5" /> : <Plus className="size-5" />}
-                  <span className="hidden sm:inline">{editingItem ? "Update" : "Confirm"}</span>
+                  <span className="hidden sm:inline">
+                    {editingItem?.isTransfer
+                      ? "Read Only"
+                      : editingItem
+                        ? "Update"
+                        : "Confirm"}
+                  </span>
                 </>
               )}
             </Button>

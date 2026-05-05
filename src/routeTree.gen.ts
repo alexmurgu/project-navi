@@ -16,6 +16,7 @@ import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as SettingsUsersRouteImport } from './routes/settings/users'
+import { Route as SettingsSavingsRouteImport } from './routes/settings/savings'
 import { Route as SettingsCategoriesRouteImport } from './routes/settings/categories'
 import { Route as MembersMemberIdRouteImport } from './routes/members.$memberId'
 import { Route as CategoriesCategoryRouteImport } from './routes/categories.$category'
@@ -56,6 +57,11 @@ const SettingsUsersRoute = SettingsUsersRouteImport.update({
   path: '/settings/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsSavingsRoute = SettingsSavingsRouteImport.update({
+  id: '/settings/savings',
+  path: '/settings/savings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
   id: '/settings/categories',
   path: '/settings/categories',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/savings': typeof SettingsSavingsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/savings': typeof SettingsSavingsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/categories/$category': typeof CategoriesCategoryRoute
   '/members/$memberId': typeof MembersMemberIdRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/savings': typeof SettingsSavingsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
+    | '/settings/savings'
     | '/settings/users'
     | '/settings/'
     | '/api/auth/$'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
+    | '/settings/savings'
     | '/settings/users'
     | '/settings'
     | '/api/auth/$'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/categories/$category'
     | '/members/$memberId'
     | '/settings/categories'
+    | '/settings/savings'
     | '/settings/users'
     | '/settings/'
     | '/api/auth/$'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   CategoriesCategoryRoute: typeof CategoriesCategoryRoute
   MembersMemberIdRoute: typeof MembersMemberIdRoute
   SettingsCategoriesRoute: typeof SettingsCategoriesRoute
+  SettingsSavingsRoute: typeof SettingsSavingsRoute
   SettingsUsersRoute: typeof SettingsUsersRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/savings': {
+      id: '/settings/savings'
+      path: '/settings/savings'
+      fullPath: '/settings/savings'
+      preLoaderRoute: typeof SettingsSavingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings/categories': {
       id: '/settings/categories'
       path: '/settings/categories'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesCategoryRoute: CategoriesCategoryRoute,
   MembersMemberIdRoute: MembersMemberIdRoute,
   SettingsCategoriesRoute: SettingsCategoriesRoute,
+  SettingsSavingsRoute: SettingsSavingsRoute,
   SettingsUsersRoute: SettingsUsersRoute,
   SettingsIndexRoute: SettingsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

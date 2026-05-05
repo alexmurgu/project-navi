@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from "react";
 import {} from "lucide-react";
-import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
+import { format, isToday, isYesterday, startOfMonth, endOfMonth, isWithinInterval, isAfter } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 
 import { type CategoryConfig } from "@/lib/category-visuals";
@@ -13,11 +13,19 @@ import {
   updateIncome,
   deleteIncome,
   updateTransactionStatus,
+  addSavingsAccount,
+  updateSavingsAccount,
+  deleteSavingsAccount,
+  addTransfer,
+  deleteTransfer,
 } from "./actions";
 import { TransactionSheet } from "@/components/transaction-sheet";
 import { StatsHero } from "@/components/dashboard/stats-hero";
 import { CategoryBreakdown } from "@/components/dashboard/category-breakdown";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
+import { SavingsSection } from "@/components/dashboard/savings-section";
+import { TransferSheet } from "@/components/transfer-sheet";
+import { SavingsAccountSheet } from "@/components/savings-account-sheet";
 
 interface User {
   id: string;
@@ -36,6 +44,7 @@ interface Transaction {
   type: "expense" | "income";
   isMonthly?: boolean;
   status?: "pending" | "paid";
+  isTransfer?: boolean;
 }
 
 interface PageProps {
@@ -47,6 +56,8 @@ interface PageProps {
     expenseCategories: string[];
     incomeCategories: string[];
     categoryConfigs: CategoryConfig[];
+    savingsAccounts: any[];
+    transfers: any[];
   };
 }
 
@@ -67,6 +78,9 @@ export function DashboardContent({ data }: PageProps) {
     expenseCategory: "",
     incomeCategory: "",
     selectedDate: new Date(),
+    savingsSheetOpen: false,
+    transferSheetOpen: false,
+    editingSavingsAccount: null,
   });
 
   const availableExpenseCategories = data.expenseCategories;
@@ -112,6 +126,38 @@ export function DashboardContent({ data }: PageProps) {
     },
   });
 
+  const addSavingsAccountMutation = useMutation({
+    mutationFn: (d: any) => addSavingsAccount({ data: d }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ savingsSheetOpen: false });
+    },
+  });
+
+  const updateSavingsAccountMutation = useMutation({
+    mutationFn: (d: any) => updateSavingsAccount({ data: d }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ savingsSheetOpen: false });
+    },
+  });
+
+  const deleteSavingsAccountMutation = useMutation({
+    mutationFn: (id: string) => deleteSavingsAccount({ data: id }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ savingsSheetOpen: false });
+    },
+  });
+
+  const addTransferMutation = useMutation({
+    mutationFn: (d: any) => addTransfer({ data: d }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      dispatch({ transferSheetOpen: false });
+    },
+  });
+
   const allItems = useMemo(
     () => [
       ...data.expenses.map((e) => ({ ...e, type: "expense" as const })),
@@ -135,10 +181,21 @@ export function DashboardContent({ data }: PageProps) {
       .filter((e) => isWithinInterval(new Date(e.date), { start, end }))
       .reduce((acc, curr) => acc + curr.amount, 0);
 
+    const totalIncomeToDate = paidIncomes
+      .filter((i) => !isAfter(new Date(i.date), end))
+      .reduce((acc, curr) => acc + curr.amount, 0);
+
+    const totalExpToDate = paidExpenses
+      .filter((e) => !isAfter(new Date(e.date), end))
+      .reduce((acc, curr) => acc + curr.amount, 0);
+
+    const totalSavings = data.savingsAccounts.reduce((acc, sa) => acc + sa.currentBalance, 0);
+
     return {
       income: monthlyIncome,
       monthlyExp,
-      balance: monthlyIncome - monthlyExp,
+      balance: totalIncomeToDate - totalExpToDate,
+      totalSavings,
     };
   }, [data, state.selectedDate]);
 
@@ -253,6 +310,12 @@ export function DashboardContent({ data }: PageProps) {
       />
 
       <div className="p-6 md:p-12 space-y-16">
+        <SavingsSection
+          accounts={data.savingsAccounts}
+          onEditAccount={(sa) => dispatch({ editingSavingsAccount: sa, savingsSheetOpen: true })}
+          onTransfer={() => dispatch({ transferSheetOpen: true })}
+          formatCurrency={formatCurrency}
+        />
         <CategoryBreakdown
           items={currentMonthCategoryData.items}
           total={currentMonthCategoryData.total}
@@ -300,11 +363,16 @@ export function DashboardContent({ data }: PageProps) {
             addExpenseMutation.mutate(payload);
           }
         }}
-        onDelete={(id) =>
-          deleteExpense({ data: id }).then(() =>
+        onDelete={(id) => {
+          if (state.editingItem?.isTransfer) {
+            return deleteTransfer({ data: id }).then(() =>
+              queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+            );
+          }
+          return deleteExpense({ data: id }).then(() =>
             queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
-          )
-        }
+          );
+        }}
         saving={addExpenseMutation.isPending || updateExpenseMutation.isPending}
       />
 
@@ -328,12 +396,42 @@ export function DashboardContent({ data }: PageProps) {
             addIncomeMutation.mutate(d);
           }
         }}
-        onDelete={(id) =>
-          deleteIncome({ data: id }).then(() =>
+        onDelete={(id) => {
+          if (state.editingItem?.isTransfer) {
+            return deleteTransfer({ data: id }).then(() =>
+              queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+            );
+          }
+          return deleteIncome({ data: id }).then(() =>
             queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
-          )
-        }
+          );
+        }}
         saving={addIncomeMutation.isPending || updateIncomeMutation.isPending}
+      />
+
+      <SavingsAccountSheet
+        open={state.savingsSheetOpen}
+        onOpenChange={(open) => dispatch({ savingsSheetOpen: open })}
+        editingItem={state.editingSavingsAccount}
+        onSubmit={(d) => {
+          if (state.editingSavingsAccount) {
+            updateSavingsAccountMutation.mutate(d);
+          } else {
+            addSavingsAccountMutation.mutate(d);
+          }
+        }}
+        onDelete={(id) => deleteSavingsAccountMutation.mutate(id)}
+        saving={addSavingsAccountMutation.isPending || updateSavingsAccountMutation.isPending}
+      />
+
+      <TransferSheet
+        open={state.transferSheetOpen}
+        onOpenChange={(open) => dispatch({ transferSheetOpen: open })}
+        users={data.users}
+        savingsAccounts={data.savingsAccounts}
+        availableBalance={stats.balance}
+        onSubmit={(d) => addTransferMutation.mutate(d)}
+        saving={addTransferMutation.isPending}
       />
     </div>
   );

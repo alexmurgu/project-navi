@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Palette, Users, ShieldCheck, Bell, Smartphone } from "lucide-react";
+import { ChevronRight, Palette, Users, ShieldCheck, Bell, Smartphone, PiggyBank } from "lucide-react";
 import { withAlpha } from "@/lib/category-visuals";
 
 const managementTiles = [
@@ -17,6 +17,13 @@ const managementTiles = [
     description: "Manage family access & roles",
     icon: Users,
     color: "#00a87e",
+  },
+  {
+    to: "/settings/savings",
+    title: "Savings Goals",
+    description: "Manage targets & goals",
+    icon: PiggyBank,
+    color: "#ec7e00",
   },
 ] as const;
 
