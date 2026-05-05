@@ -172,27 +172,6 @@ export function TransactionSheet({
               }
             />
 
-            <CategoryPicker
-              category={state.category}
-              onCategoryChange={(val) =>
-                dispatch({ type: "SET_FIELD", field: "category", value: val })
-              }
-              availableCategories={availableCategories}
-              categoryConfigs={categoryConfigs}
-              isCustomizing={state.isCustomizing}
-              onCustomizingChange={(val) =>
-                dispatch({ type: "SET_FIELD", field: "isCustomizing", value: val })
-              }
-              draftColor={state.draftColor}
-              onDraftColorChange={(val) =>
-                dispatch({ type: "SET_FIELD", field: "draftColor", value: val })
-              }
-              draftIcon={state.draftIcon}
-              onDraftIconChange={(val) =>
-                dispatch({ type: "SET_FIELD", field: "draftIcon", value: val })
-              }
-            />
-
             <TransactionForm
               mode={mode}
               amount={state.amount}
@@ -222,6 +201,27 @@ export function TransactionSheet({
               accountId={state.accountId}
               onAccountIdChange={(val) =>
                 dispatch({ type: "SET_FIELD", field: "accountId", value: val })
+              }
+            />
+
+            <CategoryPicker
+              category={state.category}
+              onCategoryChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "category", value: val })
+              }
+              availableCategories={availableCategories}
+              categoryConfigs={categoryConfigs}
+              isCustomizing={state.isCustomizing}
+              onCustomizingChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "isCustomizing", value: val })
+              }
+              draftColor={state.draftColor}
+              onDraftColorChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "draftColor", value: val })
+              }
+              draftIcon={state.draftIcon}
+              onDraftIconChange={(val) =>
+                dispatch({ type: "SET_FIELD", field: "draftIcon", value: val })
               }
             />
           </div>
