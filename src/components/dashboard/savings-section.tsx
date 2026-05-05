@@ -1,6 +1,5 @@
 import React from "react";
 import { PiggyBank, ArrowRightLeft } from "lucide-react";
-import { withAlpha } from "@/lib/category-visuals";
 
 interface SavingsAccount {
   id: string;
@@ -26,10 +25,7 @@ export function SavingsSection({
 }: SavingsSectionProps) {
   return (
     <section className="space-y-8">
-      <div className="flex items-center justify-between px-2">
-        <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
-          Savings Goals
-        </h3>
+      <div className="flex items-center justify-end px-2">
         <div className="flex items-center gap-2">
           <button 
             onClick={onTransfer}
@@ -57,40 +53,31 @@ export function SavingsSection({
               <div 
                 key={sa.id}
                 onClick={() => onEditAccount(sa)}
-                className="navi-card p-4 flex items-center justify-between group cursor-pointer border-none shadow-none bg-navi-surface/30 hover:bg-navi-surface/50 transition-all rounded-premium"
+                className="group cursor-pointer flex flex-col gap-2 py-2 px-1 hover:opacity-60 transition-all"
               >
-                <div className="flex items-center gap-4">
-                  <div 
-                    className="size-10 rounded-[14px] flex items-center justify-center border transition-colors shrink-0"
-                    style={{
-                      backgroundColor: withAlpha(sa.color, 0.05),
-                      borderColor: withAlpha(sa.color, 0.1),
-                    }}
-                  >
-                    <PiggyBank className="size-4" style={{ color: sa.color }} strokeWidth={1.2} />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="size-1.5 rounded-full" style={{ backgroundColor: sa.color }} />
+                    <h4 className="font-display font-medium text-[10px] text-navi-dark/30 uppercase tracking-[0.2em] truncate">
+                      {sa.name}
+                    </h4>
                   </div>
-                  <div className="min-w-0">
-                    <h4 className="font-display font-medium text-[15px] text-navi-dark truncate">{sa.name}</h4>
-                    {sa.targetAmount && (
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="h-1 w-20 bg-navi-border/20 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full transition-all duration-1000 ease-out"
-                            style={{ 
-                              width: `${progress}%`,
-                              backgroundColor: sa.color
-                            }}
-                          />
-                        </div>
-                        <span className="text-[9px] font-sans font-medium text-navi-gray/40">{Math.round(progress || 0)}%</span>
-                      </div>
-                    )}
+                  <p className="text-[12px] font-display font-medium text-navi-dark/60 tracking-tight">
+                    {formatCurrency(sa.currentBalance)}
+                  </p>
+                </div>
+                
+                {sa.targetAmount && (
+                  <div className="h-[3px] w-full bg-navi-dark/[0.04] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]"
+                      style={{ 
+                        width: `${progress}%`,
+                        backgroundColor: sa.color
+                      }}
+                    />
                   </div>
-                </div>
-
-                <div className="text-right">
-                  <p className="text-[14px] font-display font-medium text-navi-dark">{formatCurrency(sa.currentBalance)}</p>
-                </div>
+                )}
               </div>
             );
           })
