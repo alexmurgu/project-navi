@@ -1,9 +1,8 @@
 import React, { useMemo } from "react";
-import { ArrowLeft } from "lucide-react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { TransactionCard } from "@/components/transaction-card";
 import { startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
-import { useNavigate } from "@tanstack/react-router";
-
-import { Button } from "@/components/ui/button";
 
 import {
   CategoryIcon,
@@ -12,7 +11,6 @@ import {
   withAlpha,
 } from "@/lib/category-visuals";
 import { OverviewStats } from "@/components/dashboard/overview-stats";
-import { OverviewTransactionList } from "@/components/dashboard/overview-transaction-list";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
 
 interface User {
@@ -52,8 +50,8 @@ const formatCurrency = (amountCents: number) =>
   (amountCents / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" });
 
 export function OverviewContent({ data, mode }: { data: DashboardData; mode: OverviewMode }) {
-  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const [tableSearch, setTableSearch] = React.useState("");
 
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
@@ -95,20 +93,32 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
 
   const filteredTransactions = useMemo(() => {
     let filtered = allItems;
+
+    if (tableSearch) {
+      const search = tableSearch.toLowerCase();
+      filtered = filtered.filter(
+        (item) =>
+          item.description.toLowerCase().includes(search) ||
+          item.category.toLowerCase().includes(search),
+      );
+    }
+
     if (mode.type === "member") {
-      filtered = allItems.filter((item) =>
+      filtered = filtered.filter((item) =>
         mode.memberId === "family" ? item.userId === null : item.userId === mode.memberId,
       );
     } else {
-      filtered = allItems.filter((item) => {
+      filtered = filtered.filter((item) => {
         if (item.category !== mode.category) return false;
         if (!categoryKind) return true;
         return item.type === categoryKind;
       });
     }
 
-    return filterTransactionsByMonth(filtered, selectedDate);
-  }, [allItems, categoryKind, mode, selectedDate]);
+    return filterTransactionsByMonth(filtered, selectedDate).sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+  }, [allItems, categoryKind, mode, selectedDate, tableSearch]);
 
   const stats = useMemo(() => {
     const start = startOfMonth(selectedDate);
@@ -203,31 +213,15 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
 
   return (
     <div className="w-full min-h-screen bg-background antialiased p-6 md:p-12 pb-32">
-      <div className="flex items-center justify-between gap-4 mb-10">
+      {/* Dynamic Header */}
+      <div className="flex items-center justify-between pt-4 mb-10">
         <div className="space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/40">
-            {subtitle}
-          </p>
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight italic uppercase">
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground uppercase italic truncate max-w-[250px] md:max-w-none">
             {title}
           </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <MonthSelector
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-            variant="icon"
-            align="end"
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => navigate({ to: "/" })}
-            className="h-12 rounded-xl px-4 font-black uppercase tracking-widest text-[10px]"
-          >
-            <ArrowLeft className="size-4 mr-2" />
-            Back
-          </Button>
+          <p className="text-[10px] md:text-sm font-black tracking-[0.2em] text-muted-foreground opacity-40 uppercase ml-1">
+            {subtitle}
+          </p>
         </div>
       </div>
 
@@ -350,11 +344,50 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
         </section>
       )}
 
-      <OverviewTransactionList
-        transactions={filteredTransactions}
-        categoryConfigMap={categoryConfigMap}
-        formatCurrency={formatCurrency}
-      />
+      {/* Modern Search/Filter */}
+      <div className="flex gap-3 mb-10 mt-12">
+        <div className="relative flex-1 group">
+          <Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground opacity-30 group-focus-within:opacity-100 transition-opacity" />
+          <Input
+            placeholder="Search within this view..."
+            className="h-14 pl-14 rounded-xl bg-secondary/30 border-none shadow-inner text-base font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+            value={tableSearch}
+            onChange={(e) => setTableSearch(e.target.value)}
+          />
+        </div>
+        <MonthSelector
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          variant="icon"
+          align="end"
+        />
+      </div>
+
+      <div className="space-y-6">
+        <div className="flex items-center justify-between px-2">
+          <h2 className="text-lg font-black tracking-tight italic uppercase">Transactions</h2>
+          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/40">
+            {filteredTransactions.length} total
+          </p>
+        </div>
+        <div className="flex flex-col gap-4">
+          {filteredTransactions.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-muted/20 bg-secondary/5 px-5 py-12 text-center text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
+              No transactions found
+            </div>
+          ) : (
+            filteredTransactions.map((item) => (
+              <TransactionCard
+                key={item.id}
+                transaction={item}
+                categoryConfigMap={categoryConfigMap}
+                onClick={() => {}}
+                formatCurrency={formatCurrency}
+              />
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
