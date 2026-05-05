@@ -46,7 +46,7 @@ export function CategoryBreakdown({
                     <div className="flex items-center gap-3">
                       <div className="size-1.5 rounded-full" style={{ backgroundColor: color }} />
                       <div className="flex flex-col gap-0.5">
-                        <h4 className="font-display font-medium text-[10px] text-navi-dark/30 uppercase tracking-[0.2em] truncate">
+                        <h4 className="font-display font-medium text-[10px] text-navi-dark/60 uppercase tracking-[0.2em] truncate">
                           {item.name}
                         </h4>
                         <p className="text-[8px] font-display font-medium uppercase tracking-widest text-navi-dark/20">

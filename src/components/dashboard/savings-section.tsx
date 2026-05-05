@@ -42,7 +42,7 @@ export function SavingsSection({ accounts, onEditAccount, formatCurrency }: Savi
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="size-1.5 rounded-full" style={{ backgroundColor: sa.color }} />
-                    <h4 className="font-display font-medium text-[10px] text-navi-dark/30 uppercase tracking-[0.2em] truncate">
+                    <h4 className="font-display font-medium text-[10px] text-navi-dark/60 uppercase tracking-[0.2em] truncate">
                       {sa.name}
                     </h4>
                   </div>

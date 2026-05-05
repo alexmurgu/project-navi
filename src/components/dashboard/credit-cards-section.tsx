@@ -43,7 +43,7 @@ export function CreditCardsSection({ cards, onEditCard, formatCurrency }: Credit
                       className="size-1.5 rounded-full"
                       style={{ backgroundColor: card.color }}
                     />
-                    <h4 className="font-display font-medium text-[10px] text-navi-dark/30 uppercase tracking-[0.2em] truncate">
+                    <h4 className="font-display font-medium text-[10px] text-navi-dark/60 uppercase tracking-[0.2em] truncate">
                       {card.name}
                     </h4>
                   </div>
