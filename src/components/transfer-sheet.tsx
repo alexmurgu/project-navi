@@ -5,6 +5,8 @@ import { X, Plus, ArrowRightLeft, AlertCircle } from "lucide-react";
 import { UserSelector } from "./transaction/user-selector";
 import { TransactionForm } from "./transaction/transaction-form";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ChevronDown } from "lucide-react";
 
 interface User {
   id: string;
@@ -96,6 +98,35 @@ export function TransferSheet({
     }
   }, [open, savingsAccounts]);
 
+  const [fromOpen, setFromOpen] = React.useState(false);
+  const [toOpen, setToOpen] = React.useState(false);
+
+  const getFromLabel = () => {
+    if (state.fromType === "main") return `Main Balance (${(availableBalance / 100).toFixed(2)}€)`;
+    if (state.fromType === "savings") {
+      const sa = savingsAccounts.find((s) => s.id === state.fromId);
+      return sa ? `${sa.name} (${(sa.currentBalance / 100).toFixed(2)}€)` : "Select source";
+    }
+    if (state.fromType === "credit") {
+      const cc = creditCards.find((c) => c.id === state.fromId);
+      return cc ? `${cc.name} (Debt: ${(cc.currentBalance / 100).toFixed(2)}€)` : "Select source";
+    }
+    return "Select source";
+  };
+
+  const getToLabel = () => {
+    if (state.toType === "main") return "Main Balance";
+    if (state.toType === "savings") {
+      const sa = savingsAccounts.find((s) => s.id === state.toId);
+      return sa ? sa.name : "Select destination";
+    }
+    if (state.toType === "credit") {
+      const cc = creditCards.find((c) => c.id === state.toId);
+      return cc ? cc.name : "Select destination";
+    }
+    return "Select destination";
+  };
+
   const amountCents = state.amount ? Math.round(parseFloat(state.amount) * 100) : 0;
   const sourceBalance =
     state.fromType === "main"
@@ -109,9 +140,24 @@ export function TransferSheet({
   const handleSave = () => {
     if (isNaN(amountCents) || isOverBalance) return;
 
+    let dynamicDescription = "Fund Transfer";
+    if (state.toType === "savings") {
+      const sa = savingsAccounts.find((s) => s.id === state.toId);
+      dynamicDescription = sa ? `Transfer to ${sa.name}` : "Transfer to Savings";
+    } else if (state.toType === "credit") {
+      const cc = creditCards.find((c) => c.id === state.toId);
+      dynamicDescription = cc ? `Payment to ${cc.name}` : "Credit Card Payment";
+    } else if (state.fromType === "savings") {
+      const sa = savingsAccounts.find((s) => s.id === state.fromId);
+      dynamicDescription = sa ? `Transfer from ${sa.name}` : "Transfer from Savings";
+    } else if (state.fromType === "credit") {
+      const cc = creditCards.find((c) => c.id === state.fromId);
+      dynamicDescription = cc ? `Transfer from ${cc.name}` : "Credit Card Transfer";
+    }
+
     onSubmit({
       amount: amountCents,
-      description: state.description,
+      description: dynamicDescription,
       date: state.date?.toISOString(),
       fromType: state.fromType,
       fromId: state.fromId,
@@ -177,42 +223,76 @@ export function TransferSheet({
                   <p className="text-[9px] font-display font-medium uppercase tracking-widest text-navi-gray/40">
                     From
                   </p>
-                  <select
-                    className="w-full bg-transparent font-display font-medium text-[18px] outline-none appearance-none cursor-pointer"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "main") {
-                        dispatch({ type: "SET_FIELD", field: "fromType", value: "main" });
-                        dispatch({ type: "SET_FIELD", field: "fromId", value: null });
-                      } else if (val.startsWith("cc_")) {
-                        dispatch({ type: "SET_FIELD", field: "fromType", value: "credit" });
-                        dispatch({
-                          type: "SET_FIELD",
-                          field: "fromId",
-                          value: val.replace("cc_", ""),
-                        });
-                      } else {
-                        dispatch({ type: "SET_FIELD", field: "fromType", value: "savings" });
-                        dispatch({ type: "SET_FIELD", field: "fromId", value: val });
+                  <Popover open={fromOpen} onOpenChange={setFromOpen}>
+                    <PopoverTrigger
+                      render={
+                        <button className="w-full flex items-center justify-between text-left h-auto p-0 border-none bg-transparent shadow-none focus:ring-0 text-[18px] font-display font-medium text-navi-dark">
+                          <span>{getFromLabel()}</span>
+                          <ChevronDown className="size-4 text-navi-gray/40" />
+                        </button>
                       }
-                    }}
-                  >
-                    <option value="main">Main Balance ({availableBalance / 100}€)</option>
-                    <optgroup label="Savings Goals">
-                      {savingsAccounts.map((sa) => (
-                        <option key={sa.id} value={sa.id}>
-                          {sa.name} ({sa.currentBalance / 100}€)
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Credit Cards">
-                      {creditCards.map((cc) => (
-                        <option key={cc.id} value={`cc_${cc.id}`}>
-                          {cc.name} (Debt: {cc.currentBalance / 100}€)
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
+                    />
+                    <PopoverContent
+                      className="w-[var(--anchor-width)] min-w-[280px] p-2 rounded-2xl shadow-2xl z-[100] bg-white border border-navi-border/10"
+                      align="start"
+                    >
+                      <div className="flex flex-col gap-1 max-h-[40vh] overflow-y-auto">
+                        <button
+                          className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
+                          onClick={() => {
+                            dispatch({ type: "SET_FIELD", field: "fromType", value: "main" });
+                            dispatch({ type: "SET_FIELD", field: "fromId", value: null });
+                            setFromOpen(false);
+                          }}
+                        >
+                          Main Balance ({(availableBalance / 100).toFixed(2)}€)
+                        </button>
+
+                        {savingsAccounts.length > 0 && (
+                          <>
+                            <div className="text-[10px] font-display uppercase tracking-[0.2em] opacity-40 px-4 py-2 mt-2">
+                              Savings Goals
+                            </div>
+                            {savingsAccounts.map((sa) => (
+                              <button
+                                key={sa.id}
+                                className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
+                                onClick={() => {
+                                  dispatch({ type: "SET_FIELD", field: "fromType", value: "savings" });
+                                  dispatch({ type: "SET_FIELD", field: "fromId", value: sa.id });
+                                  setFromOpen(false);
+                                }}
+                              >
+                                {sa.name} ({(sa.currentBalance / 100).toFixed(2)}€)
+                              </button>
+                            ))}
+                          </>
+                        )}
+
+                        {creditCards.length > 0 && (
+                          <>
+                            <div className="text-[10px] font-display uppercase tracking-[0.2em] opacity-40 px-4 py-2 mt-2">
+                              Credit Cards
+                            </div>
+                            {creditCards.map((cc) => (
+                              <button
+                                key={cc.id}
+                                className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
+                                onClick={() => {
+                                  dispatch({ type: "SET_FIELD", field: "fromType", value: "credit" });
+                                  dispatch({ type: "SET_FIELD", field: "fromId", value: cc.id });
+                                  setFromOpen(false);
+                                }}
+                              >
+                                {cc.name} (Debt: {(cc.currentBalance / 100).toFixed(2)}€)
+                              </button>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
                 </div>
 
                 {/* Swap Button */}
@@ -228,42 +308,76 @@ export function TransferSheet({
                   <p className="text-[9px] font-display font-medium uppercase tracking-widest text-navi-gray/40">
                     To
                   </p>
-                  <select
-                    className="w-full bg-transparent font-display font-medium text-[18px] outline-none appearance-none cursor-pointer"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "main") {
-                        dispatch({ type: "SET_FIELD", field: "toType", value: "main" });
-                        dispatch({ type: "SET_FIELD", field: "toId", value: null });
-                      } else if (val.startsWith("cc_")) {
-                        dispatch({ type: "SET_FIELD", field: "toType", value: "credit" });
-                        dispatch({
-                          type: "SET_FIELD",
-                          field: "toId",
-                          value: val.replace("cc_", ""),
-                        });
-                      } else {
-                        dispatch({ type: "SET_FIELD", field: "toType", value: "savings" });
-                        dispatch({ type: "SET_FIELD", field: "toId", value: val });
+                  <Popover open={toOpen} onOpenChange={setToOpen}>
+                    <PopoverTrigger
+                      render={
+                        <button className="w-full flex items-center justify-between text-left h-auto p-0 border-none bg-transparent shadow-none focus:ring-0 text-[18px] font-display font-medium text-navi-dark">
+                          <span>{getToLabel()}</span>
+                          <ChevronDown className="size-4 text-navi-gray/40" />
+                        </button>
                       }
-                    }}
-                  >
-                    <option value="main">Main Balance</option>
-                    <optgroup label="Savings Goals">
-                      {savingsAccounts.map((sa) => (
-                        <option key={sa.id} value={sa.id}>
-                          {sa.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Credit Cards">
-                      {creditCards.map((cc) => (
-                        <option key={cc.id} value={`cc_${cc.id}`}>
-                          {cc.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
+                    />
+                    <PopoverContent
+                      className="w-[var(--anchor-width)] min-w-[280px] p-2 rounded-2xl shadow-2xl z-[100] bg-white border border-navi-border/10"
+                      align="start"
+                    >
+                      <div className="flex flex-col gap-1 max-h-[40vh] overflow-y-auto">
+                        <button
+                          className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
+                          onClick={() => {
+                            dispatch({ type: "SET_FIELD", field: "toType", value: "main" });
+                            dispatch({ type: "SET_FIELD", field: "toId", value: null });
+                            setToOpen(false);
+                          }}
+                        >
+                          Main Balance
+                        </button>
+
+                        {savingsAccounts.length > 0 && (
+                          <>
+                            <div className="text-[10px] font-display uppercase tracking-[0.2em] opacity-40 px-4 py-2 mt-2">
+                              Savings Goals
+                            </div>
+                            {savingsAccounts.map((sa) => (
+                              <button
+                                key={sa.id}
+                                className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
+                                onClick={() => {
+                                  dispatch({ type: "SET_FIELD", field: "toType", value: "savings" });
+                                  dispatch({ type: "SET_FIELD", field: "toId", value: sa.id });
+                                  setToOpen(false);
+                                }}
+                              >
+                                {sa.name}
+                              </button>
+                            ))}
+                          </>
+                        )}
+
+                        {creditCards.length > 0 && (
+                          <>
+                            <div className="text-[10px] font-display uppercase tracking-[0.2em] opacity-40 px-4 py-2 mt-2">
+                              Credit Cards
+                            </div>
+                            {creditCards.map((cc) => (
+                              <button
+                                key={cc.id}
+                                className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
+                                onClick={() => {
+                                  dispatch({ type: "SET_FIELD", field: "toType", value: "credit" });
+                                  dispatch({ type: "SET_FIELD", field: "toId", value: cc.id });
+                                  setToOpen(false);
+                                }}
+                              >
+                                {cc.name}
+                              </button>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
                 </div>
               </div>
             </div>
@@ -276,6 +390,7 @@ export function TransferSheet({
               onDescriptionChange={(val) =>
                 dispatch({ type: "SET_FIELD", field: "description", value: val })
               }
+              hideDescription={true}
               date={state.date}
               onDateChange={(val) => dispatch({ type: "SET_FIELD", field: "date", value: val })}
               status="paid"

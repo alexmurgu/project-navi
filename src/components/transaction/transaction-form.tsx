@@ -28,6 +28,7 @@ interface TransactionFormProps {
   onAccountTypeChange?: (val: "main" | "credit") => void;
   accountId?: string | null;
   onAccountIdChange?: (val: string | null) => void;
+  hideDescription?: boolean;
 }
 
 export function TransactionForm({
@@ -48,6 +49,7 @@ export function TransactionForm({
   onAccountTypeChange,
   accountId,
   onAccountIdChange,
+  hideDescription = false,
 }: TransactionFormProps) {
   const showStatus = mode === "expense" && isRecurrent;
 
@@ -73,8 +75,9 @@ export function TransactionForm({
   return (
     <div className="space-y-8">
       {/* Description */}
-      <div className="space-y-3" ref={containerRef}>
-        <Label
+      {!hideDescription && (
+        <div className="space-y-3" ref={containerRef}>
+          <Label
           htmlFor="description"
           className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
         >
@@ -142,7 +145,8 @@ export function TransactionForm({
             </div>
           )}
         </div>
-      </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Amount Input */}
