@@ -19,7 +19,7 @@ export function StatsHero({
   onDateChange,
 }: StatsHeroProps) {
   return (
-    <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-10 relative overflow-hidden text-white">
+    <section className="bg-navi-dark pt-[calc(env(safe-area-inset-top,0px)+64px)] pb-20 px-6 md:px-12 flex flex-col gap-10 relative overflow-hidden text-white">
       <div className="flex items-center gap-1 relative z-10 self-center md:self-end">
         <MonthSelector selectedDate={selectedDate} onDateChange={onDateChange} align="end" />
       </div>

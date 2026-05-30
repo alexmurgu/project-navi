@@ -4,14 +4,9 @@ import { Input } from "@/components/ui/input";
 import { TransactionCard } from "@/components/transaction-card";
 import { startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 
-import {
-  CategoryIcon,
-  getCategoryConfig,
-  type CategoryConfig,
-  withAlpha,
-} from "@/lib/category-visuals";
-import { OverviewStats } from "@/components/dashboard/overview-stats";
+import { getCategoryConfig, type CategoryConfig } from "@/lib/category-visuals";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
+import { Link } from "@tanstack/react-router";
 
 interface User {
   id: string;
@@ -171,6 +166,10 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
       .sort((a, b) => b.amount - a.amount);
   }, [data.expenses, mode]);
 
+  const memberExpensesTotal = useMemo(() => {
+    return currentMonthExpensesByCategory.reduce((acc, curr) => acc + curr.amount, 0);
+  }, [currentMonthExpensesByCategory]);
+
   const categoryMemberExpenseSummary = useMemo(() => {
     if (mode.type !== "category") return [];
     const map = new Map<string, { label: string; amount: number; count: number }>();
@@ -212,180 +211,236 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
   const categoryLabel = categoryKind === "income" ? "Income by member" : "Expenses by member";
 
   return (
-    <div className="w-full min-h-screen bg-background antialiased p-6 md:p-12 pb-32">
-      {/* Dynamic Header */}
-      <div className="flex items-center justify-between pt-4 mb-10">
-        <div className="space-y-1">
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground uppercase italic truncate max-w-[250px] md:max-w-none">
-            {title}
-          </h1>
-          <p className="text-[10px] md:text-sm font-black tracking-[0.2em] text-muted-foreground opacity-40 uppercase ml-1">
+    <div className="w-full min-h-screen flex flex-col bg-white antialiased">
+      {/* High-Impact Header */}
+      <section className="bg-navi-dark pt-[calc(env(safe-area-inset-top,0px)+64px)] pb-16 px-6 md:px-12 flex flex-col gap-10 relative overflow-hidden text-white">
+        <div className="space-y-4 relative z-10">
+          <p className="text-[12px] font-display font-medium uppercase tracking-[0.25em] opacity-50">
             {subtitle}
           </p>
+          <h1 className="text-[48px] md:text-[64px] font-display font-medium leading-[0.9] tracking-[-0.04em] uppercase italic">
+            {title}
+          </h1>
         </div>
-      </div>
 
-      <OverviewStats
-        totalIncome={stats.totalIncome}
-        totalExpense={stats.totalExpense}
-        balance={stats.balance}
-        formatCurrency={formatCurrency}
-      />
-
-      {mode.type === "member" ? (
-        <section className="mt-12 space-y-4">
-          <h2 className="text-lg font-black tracking-tight italic uppercase px-2">
-            Current Month Breakdown
-          </h2>
+        {/* Integrated Premium Stats Grid inside the Dark Header */}
+        <div className="grid grid-cols-3 gap-6 relative z-10 pt-8 border-t border-white/10">
           <div className="space-y-2">
-            {currentMonthExpensesByCategory.map((item) => {
-              const config = getCategoryConfig(categoryConfigMap, item.name);
-              const color = config?.color || "#14B8A6";
-              return (
-                <div key={item.name} className="rounded-xl p-4 bg-secondary/20">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className="size-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: withAlpha(color, 0.12) }}
-                      >
-                        <CategoryIcon
-                          category={item.name}
-                          config={config}
-                          kind="expense"
-                          className="size-5"
-                          color={color}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm tracking-tight">{item.name}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-                          {item.count} {item.count === 1 ? "transaction" : "transactions"}
+            <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
+              Income (Monthly)
+            </p>
+            <p className="text-xl md:text-[32px] font-display font-medium leading-none text-navi-teal">
+              {formatCurrency(stats.totalIncome)}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
+              Expenses (Monthly)
+            </p>
+            <p className="text-xl md:text-[32px] font-display font-medium leading-none text-navi-danger">
+              {formatCurrency(stats.totalExpense)}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <p className="text-[10px] font-display font-medium uppercase tracking-[0.2em] opacity-40">
+              Net Balance
+            </p>
+            <p
+              className={`text-xl md:text-[32px] font-display font-medium leading-none ${stats.balance >= 0 ? "text-white" : "text-navi-danger"}`}
+            >
+              {formatCurrency(stats.balance)}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="p-6 md:p-12 max-w-5xl space-y-16">
+        {mode.type === "member" ? (
+          <section className="space-y-8">
+            <div className="flex items-center gap-4 px-2">
+              <div className="h-1.5 w-8 bg-navi-blue rounded-full" />
+              <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+                Current Month Breakdown
+              </h3>
+            </div>
+            <div className="grid gap-2">
+              {currentMonthExpensesByCategory.length === 0 ? (
+                <div className="rounded-premium border border-dashed border-navi-border/20 bg-transparent px-8 py-10 text-[10px] text-navi-dark/30 font-display font-medium uppercase tracking-[0.2em] text-center">
+                  No expenses recorded for this month yet.
+                </div>
+              ) : (
+                currentMonthExpensesByCategory.map((item) => {
+                  const config = getCategoryConfig(categoryConfigMap, item.name);
+                  const color = config?.color || "#494fdf";
+                  const share = memberExpensesTotal ? (item.amount / memberExpensesTotal) * 100 : 0;
+
+                  return (
+                    <Link
+                      key={item.name}
+                      to="/categories/$category"
+                      params={{ category: item.name }}
+                      className="group cursor-pointer flex flex-col gap-2 py-3 px-1 hover:opacity-60 transition-all text-left w-full focus-visible:outline-none"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="size-1.5 rounded-full"
+                            style={{ backgroundColor: color }}
+                          />
+                          <div className="flex flex-col gap-0.5">
+                            <h4 className="font-display font-medium text-[10px] text-navi-dark/60 uppercase tracking-[0.2em] truncate">
+                              {item.name}
+                            </h4>
+                            <p className="text-[8px] font-display font-medium uppercase tracking-widest text-navi-dark/20">
+                              {item.count} {item.count === 1 ? "txn" : "txns"} • {Math.round(share)}
+                              %
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-[14px] font-display font-medium text-navi-dark/80 tracking-tight">
+                          {formatCurrency(item.amount)}
                         </p>
                       </div>
-                    </div>
-                    <p className="font-black text-sm tracking-tight">
-                      {formatCurrency(item.amount)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ) : (
-        <section className="mt-12 space-y-4">
-          <h2 className="text-lg font-black tracking-tight italic uppercase px-2">
-            {categoryLabel}
-          </h2>
-          <div className="rounded-2xl bg-secondary/20 p-5 space-y-4">
-            {categoryMemberExpenseSummary.length === 0 ? (
-              <div className="text-sm text-muted-foreground">
-                No member spending found for this category.
-              </div>
-            ) : (
-              <>
-                <div className="h-4 overflow-hidden rounded-full bg-white/70 shadow-inner flex">
-                  {categoryMemberExpenseSummary.map((item, index) => {
-                    const palette =
-                      categoryKind === "income"
-                        ? ["#10B981", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5"]
-                        : ["#2DD4BF", "#F472B6", "#60A5FA", "#F59E0B", "#A78BFA"];
-                    const total = categoryMemberExpenseSummary.reduce(
-                      (acc, curr) => acc + curr.amount,
-                      0,
-                    );
-                    const width = total ? (item.amount / total) * 100 : 0;
-                    return (
-                      <div
-                        key={item.memberId}
-                        className="h-full"
-                        title={`${item.label}: ${formatCurrency(item.amount)}`}
-                        style={{
-                          width: `${width}%`,
-                          backgroundColor: palette[index % palette.length],
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-                <div className="flex flex-wrap gap-3">
-                  {categoryMemberExpenseSummary.map((item, index) => {
-                    const palette =
-                      categoryKind === "income"
-                        ? ["#10B981", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5"]
-                        : ["#2DD4BF", "#F472B6", "#60A5FA", "#F59E0B", "#A78BFA"];
-                    const total = categoryMemberExpenseSummary.reduce(
-                      (acc, curr) => acc + curr.amount,
-                      0,
-                    );
-                    const share = total ? Math.round((item.amount / total) * 100) : 0;
-                    return (
-                      <div
-                        key={item.memberId}
-                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40"
-                      >
-                        <span
-                          className="size-2.5 rounded-full"
-                          style={{ backgroundColor: palette[index % palette.length] }}
-                        />
-                        <span>{item.label}</span>
-                        <span>·</span>
-                        <span>{share}%</span>
-                        <span>·</span>
-                        <span>{formatCurrency(item.amount)}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        </section>
-      )}
 
-      {/* Modern Search/Filter */}
-      <div className="flex gap-3 mb-10 mt-12">
-        <div className="relative flex-1 group">
-          <Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground opacity-30 group-focus-within:opacity-100 transition-opacity" />
-          <Input
-            placeholder="Search within this view..."
-            className="h-14 pl-14 rounded-xl bg-secondary/30 border-none shadow-inner text-base font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
-            value={tableSearch}
-            onChange={(e) => setTableSearch(e.target.value)}
+                      <div className="h-[3px] w-full bg-navi-dark/4 rounded-full overflow-hidden">
+                        <div
+                          className="h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]"
+                          style={{
+                            width: `${share}%`,
+                            backgroundColor: color,
+                          }}
+                        />
+                      </div>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          </section>
+        ) : (
+          <section className="space-y-8">
+            <div className="flex items-center gap-4 px-2">
+              <div className="h-1.5 w-8 bg-navi-gray/30 rounded-full" />
+              <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+                {categoryLabel}
+              </h3>
+            </div>
+            <div className="navi-card p-6 space-y-6 border-none bg-navi-surface">
+              {categoryMemberExpenseSummary.length === 0 ? (
+                <div className="text-xs font-sans font-medium uppercase tracking-widest text-navi-gray/40">
+                  No member spending found for this category.
+                </div>
+              ) : (
+                <>
+                  <div className="h-4 overflow-hidden rounded-full bg-white/70 flex">
+                    {categoryMemberExpenseSummary.map((item, index) => {
+                      const palette =
+                        categoryKind === "income"
+                          ? ["#10B981", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5"]
+                          : ["#2DD4BF", "#F472B6", "#60A5FA", "#F59E0B", "#A78BFA"];
+                      const total = categoryMemberExpenseSummary.reduce(
+                        (acc, curr) => acc + curr.amount,
+                        0,
+                      );
+                      const width = total ? (item.amount / total) * 100 : 0;
+                      return (
+                        <div
+                          key={item.memberId}
+                          className="h-full"
+                          title={`${item.label}: ${formatCurrency(item.amount)}`}
+                          style={{
+                            width: `${width}%`,
+                            backgroundColor: palette[index % palette.length],
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="flex flex-wrap gap-x-6 gap-y-3">
+                    {categoryMemberExpenseSummary.map((item, index) => {
+                      const palette =
+                        categoryKind === "income"
+                          ? ["#10B981", "#34D399", "#6EE7B7", "#A7F3D0", "#D1FAE5"]
+                          : ["#2DD4BF", "#F472B6", "#60A5FA", "#F59E0B", "#A78BFA"];
+                      const total = categoryMemberExpenseSummary.reduce(
+                        (acc, curr) => acc + curr.amount,
+                        0,
+                      );
+                      const share = total ? Math.round((item.amount / total) * 100) : 0;
+                      return (
+                        <div
+                          key={item.memberId}
+                          className="flex items-center gap-2 text-[10px] font-sans font-medium uppercase tracking-widest text-navi-gray/60"
+                        >
+                          <span
+                            className="size-2.5 rounded-full"
+                            style={{ backgroundColor: palette[index % palette.length] }}
+                          />
+                          <span>{item.label}</span>
+                          <span className="opacity-40">·</span>
+                          <span className="font-bold text-navi-dark">{share}%</span>
+                          <span className="opacity-40">·</span>
+                          <span className="font-bold text-navi-dark">
+                            {formatCurrency(item.amount)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Modern Search/Filter */}
+        <div className="flex gap-3 pt-4">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground opacity-30 group-focus-within:opacity-100 transition-opacity" />
+            <Input
+              placeholder="Search within this view..."
+              className="h-14 pl-14 rounded-xl bg-secondary/30 border-none shadow-inner text-base font-bold placeholder:font-black placeholder:uppercase placeholder:text-[10px] placeholder:tracking-widest"
+              value={tableSearch}
+              onChange={(e) => setTableSearch(e.target.value)}
+            />
+          </div>
+          <MonthSelector
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+            variant="icon"
+            align="end"
           />
         </div>
-        <MonthSelector
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          variant="icon"
-          align="end"
-        />
-      </div>
 
-      <div className="space-y-6">
-        <div className="flex items-center justify-between px-2">
-          <h2 className="text-lg font-black tracking-tight italic uppercase">Transactions</h2>
-          <p className="text-[10px] font-black uppercase tracking-[0.24em] text-muted-foreground/40">
-            {filteredTransactions.length} total
-          </p>
-        </div>
-        <div className="flex flex-col gap-4">
-          {filteredTransactions.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-muted/20 bg-secondary/5 px-5 py-12 text-center text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
-              No transactions found
+        <div className="space-y-8">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-4">
+              <div className="h-1.5 w-8 bg-navi-blue rounded-full" />
+              <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+                Transactions
+              </h3>
             </div>
-          ) : (
-            filteredTransactions.map((item) => (
-              <TransactionCard
-                key={item.id}
-                transaction={item}
-                categoryConfigMap={categoryConfigMap}
-                onClick={() => {}}
-                formatCurrency={formatCurrency}
-              />
-            ))
-          )}
+            <p className="text-[10px] font-sans font-medium uppercase tracking-[0.24em] text-navi-gray/40">
+              {filteredTransactions.length} total
+            </p>
+          </div>
+          <div className="flex flex-col gap-4">
+            {filteredTransactions.length === 0 ? (
+              <div className="rounded-[24px] border border-dashed border-navi-border/30 bg-navi-surface px-5 py-12 text-center text-xs font-sans font-medium uppercase tracking-widest text-navi-gray/40">
+                No transactions found
+              </div>
+            ) : (
+              filteredTransactions.map((item) => (
+                <TransactionCard
+                  key={item.id}
+                  transaction={item}
+                  categoryConfigMap={categoryConfigMap}
+                  onClick={() => {}}
+                  formatCurrency={formatCurrency}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

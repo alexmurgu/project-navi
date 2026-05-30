@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ChevronRight,
@@ -65,10 +65,21 @@ const generalSettings = [
 ];
 
 export function SettingsContent() {
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true;
+      setIsStandalone(checkStandalone);
+    }
+  }, []);
+
   return (
     <div className="w-full min-h-screen flex flex-col bg-white antialiased">
       {/* High-Impact Header */}
-      <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
+      <section className="bg-navi-dark pt-[calc(env(safe-area-inset-top,0px)+64px)] pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
         <div className="space-y-4 relative z-10">
           <p className="text-[12px] font-display font-medium uppercase tracking-[0.25em] opacity-50">
             System Configuration
@@ -168,6 +179,56 @@ export function SettingsContent() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* App Installation Status Section */}
+        <section className="space-y-8">
+          <div className="flex items-center gap-4 px-2">
+            <div className="h-1.5 w-8 bg-navi-blue rounded-full" />
+            <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+              App Installation
+            </h3>
+          </div>
+
+          <div className="navi-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border-none">
+            <div className="flex items-center gap-6">
+              <div
+                className="size-14 rounded-[18px] flex items-center justify-center shrink-0 border"
+                style={{
+                  backgroundColor: withAlpha("#00a87e", 0.05),
+                  borderColor: withAlpha("#00a87e", 0.1),
+                  color: "#00a87e",
+                }}
+              >
+                <Smartphone className="size-6" strokeWidth={1.2} />
+              </div>
+              <div>
+                <h4 className="text-[18px] font-display font-medium text-navi-dark tracking-tight">
+                  {isStandalone ? "Installed Standalone PWA" : "Running in Web Browser"}
+                </h4>
+                <p className="text-[10px] font-sans font-medium uppercase tracking-widest text-navi-gray/60 mt-1">
+                  {isStandalone
+                    ? "NAVI is running in fullscreen standalone mode with native system resources."
+                    : "Install as a progressive web app to unlock full-bleed safe areas and quick access."}
+                </p>
+              </div>
+            </div>
+
+            {!isStandalone && (
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("trigger-pwa-install-flow"))}
+                className="h-12 px-6 rounded-pill bg-[#494fdf] text-white font-display font-medium tracking-widest text-[10px] uppercase hover:bg-[#494fdf]/90 transition-all text-center shrink-0"
+              >
+                Install App
+              </button>
+            )}
+            {isStandalone && (
+              <span className="h-10 px-4 flex items-center rounded-pill bg-navi-teal/10 text-navi-teal font-display font-medium tracking-widest text-[10px] uppercase shrink-0 border border-navi-teal/20">
+                Active
+              </span>
+            )}
           </div>
         </section>
 

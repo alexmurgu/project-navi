@@ -258,7 +258,11 @@ export function TransferSheet({
                                 key={sa.id}
                                 className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
                                 onClick={() => {
-                                  dispatch({ type: "SET_FIELD", field: "fromType", value: "savings" });
+                                  dispatch({
+                                    type: "SET_FIELD",
+                                    field: "fromType",
+                                    value: "savings",
+                                  });
                                   dispatch({ type: "SET_FIELD", field: "fromId", value: sa.id });
                                   setFromOpen(false);
                                 }}
@@ -279,7 +283,11 @@ export function TransferSheet({
                                 key={cc.id}
                                 className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
                                 onClick={() => {
-                                  dispatch({ type: "SET_FIELD", field: "fromType", value: "credit" });
+                                  dispatch({
+                                    type: "SET_FIELD",
+                                    field: "fromType",
+                                    value: "credit",
+                                  });
                                   dispatch({ type: "SET_FIELD", field: "fromId", value: cc.id });
                                   setFromOpen(false);
                                 }}
@@ -292,7 +300,6 @@ export function TransferSheet({
                       </div>
                     </PopoverContent>
                   </Popover>
-
                 </div>
 
                 {/* Swap Button */}
@@ -343,7 +350,11 @@ export function TransferSheet({
                                 key={sa.id}
                                 className="w-full text-left px-4 py-3 rounded-xl text-[15px] font-display hover:bg-navi-surface/50 transition-colors"
                                 onClick={() => {
-                                  dispatch({ type: "SET_FIELD", field: "toType", value: "savings" });
+                                  dispatch({
+                                    type: "SET_FIELD",
+                                    field: "toType",
+                                    value: "savings",
+                                  });
                                   dispatch({ type: "SET_FIELD", field: "toId", value: sa.id });
                                   setToOpen(false);
                                 }}
@@ -377,7 +388,6 @@ export function TransferSheet({
                       </div>
                     </PopoverContent>
                   </Popover>
-
                 </div>
               </div>
             </div>

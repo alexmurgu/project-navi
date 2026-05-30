@@ -19,8 +19,18 @@ function AccountActivityPage() {
     enabled: !!user,
   });
 
-  if (loading) return <div className="p-8 text-foreground font-display uppercase tracking-widest text-[10px]">Authenticating...</div>;
-  if (isLoading) return <div className="p-8 text-foreground font-display uppercase tracking-widest text-[10px]">Loading Activity...</div>;
+  if (loading)
+    return (
+      <div className="p-8 text-foreground font-display uppercase tracking-widest text-[10px]">
+        Authenticating...
+      </div>
+    );
+  if (isLoading)
+    return (
+      <div className="p-8 text-foreground font-display uppercase tracking-widest text-[10px]">
+        Loading Activity...
+      </div>
+    );
   if (!data) return null;
 
   // Find the account in either credit cards or savings accounts
@@ -29,16 +39,15 @@ function AccountActivityPage() {
     data.savingsAccounts.find((sa: any) => sa.id === accountId);
 
   if (!account) {
-    return <div className="p-8 text-foreground font-display uppercase tracking-widest text-[10px]">Account not found</div>;
+    return (
+      <div className="p-8 text-foreground font-display uppercase tracking-widest text-[10px]">
+        Account not found
+      </div>
+    );
   }
 
   // Determine type
   const type = data.creditCards.some((cc: any) => cc.id === accountId) ? "credit" : "savings";
 
-  return (
-    <AccountActivityContent
-      data={data}
-      account={{ ...account, type }}
-    />
-  );
+  return <AccountActivityContent data={data} account={{ ...account, type }} />;
 }

@@ -8,6 +8,7 @@ import {
   type CategoryConfig,
   withAlpha,
 } from "@/lib/category-visuals";
+import { Link } from "@tanstack/react-router";
 
 interface Transaction {
   id: string;
@@ -92,7 +93,16 @@ export function TransactionCard({
 
           <div className="flex items-center gap-2 mt-0.5">
             <p className="flex-1 min-w-0 text-[10px] font-sans font-medium uppercase tracking-[0.15em] text-navi-gray/60 truncate">
-              {transaction.category} • {format(date, "EEEE, h:mm a")}
+              {transaction.category} •{" "}
+              <Link
+                to="/members/$memberId"
+                params={{ memberId: transaction.userId || "family" }}
+                onClick={(e) => e.stopPropagation()}
+                className="underline hover:text-navi-blue transition-colors font-bold"
+              >
+                {transaction.userName || "Joint Family"}
+              </Link>{" "}
+              • {format(date, "EEEE, h:mm a")}
             </p>
             {transaction.status === "pending" && transaction.type === "expense" && (
               <span className="px-1.5 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[8px] font-display font-medium uppercase tracking-widest shrink-0">

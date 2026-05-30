@@ -384,12 +384,16 @@ export function DashboardContent({ data }: PageProps) {
         <div className="space-y-6">
           <SavingsSection
             accounts={data.savingsAccounts}
-            onEditAccount={(sa) => navigate({ to: "/accounts/$accountId", params: { accountId: sa.id } })}
+            onEditAccount={(sa) =>
+              navigate({ to: "/accounts/$accountId", params: { accountId: sa.id } })
+            }
             formatCurrency={formatCurrency}
           />
           <CreditCardsSection
             cards={data.creditCards}
-            onEditCard={(cc) => navigate({ to: "/accounts/$accountId", params: { accountId: cc.id } })}
+            onEditCard={(cc) =>
+              navigate({ to: "/accounts/$accountId", params: { accountId: cc.id } })
+            }
             formatCurrency={formatCurrency}
           />
         </div>

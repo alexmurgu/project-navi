@@ -129,7 +129,10 @@ export function IncomesContent({ data }: PageProps) {
   const availableBalance = useMemo(() => {
     const paidIncomes = data.incomes.filter((i) => !(i as any).isTransfer);
     const paidExpenses = data.expenses.filter(
-      (e) => (e as any).status !== "pending" && (e as any).accountType !== "credit" && !(e as any).isTransfer,
+      (e) =>
+        (e as any).status !== "pending" &&
+        (e as any).accountType !== "credit" &&
+        !(e as any).isTransfer,
     );
 
     const incomeSum = paidIncomes.reduce((acc, curr) => acc + curr.amount, 0);
@@ -208,7 +211,7 @@ export function IncomesContent({ data }: PageProps) {
   }, []);
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-background antialiased p-6 md:p-12 pb-32">
+    <div className="w-full min-h-screen flex flex-col bg-background antialiased px-6 md:px-12 pt-[calc(env(safe-area-inset-top,0px)+24px)] pb-32">
       {/* Dynamic Header */}
       <div className="flex items-center justify-between pt-4 mb-10">
         <div className="space-y-1">

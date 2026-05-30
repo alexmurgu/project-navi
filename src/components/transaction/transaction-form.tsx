@@ -29,6 +29,7 @@ interface TransactionFormProps {
   accountId?: string | null;
   onAccountIdChange?: (val: string | null) => void;
   hideDescription?: boolean;
+  categoryPickerNode?: React.ReactNode;
 }
 
 export function TransactionForm({
@@ -50,6 +51,7 @@ export function TransactionForm({
   accountId,
   onAccountIdChange,
   hideDescription = false,
+  categoryPickerNode,
 }: TransactionFormProps) {
   const showStatus = mode === "expense" && isRecurrent;
 
@@ -78,75 +80,78 @@ export function TransactionForm({
       {!hideDescription && (
         <div className="space-y-3" ref={containerRef}>
           <Label
-          htmlFor="description"
-          className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
-        >
-          Description
-        </Label>
-        <div className="relative">
-          <FileText
-            className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40"
-            strokeWidth={1}
-          />
-          <Input
-            id="description"
-            placeholder="What was this for?"
-            value={description}
-            onChange={(e) => {
-              onDescriptionChange(e.target.value);
-              setShowSuggestions(true);
-            }}
-            onFocus={() => setShowSuggestions(true)}
-            className="h-14 rounded-2xl border-none bg-navi-surface px-12 font-display font-medium text-navi-dark shadow-sm"
-            autoComplete="off"
-          />
-          {showSuggestions && suggestions && suggestions.length > 0 && (
-            <div className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white rounded-2xl shadow-xl border border-navi-surface p-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
-              <ul className="max-h-[200px] overflow-auto">
-                {suggestions.map((suggestion, i) => (
-                  <li key={i}>
-                    <button
-                      type="button"
-                      className="w-full text-left px-4 py-3 rounded-xl hover:bg-navi-surface/50 transition-colors flex flex-col gap-1"
-                      onClick={() => {
-                        onDescriptionChange(suggestion.description);
-                        if (onSuggestionSelect) {
-                          onSuggestionSelect(suggestion);
-                        }
-                        setShowSuggestions(false);
-                      }}
-                    >
-                      <span className="font-display font-medium text-navi-dark text-sm block truncate">
-                        {suggestion.description}
-                      </span>
-                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-navi-gray/60 font-black">
-                        <span
-                          className={cn(
-                            "px-2 py-0.5 rounded-full border",
-                            suggestion.type === "expense"
-                              ? "bg-navi-dark/5 border-navi-dark/10"
-                              : "bg-navi-teal/5 border-navi-teal/10",
-                          )}
-                        >
-                          {suggestion.category}
+            htmlFor="description"
+            className="ml-1 text-[11px] font-display font-medium uppercase tracking-[0.2em] text-navi-gray/60"
+          >
+            Description
+          </Label>
+          <div className="relative">
+            <FileText
+              className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-navi-gray/40"
+              strokeWidth={1}
+            />
+            <Input
+              id="description"
+              placeholder="What was this for?"
+              value={description}
+              onChange={(e) => {
+                onDescriptionChange(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              className="h-14 rounded-2xl border-none bg-navi-surface px-12 font-display font-medium text-navi-dark shadow-sm"
+              autoComplete="off"
+            />
+            {showSuggestions && suggestions && suggestions.length > 0 && (
+              <div className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white rounded-2xl shadow-xl border border-navi-surface p-2 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                <ul className="max-h-[200px] overflow-auto">
+                  {suggestions.map((suggestion, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        className="w-full text-left px-4 py-3 rounded-xl hover:bg-navi-surface/50 transition-colors flex flex-col gap-1"
+                        onClick={() => {
+                          onDescriptionChange(suggestion.description);
+                          if (onSuggestionSelect) {
+                            onSuggestionSelect(suggestion);
+                          }
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        <span className="font-display font-medium text-navi-dark text-sm block truncate">
+                          {suggestion.description}
                         </span>
-                        <span>•</span>
-                        <span>
-                          {(suggestion.amount / 100).toLocaleString("en-IE", {
-                            style: "currency",
-                            currency: "EUR",
-                          })}
-                        </span>
-                      </div>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-navi-gray/60 font-black">
+                          <span
+                            className={cn(
+                              "px-2 py-0.5 rounded-full border",
+                              suggestion.type === "expense"
+                                ? "bg-navi-dark/5 border-navi-dark/10"
+                                : "bg-navi-teal/5 border-navi-teal/10",
+                            )}
+                          >
+                            {suggestion.category}
+                          </span>
+                          <span>•</span>
+                          <span>
+                            {(suggestion.amount / 100).toLocaleString("en-IE", {
+                              style: "currency",
+                              currency: "EUR",
+                            })}
+                          </span>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       )}
+
+      {/* Category Picker inserted here between description and amount fields */}
+      {categoryPickerNode}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Amount Input */}

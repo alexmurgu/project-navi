@@ -61,6 +61,7 @@
     border-color: oklch(var(--border));
     outline-color: oklch(var(--ring) / 0.5);
     -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none; /* Disables default iOS save/copy callout on images/links */
   }
 
   body {
@@ -70,6 +71,16 @@
     font-feature-settings: "cv02", "cv03", "cv04", "ss01";
     letter-spacing: 0.24px;
     overscroll-behavior-y: none;
+    -webkit-user-select: none; /* Disable text highlight for premium app feel */
+    user-select: none;
+  }
+
+  /* Allow text selection specifically for input forms and textareas */
+  input,
+  textarea,
+  [contenteditable="true"] {
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   h1,
@@ -80,6 +91,17 @@
   h6 {
     @apply font-display font-medium tracking-tight;
     line-height: 1;
+  }
+
+  /* Premium Mobile Safe Area Spacers */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 24px);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .h-safe-screen {
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -133,4 +155,115 @@
 /* Custom Inter tracking */
 .font-sans {
   letter-spacing: 0.24px;
+}
+
+/* Premium Native Transition System for Base UI overlay elements */
+[data-slot="sheet-overlay"],
+[data-slot="dialog-overlay"] {
+  transition:
+    opacity 280ms cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-behavior: allow-discrete;
+  opacity: 1;
+}
+
+@starting-style {
+  [data-slot="sheet-overlay"],
+  [data-slot="dialog-overlay"] {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+}
+
+[data-slot="sheet-overlay"][data-closed],
+[data-slot="dialog-overlay"][data-closed] {
+  opacity: 0;
+  backdrop-filter: blur(0px);
+}
+
+/* Sheets Content */
+[data-slot="sheet-content"] {
+  transition:
+    transform 340ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 340ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-behavior: allow-discrete;
+}
+
+/* Bottom Sheet (Add Expense Sheet / etc.) */
+[data-slot="sheet-content"][data-side="bottom"] {
+  transform: translateY(0);
+}
+@starting-style {
+  [data-slot="sheet-content"][data-side="bottom"] {
+    transform: translateY(100%);
+  }
+}
+[data-slot="sheet-content"][data-side="bottom"][data-closed] {
+  transform: translateY(100%);
+}
+
+/* Right Sheet */
+[data-slot="sheet-content"][data-side="right"] {
+  transform: translateX(0);
+}
+@starting-style {
+  [data-slot="sheet-content"][data-side="right"] {
+    transform: translateX(100%);
+  }
+}
+[data-slot="sheet-content"][data-side="right"][data-closed] {
+  transform: translateX(100%);
+}
+
+/* Left Sheet */
+[data-slot="sheet-content"][data-side="left"] {
+  transform: translateX(0);
+}
+@starting-style {
+  [data-slot="sheet-content"][data-side="left"] {
+    transform: translateX(-100%);
+  }
+}
+[data-slot="sheet-content"][data-side="left"][data-closed] {
+  transform: translateX(-100%);
+}
+
+/* Dialog Content */
+[data-slot="dialog-content"] {
+  transition:
+    transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-behavior: allow-discrete;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+@starting-style {
+  [data-slot="dialog-content"] {
+    transform: translate(-50%, -46%) scale(0.92);
+    opacity: 0;
+  }
+}
+[data-slot="dialog-content"][data-closed] {
+  transform: translate(-50%, -46%) scale(0.92);
+  opacity: 0;
+}
+
+/* Popover Content (Calendar popups, etc.) */
+[data-slot="popover-content"] {
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-behavior: allow-discrete;
+  transform: scale(1);
+  opacity: 1;
+}
+@starting-style {
+  [data-slot="popover-content"] {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+[data-slot="popover-content"][data-closed] {
+  transform: scale(0.95);
+  opacity: 0;
 }

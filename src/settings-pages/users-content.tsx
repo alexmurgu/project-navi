@@ -2,10 +2,11 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, UserPlus, ShieldCheck, Mail, Lock, User as UserIcon } from "lucide-react";
+import { Trash2, UserPlus, ShieldCheck, Mail, Lock, User as UserIcon, Users } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addAdminUser, deleteAdminUser } from "@/actions";
 import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 interface UsersContentProps {
   allUsers: any[];
@@ -159,6 +160,38 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
             </div>
 
             <div className="grid gap-4">
+              {/* Joint Family / Shared Profile */}
+              <div className="group relative flex items-center justify-between p-6 rounded-premium bg-navi-surface transition-all active:scale-[0.995]">
+                <div className="flex items-center gap-6">
+                  <div className="size-14 rounded-full flex items-center justify-center bg-white shadow-sm text-navi-blue">
+                    <Users className="size-6" strokeWidth={1} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-3">
+                      <h4 className="text-[18px] font-display font-medium text-navi-dark tracking-tight truncate">
+                        Joint Family
+                      </h4>
+                      <span className="px-2 py-0.5 rounded-full bg-navi-teal/10 text-navi-teal text-[9px] font-display font-medium uppercase tracking-widest">
+                        Shared
+                      </span>
+                    </div>
+                    <p className="text-[11px] font-display font-medium uppercase tracking-widest text-navi-gray/60 mt-1 truncate">
+                      Shared household bills & joint expenses
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <Link
+                    to="/members/$memberId"
+                    params={{ memberId: "family" }}
+                    className="h-10 px-4 rounded-full bg-white text-navi-dark border border-navi-border/20 flex items-center justify-center hover:bg-navi-dark hover:text-white transition-all font-display font-medium text-[10px] uppercase tracking-widest shrink-0"
+                  >
+                    Activity
+                  </Link>
+                </div>
+              </div>
+
               {allUsers.map((user) => {
                 const isAdmin = user.email === adminEmail;
                 return (
@@ -193,6 +226,14 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                     </div>
 
                     <div className="flex items-center gap-4">
+                      <Link
+                        to="/members/$memberId"
+                        params={{ memberId: user.id }}
+                        className="h-10 px-4 rounded-full bg-white text-navi-dark border border-navi-border/20 flex items-center justify-center hover:bg-navi-dark hover:text-white transition-all font-display font-medium text-[10px] uppercase tracking-widest shrink-0"
+                      >
+                        Activity
+                      </Link>
+
                       {isAdmin ? (
                         <div className="size-10 rounded-full flex items-center justify-center text-navi-blue bg-navi-blue/5">
                           <ShieldCheck className="size-5" strokeWidth={1} />

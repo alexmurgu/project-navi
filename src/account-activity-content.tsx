@@ -93,9 +93,7 @@ export function AccountActivityContent({ data, account }: PageProps) {
 
     filtered = filterTransactionsByMonth(filtered, selectedDate);
 
-    return filtered.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
+    return filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [account.id, account.type, data, tableSearch, selectedDate]);
 
   return (
@@ -143,7 +141,11 @@ export function AccountActivityContent({ data, account }: PageProps) {
                 {account.type === "credit" ? "Limit Progress" : "Goal Progress"}
               </p>
               <span className="text-xl font-black tracking-tight text-foreground/80">
-                {((account.currentBalance / (account.limit || account.targetAmount || 1)) * 100).toFixed(0)}%
+                {(
+                  (account.currentBalance / (account.limit || account.targetAmount || 1)) *
+                  100
+                ).toFixed(0)}
+                %
               </span>
             </div>
             <div className="h-2 bg-secondary/30 rounded-full overflow-hidden w-full">

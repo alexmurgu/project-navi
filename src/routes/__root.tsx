@@ -4,6 +4,7 @@ import {
   Outlet,
   Scripts,
   redirect,
+  useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -21,6 +22,7 @@ import { NotFound } from "@/components/not-found";
 import { RouteError } from "@/components/route-error";
 import { fetchSession } from "@/actions";
 import { PullToRefresh } from "@/components/pull-to-refresh";
+import { PwaInstallBanner } from "@/components/pwa-install-banner";
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
@@ -47,6 +49,9 @@ interface MyRouterContext {
 function RootLayout() {
   const { queryClient } = Route.useRouteContext();
   const { fetchSession, loading, user } = useAuthStore();
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
+
   const [uiState, setUiState] = useState<{
     quickAddOpen: boolean;
     pwaUpdateAvailable: boolean;
@@ -62,6 +67,24 @@ function RootLayout() {
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    // Determine the status bar theme color based on page layout
+    const isDarkHeader =
+      pathname === "/" ||
+      pathname.startsWith("/settings") ||
+      pathname.startsWith("/members/") ||
+      pathname.startsWith("/categories/");
+    const targetColor = isDarkHeader ? "#191c1f" : "#ffffff";
+    let metaTag = document.querySelector('meta[name="theme-color"]');
+    if (!metaTag) {
+      metaTag = document.createElement("meta");
+      metaTag.setAttribute("name", "theme-color");
+      document.head.appendChild(metaTag);
+    }
+    metaTag.setAttribute("content", targetColor);
+  }, [pathname]);
 
   useEffect(() => {
     const handleOpenQuickAddChoice = () => setUiState((prev) => ({ ...prev, quickAddOpen: true }));
@@ -157,6 +180,7 @@ function RootLayout() {
             </div>
           </div>
         ) : null}
+        {user && <PwaInstallBanner />}
         <SidebarProvider>
           {/* Desktop Sidebar - Hidden on mobile/tablets */}
           {user && (
