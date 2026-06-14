@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { getTransactionSuggestions } from "@/actions";
 import { useState, useRef, useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TransactionFormProps {
   mode: "expense" | "income";
@@ -57,6 +59,13 @@ export function TransactionForm({
 
   const [showSuggestions, setShowSuggestions] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+  const [mounted, setMounted] = useState(false);
+  const [openDatePicker, setOpenDatePicker] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data: suggestions } = useQuery({
     queryKey: ["suggestions", description],
@@ -187,34 +196,100 @@ export function TransactionForm({
           >
             Occurrence
           </Label>
-          <Popover>
-            <PopoverTrigger
-              render={
-                <button
-                  id="date-picker"
-                  type="button"
-                  className="w-full h-14 rounded-2xl bg-navi-surface flex items-center px-5 gap-4 text-navi-dark hover:bg-white/50 transition-colors shadow-sm"
-                >
-                  <CalendarIcon className="size-4 text-navi-gray/40" strokeWidth={1} />
-                  <span className="font-display font-medium text-[15px]">
-                    {date ? format(date, "PPP") : "Select date"}
-                  </span>
-                </button>
-              }
-            />
-            <PopoverContent
-              className="w-auto p-0 rounded-3xl overflow-hidden border-none shadow-2xl"
-              align="start"
+          {!mounted ? (
+            <button
+              id="date-picker"
+              type="button"
+              className="w-full h-14 rounded-2xl bg-navi-surface flex items-center px-5 gap-4 text-navi-dark hover:bg-white/50 transition-colors shadow-sm"
             >
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={onDateChange}
-                initialFocus
-                className="p-4"
+              <CalendarIcon className="size-4 text-navi-gray/40" strokeWidth={1} />
+              <span className="font-display font-medium text-[15px]">
+                {date ? format(date, "PPP") : "Select date"}
+              </span>
+            </button>
+          ) : isMobile ? (
+            <Sheet open={openDatePicker} onOpenChange={setOpenDatePicker}>
+              <SheetTrigger
+                render={
+                  <button
+                    id="date-picker"
+                    type="button"
+                    className="w-full h-14 rounded-2xl bg-navi-surface flex items-center px-5 gap-4 text-navi-dark hover:bg-white/50 transition-colors shadow-sm"
+                  >
+                    <CalendarIcon className="size-4 text-navi-gray/40" strokeWidth={1} />
+                    <span className="font-display font-medium text-[15px]">
+                      {date ? format(date, "PPP") : "Select date"}
+                    </span>
+                  </button>
+                }
               />
-            </PopoverContent>
-          </Popover>
+              <SheetContent
+                side="bottom"
+                className="rounded-t-[40px] border-none px-6 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] pt-4 bg-white flex flex-col max-h-[85dvh] z-[100]"
+                showCloseButton={false}
+              >
+                {/* iOS Native Pull Handle */}
+                <div className="mx-auto w-12 h-1.5 rounded-full bg-navi-border/30 mb-6 shrink-0" />
+
+                <div className="flex items-center justify-between mb-4 px-1 shrink-0">
+                  <h3 className="text-lg font-display font-medium text-navi-dark uppercase tracking-wider">
+                    Select Date
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDatePicker(false)}
+                    className="text-xs font-display font-medium uppercase tracking-widest text-navi-gray/60 hover:text-navi-dark px-2 py-1"
+                  >
+                    Done
+                  </button>
+                </div>
+
+                <div className="flex-1 flex justify-center items-center py-4 overflow-y-auto min-h-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(selectedDate) => {
+                      onDateChange(selectedDate);
+                      setOpenDatePicker(false);
+                    }}
+                    defaultMonth={date || new Date()}
+                    initialFocus
+                    className="p-4 bg-transparent border-none scale-105"
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          ) : (
+            <Popover>
+              <PopoverTrigger
+                render={
+                  <button
+                    id="date-picker"
+                    type="button"
+                    className="w-full h-14 rounded-2xl bg-navi-surface flex items-center px-5 gap-4 text-navi-dark hover:bg-white/50 transition-colors shadow-sm"
+                  >
+                    <CalendarIcon className="size-4 text-navi-gray/40" strokeWidth={1} />
+                    <span className="font-display font-medium text-[15px]">
+                      {date ? format(date, "PPP") : "Select date"}
+                    </span>
+                  </button>
+                }
+              />
+              <PopoverContent
+                className="w-auto p-0 rounded-3xl overflow-hidden border-none shadow-2xl z-[100]"
+                align="start"
+              >
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={onDateChange}
+                  defaultMonth={date || new Date()}
+                  initialFocus
+                  className="p-4"
+                />
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </div>
 

@@ -277,7 +277,7 @@ export function ImportContent({
                             onChange={(e) =>
                               updateTransaction(tx.id, "description", e.target.value)
                             }
-                            className="rounded-lg h-9 shadow-sm text-sm"
+                            className="rounded-lg h-9 shadow-sm text-base md:text-sm"
                           />
                         </TableCell>
                         <TableCell className="p-2 text-right">

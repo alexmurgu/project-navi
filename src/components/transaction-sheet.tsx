@@ -75,10 +75,16 @@ export function TransactionSheet({
   availableCategories,
   creditCards = [],
 }: TransactionSheetProps) {
+  const getTodayMidnight = React.useCallback(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
   const [state, dispatch] = useReducer(transactionReducer, {
     amount: "",
     description: "",
-    date: new Date(),
+    date: getTodayMidnight(),
     status: "paid",
     selectedUserId: "family",
     category: "",
@@ -92,10 +98,12 @@ export function TransactionSheet({
 
   const initializeForm = React.useCallback(() => {
     if (open) {
+      const initialDate = editingItem ? new Date(editingItem.date) : getTodayMidnight();
+      initialDate.setHours(0, 0, 0, 0);
       const initialState: FormState = {
         amount: editingItem ? (editingItem.amount / 100).toString() : "",
         description: editingItem?.description || "",
-        date: editingItem ? new Date(editingItem.date) : new Date(),
+        date: initialDate,
         status: editingItem?.status || "paid",
         selectedUserId: editingItem?.userId || "family",
         category: editingItem?.category || availableCategories[0] || "",
@@ -110,7 +118,7 @@ export function TransactionSheet({
       // when editingItem changes to avoid simulating an event handler warning.
       dispatch({ type: "RESET", payload: initialState });
     }
-  }, [open, editingItem, availableCategories]);
+  }, [open, editingItem, availableCategories, getTodayMidnight]);
 
   useEffect(() => {
     initializeForm();
