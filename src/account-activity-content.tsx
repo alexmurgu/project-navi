@@ -5,6 +5,7 @@ import { ArrowRightLeft, Settings2, Search } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
+import { useViewedMonth } from "@/hooks/use-viewed-month";
 
 interface PageProps {
   data: {
@@ -30,7 +31,7 @@ const formatCurrency = (amountCents: number) => {
 
 export function AccountActivityContent({ data, account }: PageProps) {
   const [tableSearch, setTableSearch] = useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useViewedMonth();
 
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};

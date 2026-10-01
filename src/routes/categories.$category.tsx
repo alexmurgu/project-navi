@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { OverviewContent } from "@/overview-content";
 import { useRequireAuth } from "@/hooks/use-auth-guard";
+import { validateMonthSearch } from "@/lib/month-param";
 import { getDashboardData } from "../actions";
 
 export const Route = createFileRoute("/categories/$category")({
+  validateSearch: validateMonthSearch,
   loader: async ({ params }) => {
     return { category: params.category };
   },

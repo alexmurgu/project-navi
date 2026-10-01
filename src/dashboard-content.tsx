@@ -10,6 +10,7 @@ import {
 } from "date-fns";
 import { useNavigate } from "@tanstack/react-router";
 
+import { useViewedMonth } from "@/hooks/use-viewed-month";
 import { type CategoryConfig } from "@/lib/category-visuals";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
@@ -82,6 +83,7 @@ const formatCurrency = (amountCents: number) => {
 export function DashboardContent({ data }: PageProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useViewedMonth();
 
   const [state, dispatch] = React.useReducer((s: any, a: any) => ({ ...s, ...a }), {
     expenseSheetOpen: false,
@@ -91,7 +93,6 @@ export function DashboardContent({ data }: PageProps) {
     selectedUserId: "family",
     expenseCategory: "",
     incomeCategory: "",
-    selectedDate: new Date(),
     savingsSheetOpen: false,
     transferSheetOpen: false,
     editingSavingsAccount: null,
@@ -212,8 +213,8 @@ export function DashboardContent({ data }: PageProps) {
       (e) => (e as any).accountType !== "credit" && !(e as any).isTransfer,
     );
 
-    const start = startOfMonth(state.selectedDate);
-    const end = endOfMonth(state.selectedDate);
+    const start = startOfMonth(selectedDate);
+    const end = endOfMonth(selectedDate);
 
     const monthlyIncome = paidIncomes
       .filter((i) => isWithinInterval(new Date(i.date), { start, end }))
@@ -249,11 +250,11 @@ export function DashboardContent({ data }: PageProps) {
       balance: totalIncomeToDate - totalMainExpToDate + totalTransfersToDate,
       totalSavings,
     };
-  }, [data, state.selectedDate]);
+  }, [data, selectedDate]);
 
   const groupedRecentActivity = useMemo(() => {
-    const start = startOfMonth(state.selectedDate);
-    const end = endOfMonth(state.selectedDate);
+    const start = startOfMonth(selectedDate);
+    const end = endOfMonth(selectedDate);
 
     const filtered = allItems.filter((item) =>
       isWithinInterval(new Date(item.date), { start, end }),
@@ -279,11 +280,11 @@ export function DashboardContent({ data }: PageProps) {
       else groups.push({ title, items: [item] });
     });
     return groups;
-  }, [allItems, state.selectedDate]);
+  }, [allItems, selectedDate]);
 
   const currentMonthCategoryData = useMemo(() => {
-    const start = startOfMonth(state.selectedDate);
-    const end = endOfMonth(state.selectedDate);
+    const start = startOfMonth(selectedDate);
+    const end = endOfMonth(selectedDate);
     const map = new Map<string, { amount: number; count: number }>();
 
     data.expenses
@@ -308,7 +309,7 @@ export function DashboardContent({ data }: PageProps) {
     const total = items.reduce((acc, item) => acc + item.amount, 0);
 
     return { items, total };
-  }, [data.expenses, state.selectedDate]);
+  }, [data.expenses, selectedDate]);
 
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
@@ -384,8 +385,8 @@ export function DashboardContent({ data }: PageProps) {
         monthlyExp={stats.monthlyExp}
         income={stats.income}
         formatCurrency={formatCurrency}
-        selectedDate={state.selectedDate}
-        onDateChange={(date) => dispatch({ selectedDate: date })}
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
       />
 
       <div className="p-6 md:p-12 space-y-16">
@@ -393,14 +394,22 @@ export function DashboardContent({ data }: PageProps) {
           <SavingsSection
             accounts={data.savingsAccounts}
             onEditAccount={(sa) =>
-              navigate({ to: "/accounts/$accountId", params: { accountId: sa.id } })
+              navigate({
+                to: "/accounts/$accountId",
+                params: { accountId: sa.id },
+                search: (prev: any) => prev,
+              })
             }
             formatCurrency={formatCurrency}
           />
           <CreditCardsSection
             cards={data.creditCards}
             onEditCard={(cc) =>
-              navigate({ to: "/accounts/$accountId", params: { accountId: cc.id } })
+              navigate({
+                to: "/accounts/$accountId",
+                params: { accountId: cc.id },
+                search: (prev: any) => prev,
+              })
             }
             formatCurrency={formatCurrency}
           />
@@ -412,7 +421,11 @@ export function DashboardContent({ data }: PageProps) {
           showAll={state.showAllCategories}
           onToggleShowAll={() => dispatch({ showAllCategories: !state.showAllCategories })}
           onCategoryClick={(name) =>
-            navigate({ to: "/categories/$category", params: { category: name } })
+            navigate({
+              to: "/categories/$category",
+              params: { category: name },
+              search: (prev: any) => prev,
+            })
           }
           formatCurrency={formatCurrency}
         />
@@ -422,7 +435,7 @@ export function DashboardContent({ data }: PageProps) {
           categoryConfigMap={categoryConfigMap}
           onEdit={handleEdit}
           onStatusUpdate={(id, type, status) => updateStatusMutation.mutate({ id, type, status })}
-          onViewAll={() => navigate({ to: "/expenses" })}
+          onViewAll={() => navigate({ to: "/expenses", search: (prev: any) => prev })}
           formatCurrency={formatCurrency}
         />
       </div>

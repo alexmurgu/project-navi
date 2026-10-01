@@ -185,6 +185,7 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                   <Link
                     to="/members/$memberId"
                     params={{ memberId: "family" }}
+                    search={(prev: any) => prev}
                     className="h-10 px-4 rounded-full bg-white text-navi-dark border border-navi-border/20 flex items-center justify-center hover:bg-navi-dark hover:text-white transition-all font-display font-medium text-[10px] uppercase tracking-widest shrink-0"
                   >
                     Activity
@@ -229,6 +230,7 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
                       <Link
                         to="/members/$memberId"
                         params={{ memberId: user.id }}
+                        search={(prev: any) => prev}
                         className="h-10 px-4 rounded-full bg-white text-navi-dark border border-navi-border/20 flex items-center justify-center hover:bg-navi-dark hover:text-white transition-all font-display font-medium text-[10px] uppercase tracking-widest shrink-0"
                       >
                         Activity

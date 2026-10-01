@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardContent } from "@/dashboard-content";
 import { useRequireAuth } from "@/hooks/use-auth-guard";
+import { validateMonthSearch } from "@/lib/month-param";
 import { getDashboardData } from "../actions";
 
 export const Route = createFileRoute("/")({
+  validateSearch: validateMonthSearch,
   loader: () => getDashboardData(),
   head: () => ({
     meta: [

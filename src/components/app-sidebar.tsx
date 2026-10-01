@@ -67,7 +67,7 @@ export function AppSidebar() {
               ].map((item) => (
                 <SidebarMenuItem key={item.to}>
                   <SidebarMenuButton
-                    render={<Link to={item.to} />}
+                    render={<Link to={item.to} search={(prev: any) => prev} />}
                     isActive={pathname === item.to}
                     className={cn(
                       "h-12 px-6 rounded-xl transition-all duration-500",

@@ -47,6 +47,7 @@ export function MobileNav() {
               <Link
                 key={item.to}
                 to={item.to as any}
+                search={(prev: any) => prev}
                 className={cn(
                   "flex flex-col items-center justify-center h-14 rounded-full transition-all duration-500 touch-manipulation",
                   isActive

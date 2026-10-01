@@ -17,6 +17,7 @@ import {
 } from "./actions";
 import { TransferSheet } from "@/components/transfer-sheet";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
+import { useViewedMonth } from "@/hooks/use-viewed-month";
 
 interface User {
   id: string;
@@ -56,6 +57,7 @@ const formatCurrency = (amountCents: number) => {
 
 export function IncomesContent({ data }: PageProps) {
   const queryClient = useQueryClient();
+  const [selectedDate, setSelectedDate] = useViewedMonth();
 
   const [state, dispatch] = React.useReducer((s: any, a: any) => ({ ...s, ...a }), {
     incomeSheetOpen: false,
@@ -67,7 +69,6 @@ export function IncomesContent({ data }: PageProps) {
     tableSearch: "",
     visibleCount: INITIAL_PAGE_SIZE,
     sortDirection: "desc",
-    selectedDate: new Date(),
     transferSheetOpen: false,
   });
 
@@ -153,7 +154,7 @@ export function IncomesContent({ data }: PageProps) {
       return true;
     });
 
-    filtered = filterTransactionsByMonth(filtered, state.selectedDate);
+    filtered = filterTransactionsByMonth(filtered, selectedDate);
 
     return filtered.sort((a, b) => {
       const valA = new Date(a.date).getTime();
@@ -165,7 +166,7 @@ export function IncomesContent({ data }: PageProps) {
       const createdB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : 0;
       return state.sortDirection === "asc" ? createdA - createdB : createdB - createdA;
     });
-  }, [data.incomes, state.tableSearch, state.sortDirection, state.selectedDate]);
+  }, [data.incomes, state.tableSearch, state.sortDirection, selectedDate]);
 
   const paginatedHistory = useMemo(
     () => filteredHistory.slice(0, state.visibleCount),
@@ -252,8 +253,8 @@ export function IncomesContent({ data }: PageProps) {
           />
         </div>
         <MonthSelector
-          selectedDate={state.selectedDate}
-          onDateChange={(date) => dispatch({ selectedDate: date })}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
           variant="icon"
           align="end"
         />
@@ -271,7 +272,7 @@ export function IncomesContent({ data }: PageProps) {
           <p className="text-sm font-bold text-muted-foreground/40 max-w-[300px] leading-relaxed uppercase tracking-widest">
             There are no income records for{" "}
             <span className="text-foreground/60 font-black">
-              {format(state.selectedDate, "MMMM yyyy")}
+              {format(selectedDate, "MMMM yyyy")}
             </span>
           </p>
         </div>

@@ -6,6 +6,7 @@ import { startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 
 import { getCategoryConfig, type CategoryConfig } from "@/lib/category-visuals";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
+import { useViewedMonth } from "@/hooks/use-viewed-month";
 import { Link } from "@tanstack/react-router";
 
 interface User {
@@ -45,7 +46,7 @@ const formatCurrency = (amountCents: number) =>
   (amountCents / 100).toLocaleString("en-IE", { style: "currency", currency: "EUR" });
 
 export function OverviewContent({ data, mode }: { data: DashboardData; mode: OverviewMode }) {
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const [selectedDate, setSelectedDate] = useViewedMonth();
   const [tableSearch, setTableSearch] = React.useState("");
 
   const categoryConfigMap = useMemo(() => {
@@ -284,6 +285,7 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
                       key={item.name}
                       to="/categories/$category"
                       params={{ category: item.name }}
+                      search={(prev: any) => prev}
                       className="group cursor-pointer flex flex-col gap-2 py-3 px-1 hover:opacity-60 transition-all text-left w-full focus-visible:outline-none"
                     >
                       <div className="flex items-center justify-between">

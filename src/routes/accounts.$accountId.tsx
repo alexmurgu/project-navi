@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AccountActivityContent } from "@/account-activity-content";
 import { useRequireAuth } from "@/hooks/use-auth-guard";
+import { validateMonthSearch } from "@/lib/month-param";
 import { getDashboardData } from "../actions";
 
 export const Route = createFileRoute("/accounts/$accountId")({
+  validateSearch: validateMonthSearch,
   loader: () => getDashboardData(),
   component: AccountActivityPage,
 });

@@ -101,6 +101,7 @@ export function TransactionCard({
               <Link
                 to="/members/$memberId"
                 params={{ memberId: transaction.userId || "family" }}
+                search={(prev: any) => prev}
                 onClick={(e) => e.stopPropagation()}
                 className="underline hover:text-navi-blue transition-colors font-bold"
               >
