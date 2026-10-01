@@ -155,7 +155,12 @@ export function ExpensesContent({ data }: PageProps) {
     return filtered.sort((a, b) => {
       const valA = new Date(a.date).getTime();
       const valB = new Date(b.date).getTime();
-      return state.sortDirection === "asc" ? valA - valB : valB - valA;
+      if (valA !== valB) {
+        return state.sortDirection === "asc" ? valA - valB : valB - valA;
+      }
+      const createdA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : 0;
+      const createdB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : 0;
+      return state.sortDirection === "asc" ? createdA - createdB : createdB - createdA;
     });
   }, [data.expenses, state.tableSearch, state.sortDirection, state.selectedDate]);
 

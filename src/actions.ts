@@ -110,6 +110,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
       amount: expense.amount,
       category: expense.category,
       date: expense.date,
+      createdAt: expense.createdAt,
       isMonthly: expense.isMonthly,
       status: expense.status,
       recurrenceId: expense.recurrenceId,
@@ -119,7 +120,8 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
       userName: sql<string>`COALESCE(${userSchema.name}, 'Family Wide')`,
     })
     .from(expense)
-    .leftJoin(userSchema, eq(expense.userId, userSchema.id));
+    .leftJoin(userSchema, eq(expense.userId, userSchema.id))
+    .orderBy(desc(expense.date), desc(expense.createdAt));
 
   const incomes = await db
     .select({
@@ -128,19 +130,24 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
       amount: income.amount,
       category: income.category,
       date: income.date,
+      createdAt: income.createdAt,
       status: income.status,
       userId: income.userId,
       userName: sql<string>`COALESCE(${userSchema.name}, 'Family Wide')`,
     })
     .from(income)
-    .leftJoin(userSchema, eq(income.userId, userSchema.id));
+    .leftJoin(userSchema, eq(income.userId, userSchema.id))
+    .orderBy(desc(income.date), desc(income.createdAt));
 
   const users = await db.select({ id: userSchema.id, name: userSchema.name }).from(userSchema);
   const configs = await db.select().from(categoryConfig);
 
   const savings = await db.select().from(savingsAccount);
   const creditCards = await db.select().from(creditCard);
-  const allTransfers = await db.select().from(transfer);
+  const allTransfers = await db
+    .select()
+    .from(transfer)
+    .orderBy(desc(transfer.date), desc(transfer.createdAt));
 
   const savingsIds = new Set(savings.map((s) => s.id));
   const creditCardIds = new Set(creditCards.map((c) => c.id));
@@ -164,6 +171,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
         amount: t.amount,
         category: "Transfer",
         date: t.date,
+        createdAt: t.createdAt,
         status: "paid" as const,
         userId: t.userId,
         userName: "Family Wide",
@@ -183,6 +191,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
         amount: t.amount,
         category: "Transfer",
         date: t.date,
+        createdAt: t.createdAt,
         status: "paid" as const,
         userId: t.userId,
         userName: "Family Wide",

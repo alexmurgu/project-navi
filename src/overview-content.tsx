@@ -110,9 +110,14 @@ export function OverviewContent({ data, mode }: { data: DashboardData; mode: Ove
       });
     }
 
-    return filterTransactionsByMonth(filtered, selectedDate).sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
+    return filterTransactionsByMonth(filtered, selectedDate).sort((a, b) => {
+      const timeB = new Date(b.date).getTime();
+      const timeA = new Date(a.date).getTime();
+      if (timeB !== timeA) return timeB - timeA;
+      const createdB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : 0;
+      const createdA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : 0;
+      return createdB - createdA;
+    });
   }, [allItems, categoryKind, mode, selectedDate, tableSearch]);
 
   const stats = useMemo(() => {

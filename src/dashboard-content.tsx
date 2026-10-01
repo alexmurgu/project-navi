@@ -48,6 +48,7 @@ interface User {
 interface Transaction {
   id: string;
   date: string | Date;
+  createdAt?: string | Date | number;
   description: string;
   amount: number;
   category: string;
@@ -259,7 +260,14 @@ export function DashboardContent({ data }: PageProps) {
     );
 
     const sorted = [...filtered]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .sort((a, b) => {
+        const timeB = new Date(b.date).getTime();
+        const timeA = new Date(a.date).getTime();
+        if (timeB !== timeA) return timeB - timeA;
+        const createdB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        return createdB - createdA;
+      })
       .slice(0, 10);
     const groups: { title: string; items: Transaction[] }[] = [];
     sorted.forEach((item) => {

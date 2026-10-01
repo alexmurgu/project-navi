@@ -2,6 +2,7 @@ const BUILD_ID = new URL(self.location.href).searchParams.get("v") || "v1";
 const CACHE_NAME = `project-navi-pwa-${BUILD_ID}`;
 const STATIC_ASSETS = [
   "/manifest.webmanifest",
+  "/manifest.json",
   "/icon.svg",
   "/navi-touch-icon.png",
   "/apple-touch-icon.png",

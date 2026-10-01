@@ -41,6 +41,10 @@ export function TransactionCard({
   const config = getCategoryConfig(categoryConfigMap, transaction.category);
   const color = config?.color || "#494fdf";
   const date = new Date(transaction.date);
+  const formattedDate =
+    date.getHours() !== 0 || date.getMinutes() !== 0
+      ? format(date, "MMM dd, yyyy, h:mm a")
+      : format(date, "MMM dd, yyyy");
 
   return (
     <div
@@ -102,7 +106,7 @@ export function TransactionCard({
               >
                 {transaction.userName || "Joint Family"}
               </Link>{" "}
-              • {format(date, "EEEE, h:mm a")}
+              • {formattedDate}
             </p>
             {transaction.status === "pending" && transaction.type === "expense" && (
               <span className="px-1.5 py-0.5 rounded-full bg-navi-warning/10 text-navi-warning text-[8px] font-display font-medium uppercase tracking-widest shrink-0">
