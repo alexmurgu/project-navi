@@ -303,16 +303,11 @@ export function calculateProjections({
       monthlyCounts.push(matching.length);
     }
 
-    const nonZeroSums = monthlySums.filter((s) => s > 0);
-    const nonZeroCounts = monthlyCounts.filter((c) => c > 0);
-    const recentActive = [0, 1, 2].some((i) => monthlySums[i] > 0);
-
-    // Use median monthly spend to prevent one-off spikes from contaminating the baseline.
-    // If active in recent months, use median of non-zero months so newer/occasional categories don't get zeroed out.
-    const baseline =
-      recentActive && nonZeroSums.length > 0 ? median(nonZeroSums) : median(monthlySums);
-    const medCount =
-      recentActive && nonZeroCounts.length > 0 ? median(nonZeroCounts) : median(monthlyCounts);
+    // Use median monthly spend across reference months.
+    // This accurately captures true ongoing monthly spending habits
+    // while ignoring one-off spikes, annual bills (like home insurance in Sep), or irregular expenses.
+    const baseline = median(monthlySums);
+    const medCount = median(monthlyCounts);
 
     const lower = cat.toLowerCase();
     const isFixed =
@@ -320,9 +315,7 @@ export function calculateProjections({
       lower.includes("insurance") ||
       lower.includes("mortgage") ||
       lower.includes("subscription") ||
-      lower.includes("utilit") ||
-      lower.includes("rent") ||
-      medCount <= 2;
+      lower.includes("rent");
 
     categoryStats.set(cat, { baseline, medCount, isFixed });
   }
