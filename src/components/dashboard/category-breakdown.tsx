@@ -2,14 +2,22 @@ import React from "react";
 import { type CategoryConfig } from "@/lib/category-visuals";
 import { getCategoryConfig } from "@/lib/category-visuals";
 
+export interface CategoryItem {
+  name: string;
+  amount: number;
+  expectedAmount?: number;
+  count: number;
+}
+
 interface CategoryBreakdownProps {
-  items: { name: string; amount: number; count: number }[];
+  items: CategoryItem[];
   total: number;
   categoryConfigMap: Record<string, CategoryConfig>;
   showAll: boolean;
   onToggleShowAll: () => void;
   onCategoryClick: (name: string) => void;
   formatCurrency: (amount: number) => string;
+  isFutureMonth?: boolean;
 }
 
 export function CategoryBreakdown({
@@ -20,6 +28,7 @@ export function CategoryBreakdown({
   onToggleShowAll,
   onCategoryClick,
   formatCurrency,
+  isFutureMonth,
 }: CategoryBreakdownProps) {
   return (
     <section className="space-y-4">
@@ -33,7 +42,10 @@ export function CategoryBreakdown({
             {(showAll ? items : items.slice(0, 3)).map((item) => {
               const config = getCategoryConfig(categoryConfigMap, item.name);
               const color = config?.color || "#494fdf";
-              const share = total ? (item.amount / total) * 100 : 0;
+              const displayAmount = isFutureMonth ? item.expectedAmount || 0 : item.amount;
+              const share = total ? (displayAmount / total) * 100 : 0;
+              const expectedTotal = item.expectedAmount || item.amount;
+              const expectedShare = total ? (expectedTotal / total) * 100 : 0;
 
               return (
                 <button
@@ -50,20 +62,44 @@ export function CategoryBreakdown({
                           {item.name}
                         </h4>
                         <p className="text-[8px] font-display font-medium uppercase tracking-widest text-navi-dark/20">
-                          {item.count} {item.count === 1 ? "txn" : "txns"} • {Math.round(share)}%
+                          {isFutureMonth
+                            ? `Historical baseline • ${Math.round(share)}%`
+                            : `${item.count} ${item.count === 1 ? "txn" : "txns"} • ${Math.round(share)}%`}
                         </p>
                       </div>
                     </div>
-                    <p className="text-[14px] font-display font-medium text-navi-dark/80 tracking-tight">
-                      {formatCurrency(item.amount)}
-                    </p>
+                    <div className="text-right">
+                      <p className="text-[14px] font-display font-medium text-navi-dark/80 tracking-tight">
+                        {isFutureMonth
+                          ? `~${formatCurrency(displayAmount)}`
+                          : formatCurrency(item.amount)}
+                      </p>
+                      {!isFutureMonth &&
+                        item.expectedAmount !== undefined &&
+                        item.expectedAmount > item.amount && (
+                          <p className="text-[9px] font-sans text-navi-gray/50 font-medium">
+                            of ~{formatCurrency(item.expectedAmount)}
+                          </p>
+                        )}
+                    </div>
                   </div>
 
-                  <div className="h-[3px] w-full bg-navi-dark/4 rounded-full overflow-hidden">
+                  <div className="relative h-[4px] w-full bg-navi-dark/4 rounded-full overflow-hidden">
+                    {!isFutureMonth &&
+                      item.expectedAmount !== undefined &&
+                      item.expectedAmount > item.amount && (
+                        <div
+                          className="absolute top-0 bottom-0 rounded-full opacity-20"
+                          style={{
+                            width: `${Math.min(100, Math.max(share, expectedShare))}%`,
+                            backgroundColor: color,
+                          }}
+                        />
+                      )}
                     <div
-                      className="h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]"
+                      className="relative h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]"
                       style={{
-                        width: `${share}%`,
+                        width: `${Math.min(100, share)}%`,
                         backgroundColor: color,
                       }}
                     />

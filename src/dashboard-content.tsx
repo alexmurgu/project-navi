@@ -39,6 +39,7 @@ import { TransferSheet } from "@/components/transfer-sheet";
 import { SavingsAccountSheet } from "@/components/savings-account-sheet";
 import { CreditCardSheet } from "@/components/credit-card-sheet";
 import { CreditCardsSection } from "@/components/dashboard/credit-cards-section";
+import { calculateProjections } from "@/lib/projections";
 
 interface User {
   id: string;
@@ -311,6 +312,49 @@ export function DashboardContent({ data }: PageProps) {
     return { items, total };
   }, [data.expenses, selectedDate]);
 
+  const projections = useMemo(() => {
+    return calculateProjections({
+      expenses: data.expenses as any,
+      incomes: data.incomes as any,
+      currentBalance: stats.balance,
+      selectedDate,
+    });
+  }, [data.expenses, data.incomes, stats.balance, selectedDate]);
+
+  const categoryBreakdownData = useMemo(() => {
+    if (projections.isPastMonth) {
+      return {
+        items: currentMonthCategoryData.items.map((i) => ({
+          ...i,
+          expectedAmount: i.amount,
+        })),
+        total: currentMonthCategoryData.total,
+      };
+    }
+
+    if (projections.isFutureMonth) {
+      return {
+        items: projections.categoryProjections.map((cp) => ({
+          name: cp.name,
+          amount: 0,
+          expectedAmount: cp.expectedAmount,
+          count: cp.count,
+        })),
+        total: projections.projectedExpenses,
+      };
+    }
+
+    return {
+      items: projections.categoryProjections.map((cp) => ({
+        name: cp.name,
+        amount: cp.actualAmount,
+        expectedAmount: cp.expectedAmount,
+        count: cp.count,
+      })),
+      total: Math.max(currentMonthCategoryData.total, projections.projectedExpenses),
+    };
+  }, [projections, currentMonthCategoryData]);
+
   const categoryConfigMap = useMemo(() => {
     const map: Record<string, CategoryConfig> = {};
     data.categoryConfigs.forEach((config) => {
@@ -387,6 +431,7 @@ export function DashboardContent({ data }: PageProps) {
         formatCurrency={formatCurrency}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
+        projections={projections}
       />
 
       <div className="p-6 md:p-12 space-y-16">
@@ -415,8 +460,8 @@ export function DashboardContent({ data }: PageProps) {
           />
         </div>
         <CategoryBreakdown
-          items={currentMonthCategoryData.items}
-          total={currentMonthCategoryData.total}
+          items={categoryBreakdownData.items}
+          total={categoryBreakdownData.total}
           categoryConfigMap={categoryConfigMap}
           showAll={state.showAllCategories}
           onToggleShowAll={() => dispatch({ showAllCategories: !state.showAllCategories })}
@@ -428,6 +473,7 @@ export function DashboardContent({ data }: PageProps) {
             })
           }
           formatCurrency={formatCurrency}
+          isFutureMonth={projections.isFutureMonth}
         />
 
         <RecentActivity
