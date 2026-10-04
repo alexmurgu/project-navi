@@ -29,14 +29,22 @@ export function useSheetHistory(
     };
 
     if (open && !isPushedRef.current) {
-      window.history.pushState({ modalId: sheetId }, "");
-      isPushedRef.current = true;
-      window.addEventListener("popstate", handlePopState);
+      try {
+        window.history.pushState({ modalId: sheetId }, "", window.location.href);
+        isPushedRef.current = true;
+        window.addEventListener("popstate", handlePopState);
+      } catch {
+        // Silently ignore if browser restricts pushState
+      }
     } else if (!open && isPushedRef.current && !isPoppingRef.current) {
       isPushedRef.current = false;
       window.removeEventListener("popstate", handlePopState);
-      if (window.history.state?.modalId === sheetId) {
-        window.history.back();
+      try {
+        if (window.history.state?.modalId === sheetId) {
+          window.history.back();
+        }
+      } catch {
+        // Silently ignore if back navigation is restricted
       }
     }
 
@@ -44,8 +52,12 @@ export function useSheetHistory(
       window.removeEventListener("popstate", handlePopState);
       if (isPushedRef.current && !isPoppingRef.current) {
         isPushedRef.current = false;
-        if (window.history.state?.modalId === sheetId) {
-          window.history.back();
+        try {
+          if (window.history.state?.modalId === sheetId) {
+            window.history.back();
+          }
+        } catch {
+          // Silently ignore
         }
       }
     };
