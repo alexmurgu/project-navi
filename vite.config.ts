@@ -12,6 +12,8 @@ export default defineConfig({
     __APP_BUILD_ID__: JSON.stringify(buildId),
   },
   preview: {
+    host: "0.0.0.0",
+    port: parseInt(process.env.PORT || "4173", 10),
     allowedHosts: ["navi.aftermind.xyz"],
   },
   plugins: [
