@@ -83,6 +83,21 @@ export function TransactionForm({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleAmountChange = (raw: string) => {
+    let val = raw.replace(",", ".");
+    if (!val) {
+      onAmountChange("");
+      return;
+    }
+    val = val.replace(/[^0-9.]/g, "");
+    const parts = val.split(".");
+    if (parts.length > 2) return;
+    if (parts[1] && parts[1].length > 2) {
+      val = `${parts[0]}.${parts[1].slice(0, 2)}`;
+    }
+    onAmountChange(val);
+  };
+
   return (
     <div className="space-y-8">
       {/* Description */}
@@ -182,7 +197,8 @@ export function TransactionForm({
               inputMode="decimal"
               placeholder="0.00"
               value={amount}
-              onChange={(e) => onAmountChange(e.target.value)}
+              onChange={(e) => handleAmountChange(e.target.value)}
+              onFocus={(e) => e.target.select()}
               className="h-14 rounded-2xl border-none bg-navi-surface pl-[72px] pr-5 font-display font-medium text-navi-dark shadow-sm placeholder:text-navi-gray/40 focus-visible:ring-2 focus-visible:ring-navi-dark/5"
             />
           </div>

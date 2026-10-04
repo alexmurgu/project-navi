@@ -3,6 +3,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Trash2, X, CreditCard as CreditCardIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSheetHistory } from "@/hooks/use-sheet-history";
+import { haptic } from "@/lib/haptics";
 
 interface CreditCardSheetProps {
   open: boolean;
@@ -72,9 +74,18 @@ export function CreditCardSheet({
     }
   }, [open, editingItem]);
 
-  const handleSave = () => {
-    const limitCents = state.limit ? Math.round(parseFloat(state.limit) * 100) : null;
+  useSheetHistory(open, onOpenChange, "credit-card-sheet");
 
+  const handleSave = () => {
+    if (!state.name.trim()) {
+      haptic.warning();
+      return;
+    }
+
+    const cleanLimit = (state.limit || "").replace(",", ".");
+    const limitCents = cleanLimit ? Math.round(parseFloat(cleanLimit) * 100) : null;
+
+    haptic.success();
     onSubmit({
       id: editingItem?.id,
       name: state.name,
@@ -87,8 +98,11 @@ export function CreditCardSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-full max-h-[90dvh] sm:h-fit sm:max-h-[95dvh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
+        className="h-full max-h-[92dvh] sm:h-auto sm:max-h-[88vh] sm:max-w-xl sm:left-1/2 sm:-translate-x-1/2 sm:bottom-6 sm:rounded-[36px] border-t sm:border sm:border-navi-border/20 rounded-t-[36px] p-0 shadow-2xl overflow-hidden flex flex-col bg-white"
       >
+        {/* Mobile grab handle */}
+        <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-navi-gray/25 sm:hidden" />
+
         <div className="p-6 sm:p-8 pb-2 text-left shrink-0">
           <h2 className="text-[28px] sm:text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
             {editingItem ? "Refine Card" : "New Credit Card"}
@@ -126,13 +140,19 @@ export function CreditCardSheet({
                   €
                 </span>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   placeholder="0.00"
                   className="w-full bg-navi-surface/30 border border-navi-border/10 rounded-premium p-6 pl-12 font-display font-medium text-[20px] outline-none focus:border-navi-dark/20 transition-colors"
                   value={state.limit}
                   onChange={(e) =>
-                    dispatch({ type: "SET_FIELD", field: "limit", value: e.target.value })
+                    dispatch({
+                      type: "SET_FIELD",
+                      field: "limit",
+                      value: e.target.value.replace(",", "."),
+                    })
                   }
+                  onFocus={(e) => e.target.select()}
                 />
               </div>
             </div>

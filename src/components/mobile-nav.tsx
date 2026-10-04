@@ -2,6 +2,7 @@ import React from "react";
 import { Home, ArrowUpCircle, TrendingDown, Settings, Plus } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 export function MobileNav() {
   const routerState = useRouterState();
@@ -20,6 +21,7 @@ export function MobileNav() {
   ];
 
   const handleFabClick = () => {
+    haptic.medium();
     window.dispatchEvent(new CustomEvent("open-quick-add-choice"));
   };
 
@@ -48,6 +50,9 @@ export function MobileNav() {
                 key={item.to}
                 to={item.to as any}
                 search={(prev: any) => prev}
+                onClick={() => {
+                  if (!isActive) haptic.light();
+                }}
                 className={cn(
                   "flex flex-col items-center justify-center h-14 rounded-full transition-all duration-500 touch-manipulation",
                   isActive

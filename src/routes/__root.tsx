@@ -24,6 +24,8 @@ import { fetchSession } from "@/actions";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
 import { cn } from "@/lib/utils";
+import { useSheetHistory } from "@/hooks/use-sheet-history";
+import { haptic } from "@/lib/haptics";
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
@@ -104,6 +106,10 @@ function RootLayout() {
     pendingRegistration: null,
   });
 
+  useSheetHistory(uiState.quickAddOpen, (open) =>
+    setUiState((prev) => ({ ...prev, quickAddOpen: open })),
+  );
+
   useEffect(() => {
     fetchSession();
   }, [fetchSession]);
@@ -160,6 +166,7 @@ function RootLayout() {
 
   const showDevtools = typeof window !== "undefined" && window.location.hostname === "localhost";
   const openQuickAdd = (mode: "expense" | "income" | "transfer") => {
+    haptic.light();
     setUiState((prev) => ({ ...prev, quickAddOpen: false }));
     const eventName =
       mode === "expense"
@@ -274,8 +281,10 @@ function RootLayout() {
         >
           <SheetContent
             side="bottom"
-            className="h-auto rounded-t-[40px] border-none p-8 pb-12 shadow-none bg-white"
+            className="h-auto sm:max-w-xl sm:left-1/2 sm:-translate-x-1/2 sm:bottom-6 sm:rounded-[36px] border-t sm:border sm:border-navi-border/20 rounded-t-[36px] p-8 pb-12 shadow-2xl bg-white"
           >
+            {/* Mobile grab handle */}
+            <div className="mx-auto -mt-3 mb-5 h-1.5 w-12 shrink-0 rounded-full bg-navi-gray/25 sm:hidden" />
             <SheetHeader className="px-1 pt-2 text-center sm:text-left">
               <SheetTitle className="text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">
                 Add Entry

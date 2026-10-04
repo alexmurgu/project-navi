@@ -6,6 +6,8 @@ import { type CategoryConfig } from "@/lib/category-visuals";
 import { UserSelector } from "./transaction/user-selector";
 import { CategoryPicker } from "./transaction/category-picker";
 import { TransactionForm } from "./transaction/transaction-form";
+import { useSheetHistory } from "@/hooks/use-sheet-history";
+import { haptic } from "@/lib/haptics";
 
 interface User {
   id: string;
@@ -124,10 +126,17 @@ export function TransactionSheet({
     initializeForm();
   }, [initializeForm]);
 
-  const handleSave = () => {
-    const amountCents = Math.round(parseFloat(state.amount) * 100);
-    if (isNaN(amountCents)) return;
+  useSheetHistory(open, onOpenChange, `transaction-${mode}`);
 
+  const handleSave = () => {
+    const cleanAmount = (state.amount || "").replace(",", ".");
+    const amountCents = Math.round(parseFloat(cleanAmount) * 100);
+    if (isNaN(amountCents) || amountCents <= 0) {
+      haptic.warning();
+      return;
+    }
+
+    haptic.success();
     onSubmit({
       id: editingItem?.id,
       amount: amountCents,
@@ -149,8 +158,11 @@ export function TransactionSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-full max-h-[90dvh] sm:h-fit sm:max-h-[95dvh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
+        className="h-full max-h-[92dvh] sm:h-auto sm:max-h-[88vh] sm:max-w-2xl sm:left-1/2 sm:-translate-x-1/2 sm:bottom-6 sm:rounded-[36px] border-t sm:border sm:border-navi-border/20 rounded-t-[36px] p-0 shadow-2xl overflow-hidden flex flex-col bg-white"
       >
+        {/* Mobile grab handle */}
+        <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-navi-gray/25 sm:hidden" />
+
         {/* Header Section */}
         <div className="p-6 sm:p-8 pb-2 text-left shrink-0">
           <h2 className="text-[28px] sm:text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">

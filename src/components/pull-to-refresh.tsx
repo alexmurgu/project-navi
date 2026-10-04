@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useReducer } from "react";
 import { RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
@@ -35,6 +36,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
 
   const startY = useRef(0);
   const isPulling = useRef(false);
+  const hasTriggeredHaptic = useRef(false);
 
   const PULL_THRESHOLD = 70;
   const MAX_PULL = 120;
@@ -49,6 +51,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
       dispatch({ type: "SET_ENABLED", payload: true });
       startY.current = e.touches[0].pageY;
       isPulling.current = true;
+      hasTriggeredHaptic.current = false;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -61,6 +64,13 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
         // Apply resistance
         const distance = Math.min(diff * 0.4, MAX_PULL);
         dispatch({ type: "SET_PULL_DISTANCE", payload: distance });
+
+        if (distance >= PULL_THRESHOLD && !hasTriggeredHaptic.current) {
+          hasTriggeredHaptic.current = true;
+          haptic.light();
+        } else if (distance < PULL_THRESHOLD) {
+          hasTriggeredHaptic.current = false;
+        }
 
         // Prevent browser's native pull-to-refresh if we are handling it
         if (diff > 10 && e.cancelable) {
@@ -80,6 +90,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
         dispatch({ type: "START_REFRESH", payload: PULL_THRESHOLD });
         try {
           await onRefresh();
+          haptic.success();
         } catch (error) {
           console.error("Refresh failed:", error);
         } finally {
