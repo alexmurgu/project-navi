@@ -9,10 +9,10 @@ import {
   creditCard,
   transfer,
 } from "./db/schema";
-import { eq, sql, and, isNotNull, desc, like } from "drizzle-orm";
+import { eq, sql, and, isNotNull, desc, like, gte, lte } from "drizzle-orm";
 import { auth } from "./auth";
 import { getRequest } from "@tanstack/react-start/server";
-import { addMonths, isBefore, startOfMonth } from "date-fns";
+import { addMonths, isBefore, startOfMonth, endOfMonth } from "date-fns";
 
 // Middleware-like session helper for server functions
 const getSession = async () => {
@@ -69,12 +69,11 @@ const syncRecurringExpenses = async () => {
         .where(
           and(
             eq(expense.recurrenceId, template.recurrenceId!),
-            sql`strftime('%m-%Y', ${expense.date} / 1000, 'unixepoch') = ${sql.placeholder("monthYear")}`,
+            gte(expense.date, startOfMonth(nextDate)),
+            lte(expense.date, endOfMonth(nextDate)),
           ),
         )
-        .limit(1)
-        .prepare()
-        .execute({ monthYear: `${nextDate.getMonth() + 1}-${nextDate.getFullYear()}` });
+        .limit(1);
 
       if (!exists) {
         await db.insert(expense).values({

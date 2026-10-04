@@ -1,31 +1,31 @@
 import { relations } from "drizzle-orm";
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import { pgTable, text, integer, boolean, timestamp, index } from "drizzle-orm/pg-core";
 
-export const user = sqliteTable("user", {
+export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: integer("email_verified", { mode: "boolean" }).default(false).notNull(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .$defaultFn(() => new Date())
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date())
     .notNull(),
 });
 
-export const session = sqliteTable(
+export const session = pgTable(
   "session",
   {
     id: text("id").primaryKey(),
-    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }).notNull(),
     token: text("token").notNull().unique(),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .$defaultFn(() => new Date())
       .notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .$onUpdate(() => new Date())
       .notNull(),
     ipAddress: text("ip_address"),
@@ -37,7 +37,7 @@ export const session = sqliteTable(
   (table) => [index("session_userId_idx").on(table.userId)],
 );
 
-export const account = sqliteTable(
+export const account = pgTable(
   "account",
   {
     id: text("id").primaryKey(),
@@ -49,35 +49,37 @@ export const account = sqliteTable(
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
-    accessTokenExpiresAt: integer("access_token_expires_at", {
-      mode: "timestamp_ms",
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      withTimezone: true,
+      mode: "date",
     }),
-    refreshTokenExpiresAt: integer("refresh_token_expires_at", {
-      mode: "timestamp_ms",
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      withTimezone: true,
+      mode: "date",
     }),
     scope: text("scope"),
     password: text("password"),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .$defaultFn(() => new Date())
       .notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .$onUpdate(() => new Date())
       .notNull(),
   },
   (table) => [index("account_userId_idx").on(table.userId)],
 );
 
-export const verification = sqliteTable(
+export const verification = pgTable(
   "verification",
   {
     id: text("id").primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
-    expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
+    expiresAt: timestamp("expires_at", { withTimezone: true, mode: "date" }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .$defaultFn(() => new Date())
       .notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .$defaultFn(() => new Date())
       .$onUpdate(() => new Date())
       .notNull(),
@@ -85,7 +87,7 @@ export const verification = sqliteTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const task = sqliteTable("task", {
+export const task = pgTable("task", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -93,7 +95,7 @@ export const task = sqliteTable("task", {
   priority: integer("priority").notNull().default(1),
 });
 
-export const categoryConfig = sqliteTable("category_config", {
+export const categoryConfig = pgTable("category_config", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -102,7 +104,7 @@ export const categoryConfig = sqliteTable("category_config", {
   icon: text("icon"),
 });
 
-export const expense = sqliteTable("expense", {
+export const expense = pgTable("expense", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -110,18 +112,18 @@ export const expense = sqliteTable("expense", {
   description: text("description").notNull(),
   amount: integer("amount").notNull(), // in cents
   category: text("category").notNull(), // e.g., 'Groceries', 'Rent', etc.
-  date: integer("date", { mode: "timestamp_ms" })
+  date: timestamp("date", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
-  isMonthly: integer("is_monthly", { mode: "boolean" }).notNull().default(false),
+  isMonthly: boolean("is_monthly").notNull().default(false),
   status: text("status", { enum: ["pending", "paid"] })
     .notNull()
     .default("paid"),
   recurrenceId: text("recurrence_id"),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),
@@ -131,7 +133,7 @@ export const expense = sqliteTable("expense", {
   accountId: text("account_id"), // ID of creditCard
 });
 
-export const income = sqliteTable("income", {
+export const income = pgTable("income", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -139,22 +141,22 @@ export const income = sqliteTable("income", {
   description: text("description").notNull(),
   amount: integer("amount").notNull(), // in cents
   category: text("category").notNull().default("Salary"),
-  date: integer("date", { mode: "timestamp_ms" })
+  date: timestamp("date", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
   status: text("status", { enum: ["pending", "paid"] })
     .notNull()
     .default("paid"),
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),
 });
 
-export const savingsAccount = sqliteTable("savings_account", {
+export const savingsAccount = pgTable("savings_account", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -163,16 +165,16 @@ export const savingsAccount = sqliteTable("savings_account", {
   icon: text("icon"),
   color: text("color").notNull().default("#494fdf"),
   targetAmount: integer("target_amount"), // in cents
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),
 });
 
-export const creditCard = sqliteTable("credit_card", {
+export const creditCard = pgTable("credit_card", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -181,33 +183,33 @@ export const creditCard = sqliteTable("credit_card", {
   icon: text("icon"),
   color: text("color").notNull().default("#f43f5e"), // Default Rose
   limit: integer("limit"), // in cents
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),
 });
 
-export const transfer = sqliteTable("transfer", {
+export const transfer = pgTable("transfer", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
   amount: integer("amount").notNull(),
   description: text("description").notNull(),
-  date: integer("date", { mode: "timestamp_ms" })
+  date: timestamp("date", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
   fromType: text("from_type", { enum: ["main", "savings", "credit"] }).notNull(),
   fromId: text("from_id"), // ID of savingsAccount or creditCard
   toType: text("to_type", { enum: ["main", "savings", "credit"] }).notNull(),
   toId: text("to_id"), // ID of savingsAccount or creditCard
-  createdAt: integer("created_at", { mode: "timestamp_ms" })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),

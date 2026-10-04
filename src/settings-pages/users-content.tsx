@@ -44,7 +44,7 @@ export function UsersContent({ allUsers, adminEmail }: UsersContentProps) {
   return (
     <div className="w-full min-h-screen flex flex-col bg-white antialiased">
       {/* High-Impact Header */}
-      <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
+      <section className="bg-navi-dark pt-[calc(env(safe-area-inset-top,0px)+64px)] pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
         <div className="space-y-4 relative z-10">
           <p className="text-[12px] font-display font-medium uppercase tracking-[0.25em] opacity-50">
             Access Control

@@ -110,7 +110,9 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
           pullDistance > 10 || isRefreshing ? "opacity-100" : "opacity-0",
         )}
         style={{
-          top: isRefreshing ? 20 : Math.max(-40, pullDistance - 40),
+          top: isRefreshing
+            ? "calc(env(safe-area-inset-top, 0px) + 16px)"
+            : `calc(env(safe-area-inset-top, 0px) + ${Math.max(-40, pullDistance - 40)}px)`,
         }}
       >
         <div className="bg-white rounded-full p-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.1)] border border-navi-border/20">

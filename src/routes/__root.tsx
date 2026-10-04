@@ -23,19 +23,20 @@ import { RouteError } from "@/components/route-error";
 import { fetchSession } from "@/actions";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
+import { cn } from "@/lib/utils";
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-[#191c1f]">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-        <meta name="theme-color" content="#0F766E" />
+        <meta name="theme-color" content="#191c1f" />
         <meta name="application-name" content="Navi" />
         <meta name="apple-mobile-web-app-title" content="Navi" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/navi-touch-icon.png" />
@@ -107,15 +108,17 @@ function RootLayout() {
     fetchSession();
   }, [fetchSession]);
 
+  const isDarkHeader =
+    pathname === "/" ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/members/") ||
+    pathname.startsWith("/categories/") ||
+    pathname.startsWith("/accounts/");
+
   useEffect(() => {
     if (typeof document === "undefined") return;
-    // Determine the status bar theme color based on page layout
-    const isDarkHeader =
-      pathname === "/" ||
-      pathname.startsWith("/settings") ||
-      pathname.startsWith("/members/") ||
-      pathname.startsWith("/categories/");
     const targetColor = isDarkHeader ? "#191c1f" : "#ffffff";
+    document.documentElement.style.backgroundColor = targetColor;
     let metaTag = document.querySelector('meta[name="theme-color"]');
     if (!metaTag) {
       metaTag = document.createElement("meta");
@@ -123,7 +126,7 @@ function RootLayout() {
       document.head.appendChild(metaTag);
     }
     metaTag.setAttribute("content", targetColor);
-  }, [pathname]);
+  }, [isDarkHeader]);
 
   useEffect(() => {
     const handleOpenQuickAddChoice = () => setUiState((prev) => ({ ...prev, quickAddOpen: true }));
@@ -220,6 +223,8 @@ function RootLayout() {
           </div>
         ) : null}
         {user && <PwaInstallBanner />}
+        {/* Mobile PWA status bar safe area cover */}
+        <div className="fixed top-0 inset-x-0 h-[env(safe-area-inset-top,0px)] bg-navi-dark z-50 pointer-events-none lg:hidden" />
         <SidebarProvider>
           {/* Desktop Sidebar - Hidden on mobile/tablets */}
           {user && (
@@ -228,7 +233,7 @@ function RootLayout() {
             </div>
           )}
 
-          <SidebarInset className="bg-background">
+          <SidebarInset className={cn("bg-background", isDarkHeader && "bg-navi-dark")}>
             <PullToRefresh
               onRefresh={async () => {
                 // Ensure at least 800ms of visual feedback

@@ -61,7 +61,7 @@ export function CreditCardsSettingsContent({ cards }: CreditCardsSettingsContent
   return (
     <div className="w-full min-h-screen flex flex-col bg-white antialiased">
       {/* Header */}
-      <section className="bg-navi-dark pt-16 pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
+      <section className="bg-navi-dark pt-[calc(env(safe-area-inset-top,0px)+64px)] pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
         <div className="space-y-4 relative z-10">
           <Link
             to="/settings"
