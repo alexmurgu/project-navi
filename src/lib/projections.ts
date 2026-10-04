@@ -140,8 +140,8 @@ export function calculateProjections({
   );
   const paidIncomes = incomes.filter((i) => !i.isTransfer && i.status !== "pending");
 
-  // Determine up to 5 completed reference months for deep statistical baselining
-  const referenceMonths = [1, 2, 3, 4, 5].map((offset) => {
+  // Determine up to 6 completed reference months (3-6 months lookback) for robust statistical baselining
+  const referenceMonths = [1, 2, 3, 4, 5, 6].map((offset) => {
     const monthDate = subMonths(currentMonthStart, offset);
     return {
       start: startOfMonth(monthDate),
@@ -303,9 +303,16 @@ export function calculateProjections({
       monthlyCounts.push(matching.length);
     }
 
-    // Use median monthly spend to prevent one-off spikes (e.g. surgeries, major car repairs) from contaminating the baseline
-    const baseline = median(monthlySums);
-    const medCount = median(monthlyCounts);
+    const nonZeroSums = monthlySums.filter((s) => s > 0);
+    const nonZeroCounts = monthlyCounts.filter((c) => c > 0);
+    const recentActive = [0, 1, 2].some((i) => monthlySums[i] > 0);
+
+    // Use median monthly spend to prevent one-off spikes from contaminating the baseline.
+    // If active in recent months, use median of non-zero months so newer/occasional categories don't get zeroed out.
+    const baseline =
+      recentActive && nonZeroSums.length > 0 ? median(nonZeroSums) : median(monthlySums);
+    const medCount =
+      recentActive && nonZeroCounts.length > 0 ? median(nonZeroCounts) : median(monthlyCounts);
 
     const lower = cat.toLowerCase();
     const isFixed =
