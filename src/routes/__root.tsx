@@ -146,8 +146,10 @@ function RootLayout() {
         pwaUpdateAvailable: true,
       }));
     };
+    let reloading = false;
     const handleControllerChange = () => {
-      if (uiState.refreshingForUpdate) {
+      if (!reloading) {
+        reloading = true;
         window.location.reload();
       }
     };
@@ -162,7 +164,7 @@ function RootLayout() {
       window.removeEventListener("pwa-update-available", handleUpdateAvailable as EventListener);
       window.removeEventListener("pwa-controller-changed", handleControllerChange);
     };
-  }, [uiState.refreshingForUpdate]);
+  }, []);
 
   const showDevtools = typeof window !== "undefined" && window.location.hostname === "localhost";
   const openQuickAdd = (mode: "expense" | "income" | "transfer") => {
@@ -177,10 +179,25 @@ function RootLayout() {
     window.dispatchEvent(new CustomEvent(eventName));
   };
 
-  const updateApp = () => {
-    if (!uiState.pendingRegistration?.waiting) return;
-    setUiState((prev) => ({ ...prev, refreshingForUpdate: true }));
-    uiState.pendingRegistration.waiting.postMessage({ type: "SKIP_WAITING" });
+  const updateApp = async () => {
+    haptic.medium();
+    setUiState((prev) => ({ ...prev, pwaUpdateAvailable: false, refreshingForUpdate: true }));
+    try {
+      if (uiState.pendingRegistration?.waiting) {
+        uiState.pendingRegistration.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+      if ("serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg?.waiting) {
+          reg.waiting.postMessage({ type: "SKIP_WAITING" });
+        }
+      }
+    } catch (e) {
+      console.warn("Error skipping waiting:", e);
+    }
+    setTimeout(() => {
+      window.location.reload();
+    }, 150);
   };
 
   return (
