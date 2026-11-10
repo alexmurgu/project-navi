@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { db } from "./db";
 import * as schema from "./db/schema";
 import os from "node:os";
@@ -59,7 +60,19 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  session: {
+    // A household app on personal phones: stay signed in for 60 days of
+    // inactivity, sliding forward at most once a day while in use.
+    expiresIn: 60 * 60 * 24 * 60,
+    updateAge: 60 * 60 * 24,
+  },
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: getBetterAuthBaseURL(),
   trustedOrigins: getTrustedOrigins(),
+  // Session reads happen inside server functions, not the /api/auth handler.
+  // Without this plugin the refreshed session cookie Better Auth emits there is
+  // dropped, so the browser cookie expired on its original date and logged
+  // users out even though the server-side session had been extended.
+  // Must stay the last plugin.
+  plugins: [tanstackStartCookies()],
 });

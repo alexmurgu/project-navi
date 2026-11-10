@@ -6,9 +6,20 @@ import { Dialog as SheetPrimitive } from "@base-ui/react/dialog";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
+import { useSheetHistory } from "@/hooks/use-sheet-history";
 
-function Sheet({ ...props }: SheetPrimitive.Root.Props) {
-  return <SheetPrimitive.Root data-slot="sheet" {...props} />;
+/**
+ * Every controlled sheet participates in back-button handling: the system
+ * back gesture closes the top-most sheet (nested pickers first) instead of
+ * leaving the page. See useSheetHistory.
+ */
+function Sheet({ open, onOpenChange, ...props }: SheetPrimitive.Root.Props) {
+  useSheetHistory(open ?? false, (next) =>
+    (onOpenChange as ((open: boolean) => void) | undefined)?.(next),
+  );
+  return (
+    <SheetPrimitive.Root data-slot="sheet" open={open} onOpenChange={onOpenChange} {...props} />
+  );
 }
 
 function SheetTrigger({ ...props }: SheetPrimitive.Trigger.Props) {
@@ -38,10 +49,16 @@ function SheetContent({
   children,
   side = "right",
   showCloseButton = true,
+  fullHeight = false,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: "top" | "right" | "bottom" | "left";
   showCloseButton?: boolean;
+  /**
+   * Bottom sheets on phones: stretch to just below the status bar and stay
+   * there while the keyboard opens or the content shrinks (see globals.css).
+   */
+  fullHeight?: boolean;
 }) {
   return (
     <SheetPortal>
@@ -49,6 +66,7 @@ function SheetContent({
       <SheetPrimitive.Popup
         data-slot="sheet-content"
         data-side={side}
+        data-full-height={fullHeight || undefined}
         className={cn(
           "fixed z-[90] flex flex-col bg-background bg-clip-padding text-sm shadow-lg data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-screen data-[side=left]:border-r data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-screen data-[side=right]:border-l data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=left]:sm:max-w-md data-[side=right]:sm:max-w-md",
           className,

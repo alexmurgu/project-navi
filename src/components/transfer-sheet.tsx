@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { X, Plus, ArrowRightLeft, AlertCircle } from "lucide-react";
@@ -7,7 +7,7 @@ import { TransactionForm } from "./transaction/transaction-form";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDown } from "lucide-react";
-import { useSheetHistory } from "@/hooks/use-sheet-history";
+import { useSheetFormReset } from "@/hooks/use-sheet-form-reset";
 import { haptic } from "@/lib/haptics";
 
 interface User {
@@ -82,23 +82,21 @@ export function TransferSheet({
     selectedUserId: "family",
   });
 
-  useEffect(() => {
-    if (open) {
-      dispatch({
-        type: "RESET",
-        payload: {
-          amount: "",
-          description: "Transfer to Savings",
-          date: new Date(),
-          fromType: "main",
-          fromId: null,
-          toType: "savings",
-          toId: savingsAccounts[0]?.id || null,
-          selectedUserId: "family",
-        },
-      });
-    }
-  }, [open, savingsAccounts]);
+  useSheetFormReset(open, null, () => {
+    dispatch({
+      type: "RESET",
+      payload: {
+        amount: "",
+        description: "Transfer to Savings",
+        date: new Date(),
+        fromType: "main",
+        fromId: null,
+        toType: "savings",
+        toId: savingsAccounts[0]?.id || null,
+        selectedUserId: "family",
+      },
+    });
+  });
 
   const [fromOpen, setFromOpen] = React.useState(false);
   const [toOpen, setToOpen] = React.useState(false);
@@ -138,8 +136,6 @@ export function TransferSheet({
         : creditCards.find((cc) => cc.id === state.fromId)?.limit || 99999999; // Credit cards use limit or arbitrary high for now
 
   const isOverBalance = amountCents > sourceBalance;
-
-  useSheetHistory(open, onOpenChange, "transfer-sheet");
 
   const handleSave = () => {
     if (isNaN(amountCents) || amountCents <= 0 || isOverBalance) {

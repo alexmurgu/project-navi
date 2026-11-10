@@ -1,21 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { getDashboardData } from "@/actions";
 import { CreditCardsSettingsContent } from "@/settings-pages/credit-cards-content";
+import { loadDashboard, useDashboardData } from "@/lib/queries";
 
 export const Route = createFileRoute("/settings/credit-cards")({
-  loader: () => getDashboardData(),
+  loader: ({ context }) => loadDashboard(context.queryClient),
   component: SettingsCreditCardsPage,
 });
 
 function SettingsCreditCardsPage() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: () => getDashboardData(),
-  });
-
-  if (isLoading) return <div className="p-8 text-foreground">Loading...</div>;
-  if (!data) return null;
-
+  const data = useDashboardData(Route.useLoaderData());
   return <CreditCardsSettingsContent cards={data.creditCards} />;
 }

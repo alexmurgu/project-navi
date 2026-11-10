@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { DashboardContent } from "@/dashboard-content";
-import { useRequireAuth } from "@/hooks/use-auth-guard";
 import { validateMonthSearch } from "@/lib/month-param";
-import { getDashboardData } from "../actions";
+import { loadDashboard, useDashboardData } from "@/lib/queries";
 
 export const Route = createFileRoute("/")({
   validateSearch: validateMonthSearch,
-  loader: () => getDashboardData(),
+  loader: ({ context }) => loadDashboard(context.queryClient),
   head: () => ({
     meta: [
       { title: "Dashboard | Aftermind" },
@@ -21,18 +19,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const { user, loading } = useRequireAuth();
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: () => getDashboardData(),
-    enabled: !!user,
-  });
-
-  if (loading) return <div className="p-8 text-foreground">Loading...</div>;
-  if (isLoading) return <div className="p-8 text-foreground">Loading Dashboard...</div>;
-  if (error) return <div className="p-8 text-destructive">Error loading dashboard</div>;
-  if (!data) return null;
-
+  const data = useDashboardData(Route.useLoaderData());
   return <DashboardContent data={data} />;
 }

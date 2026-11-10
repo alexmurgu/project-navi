@@ -9,7 +9,7 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "../globals.css";
-import { useAuthStore } from "../store/useAuthStore";
+import { resolveSession, useAuthStore } from "../store/useAuthStore";
 import { useEffect, useState, type ReactNode } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -20,11 +20,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownCircle, ArrowUpCircle, Plus } from "lucide-react";
 import { NotFound } from "@/components/not-found";
 import { RouteError } from "@/components/route-error";
-import { fetchSession } from "@/actions";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
 import { cn } from "@/lib/utils";
-import { useSheetHistory } from "@/hooks/use-sheet-history";
+import { useVisualViewportVars } from "@/hooks/use-visual-viewport-vars";
 import { haptic } from "@/lib/haptics";
 
 function RootDocument({ children }: { children: ReactNode }) {
@@ -89,8 +88,7 @@ interface MyRouterContext {
 }
 
 function RootLayout() {
-  const { queryClient } = Route.useRouteContext();
-  const { fetchSession, loading, user } = useAuthStore();
+  const { queryClient, user, session } = Route.useRouteContext();
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
 
@@ -106,13 +104,15 @@ function RootLayout() {
     pendingRegistration: null,
   });
 
-  useSheetHistory(uiState.quickAddOpen, (open) =>
-    setUiState((prev) => ({ ...prev, quickAddOpen: open })),
-  );
+  useVisualViewportVars();
 
+  // Seed the client session cache from the SSR-resolved context so the first
+  // client-side navigation does not need another session round trip.
   useEffect(() => {
-    fetchSession();
-  }, [fetchSession]);
+    if (user && !useAuthStore.getState().user) {
+      useAuthStore.getState().setSession({ user, session } as any);
+    }
+  }, [user, session]);
 
   const isDarkHeader =
     pathname === "/" ||
@@ -203,18 +203,6 @@ function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-        {loading ? (
-          <div className="fixed inset-0 z-200 flex items-center justify-center bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.16),transparent_30%),linear-gradient(180deg,rgba(248,251,251,1)_0%,rgba(241,249,248,1)_100%)]">
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#083B3A] shadow-lg">
-                <img src="/icon.svg" alt="Navi" className="h-9 w-9" />
-              </div>
-              <div className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">
-                Loading
-              </div>
-            </div>
-          </div>
-        ) : null}
         {uiState.pwaUpdateAvailable ? (
           <div className="fixed bottom-6 left-1/2 z-210 w-[min(92vw,520px)] -translate-x-1/2 rounded-2xl border border-muted/10 bg-white/95 p-4 shadow-2xl backdrop-blur">
             <div className="flex items-center justify-between gap-4">
@@ -350,7 +338,7 @@ function RootLayout() {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   beforeLoad: async ({ location }) => {
-    const sessionData = await fetchSession();
+    const sessionData = await resolveSession();
 
     if (!sessionData && location.pathname !== "/login") {
       throw redirect({

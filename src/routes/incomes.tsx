@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { IncomesContent } from "@/incomes-content";
-import { useRequireAuth } from "@/hooks/use-auth-guard";
 import { validateMonthSearch } from "@/lib/month-param";
-import { getDashboardData } from "../actions";
+import { loadDashboard, useDashboardData } from "@/lib/queries";
 
 export const Route = createFileRoute("/incomes")({
   validateSearch: validateMonthSearch,
-  loader: () => getDashboardData(),
+  loader: ({ context }) => loadDashboard(context.queryClient),
   head: () => ({
     meta: [
       { title: "Incomes | Aftermind" },
@@ -18,17 +16,6 @@ export const Route = createFileRoute("/incomes")({
 });
 
 function IncomesPage() {
-  const { user, loading } = useRequireAuth();
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: () => getDashboardData(),
-    enabled: !!user,
-  });
-
-  if (loading) return <div className="p-8 text-foreground">Loading...</div>;
-  if (isLoading) return <div className="p-8 text-foreground">Loading Incomes...</div>;
-  if (!data) return null;
-
+  const data = useDashboardData(Route.useLoaderData());
   return <IncomesContent data={data} />;
 }

@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Trash2, Save, X, Plus } from "lucide-react";
@@ -6,7 +6,7 @@ import { type CategoryConfig } from "@/lib/category-visuals";
 import { UserSelector } from "./transaction/user-selector";
 import { CategoryPicker } from "./transaction/category-picker";
 import { TransactionForm } from "./transaction/transaction-form";
-import { useSheetHistory } from "@/hooks/use-sheet-history";
+import { useSheetFormReset } from "@/hooks/use-sheet-form-reset";
 import { haptic } from "@/lib/haptics";
 
 interface User {
@@ -98,11 +98,12 @@ export function TransactionSheet({
     accountId: null,
   });
 
-  const initializeForm = React.useCallback(() => {
-    if (open) {
-      const initialDate = editingItem ? new Date(editingItem.date) : getTodayMidnight();
-      initialDate.setHours(0, 0, 0, 0);
-      const initialState: FormState = {
+  useSheetFormReset(open, editingItem?.id ?? null, () => {
+    const initialDate = editingItem ? new Date(editingItem.date) : getTodayMidnight();
+    initialDate.setHours(0, 0, 0, 0);
+    dispatch({
+      type: "RESET",
+      payload: {
         amount: editingItem ? (editingItem.amount / 100).toString() : "",
         description: editingItem?.description || "",
         date: initialDate,
@@ -115,18 +116,9 @@ export function TransactionSheet({
         isRecurrent: editingItem?.isRecurrent || false,
         accountType: editingItem?.accountType || "main",
         accountId: editingItem?.accountId || null,
-      };
-      // We purposefully do not use useEffect directly for this state sync
-      // when editingItem changes to avoid simulating an event handler warning.
-      dispatch({ type: "RESET", payload: initialState });
-    }
-  }, [open, editingItem, availableCategories, getTodayMidnight]);
-
-  useEffect(() => {
-    initializeForm();
-  }, [initializeForm]);
-
-  useSheetHistory(open, onOpenChange, `transaction-${mode}`);
+      },
+    });
+  });
 
   const handleSave = () => {
     const cleanAmount = (state.amount || "").replace(",", ".");

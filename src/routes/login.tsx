@@ -2,8 +2,7 @@ import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { type FormEvent, useReducer } from "react";
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import { useAuthStore } from "../store/useAuthStore";
-import { useRedirectIfAuthed } from "@/hooks/use-auth-guard";
+import { resolveSession } from "../store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,8 +24,6 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const router = useRouter();
-  const { loading } = useRedirectIfAuthed();
-  const { fetchSession } = useAuthStore();
   const [state, setState] = useReducer(
     (
       current: {
@@ -53,20 +50,6 @@ function Login() {
     },
   );
 
-  if (loading) {
-    return (
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.14),transparent_28%),linear-gradient(180deg,rgba(248,251,251,1)_0%,rgba(241,249,248,1)_100%)] px-4 py-10 text-foreground">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-32 -top-32 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -right-24 -bottom-32 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
-        </div>
-        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#083B3A] shadow-lg">
-          <img src="/icon.svg" alt="Navi" className="h-9 w-9" />
-        </div>
-      </main>
-    );
-  }
-
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setState({ loading: true, error: "" });
@@ -80,8 +63,7 @@ function Login() {
       if (authError) {
         setState({ error: authError.message || "Invalid email or password", loading: false });
       } else {
-        await fetchSession();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        await resolveSession({ force: true });
         router.navigate({ to: "/" });
       }
     } catch {

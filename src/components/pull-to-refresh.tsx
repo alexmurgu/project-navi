@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useReducer } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
@@ -10,110 +10,116 @@ interface PullToRefreshProps {
   children: React.ReactNode;
 }
 
+const PULL_THRESHOLD = 70;
+const MAX_PULL = 120;
+const RESISTANCE = 0.4;
+
+/**
+ * Pull-to-refresh for the page content.
+ *
+ * Listeners are attached to the content wrapper, not `window`, so gestures in
+ * portaled sheets and dialogs never trigger a refresh or move the page behind
+ * them. Gesture state lives in refs so listeners are attached exactly once.
+ */
 export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
-  const [state, dispatch] = useReducer(
-    (
-      state: { pullDistance: number; isRefreshing: boolean; isEnabled: boolean },
-      action: { type: string; payload?: any },
-    ) => {
-      switch (action.type) {
-        case "SET_ENABLED":
-          return { ...state, isEnabled: action.payload };
-        case "SET_PULL_DISTANCE":
-          return { ...state, pullDistance: action.payload };
-        case "START_REFRESH":
-          return { ...state, isRefreshing: true, pullDistance: action.payload };
-        case "STOP_REFRESH":
-          return { ...state, isRefreshing: false, pullDistance: 0 };
-        default:
-          return state;
-      }
-    },
-    { pullDistance: 0, isRefreshing: false, isEnabled: true },
-  );
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const { pullDistance, isRefreshing, isEnabled } = state;
-
-  const startY = useRef(0);
-  const isPulling = useRef(false);
-  const hasTriggeredHaptic = useRef(false);
-
-  const PULL_THRESHOLD = 70;
-  const MAX_PULL = 120;
+  const onRefreshRef = useRef(onRefresh);
+  onRefreshRef.current = onRefresh;
 
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    let startY = 0;
+    let tracking = false;
+    let distance = 0;
+    let refreshing = false;
+    let passedThreshold = false;
+
+    const update = (value: number) => {
+      distance = value;
+      setPullDistance(value);
+    };
+
     const handleTouchStart = (e: TouchEvent) => {
-      // Only trigger if we are at the top of the page
-      if (window.scrollY > 5) {
-        dispatch({ type: "SET_ENABLED", payload: false });
+      if (refreshing || window.scrollY > 0 || e.touches.length !== 1) {
+        tracking = false;
         return;
       }
-      dispatch({ type: "SET_ENABLED", payload: true });
-      startY.current = e.touches[0].pageY;
-      isPulling.current = true;
-      hasTriggeredHaptic.current = false;
+      tracking = true;
+      passedThreshold = false;
+      startY = e.touches[0].clientY;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isPulling.current || isRefreshing || !isEnabled) return;
+      if (!tracking) return;
 
-      const currentY = e.touches[0].pageY;
-      const diff = currentY - startY.current;
-
-      if (diff > 0) {
-        // Apply resistance
-        const distance = Math.min(diff * 0.4, MAX_PULL);
-        dispatch({ type: "SET_PULL_DISTANCE", payload: distance });
-
-        if (distance >= PULL_THRESHOLD && !hasTriggeredHaptic.current) {
-          hasTriggeredHaptic.current = true;
-          haptic.light();
-        } else if (distance < PULL_THRESHOLD) {
-          hasTriggeredHaptic.current = false;
-        }
-
-        // Prevent browser's native pull-to-refresh if we are handling it
-        if (diff > 10 && e.cancelable) {
-          e.preventDefault();
-        }
-      } else {
-        isPulling.current = false;
-        dispatch({ type: "SET_PULL_DISTANCE", payload: 0 });
+      const diff = e.touches[0].clientY - startY;
+      if (diff <= 0 || window.scrollY > 0) {
+        // Scrolling up into the content: hand the gesture back to the browser.
+        tracking = false;
+        setIsDragging(false);
+        update(0);
+        return;
       }
+
+      setIsDragging(true);
+      const next = Math.min(diff * RESISTANCE, MAX_PULL);
+      update(next);
+
+      if (next >= PULL_THRESHOLD && !passedThreshold) {
+        passedThreshold = true;
+        haptic.light();
+      } else if (next < PULL_THRESHOLD) {
+        passedThreshold = false;
+      }
+
+      if (e.cancelable) e.preventDefault();
     };
 
     const handleTouchEnd = async () => {
-      if (!isPulling.current || isRefreshing || !isEnabled) return;
-      isPulling.current = false;
+      if (!tracking) return;
+      tracking = false;
+      setIsDragging(false);
 
-      if (pullDistance >= PULL_THRESHOLD) {
-        dispatch({ type: "START_REFRESH", payload: PULL_THRESHOLD });
-        try {
-          await onRefresh();
-          haptic.success();
-        } catch (error) {
-          console.error("Refresh failed:", error);
-        } finally {
-          dispatch({ type: "STOP_REFRESH" });
-        }
-      } else {
-        dispatch({ type: "SET_PULL_DISTANCE", payload: 0 });
+      if (distance < PULL_THRESHOLD) {
+        update(0);
+        return;
+      }
+
+      refreshing = true;
+      setIsRefreshing(true);
+      try {
+        await onRefreshRef.current();
+        haptic.success();
+      } catch (error) {
+        console.error("Refresh failed:", error);
+      } finally {
+        refreshing = false;
+        setIsRefreshing(false);
+        update(0);
       }
     };
 
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    el.addEventListener("touchstart", handleTouchStart, { passive: true });
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    el.addEventListener("touchend", handleTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", handleTouchEnd, { passive: true });
 
     return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("touchend", handleTouchEnd);
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("touchend", handleTouchEnd);
+      el.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, [pullDistance, isRefreshing, isEnabled, onRefresh]);
+  }, []);
 
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="relative w-full">
       {/* Pull indicator */}
       <div
         className={cn(
@@ -138,9 +144,15 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
 
       {/* Content wrapper */}
       <div
-        className={cn("transition-transform", !isPulling.current && "duration-300")}
+        className={cn(!isDragging && "transition-transform duration-300")}
         style={{
-          transform: isRefreshing ? "translateY(60px)" : `translateY(${pullDistance * 0.4}px)`,
+          // Leave `transform` unset at rest: even translateY(0) would turn this
+          // wrapper into the containing block for fixed-position page elements.
+          transform: isRefreshing
+            ? "translateY(60px)"
+            : pullDistance > 0
+              ? `translateY(${pullDistance * 0.4}px)`
+              : undefined,
         }}
       >
         {children}

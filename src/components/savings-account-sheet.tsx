@@ -1,9 +1,9 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Trash2, X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSheetHistory } from "@/hooks/use-sheet-history";
+import { useSheetFormReset } from "@/hooks/use-sheet-form-reset";
 import { haptic } from "@/lib/haptics";
 
 interface SavingsAccountSheetProps {
@@ -55,28 +55,22 @@ export function SavingsAccountSheet({
   onDelete,
   saving,
 }: SavingsAccountSheetProps) {
-  useSheetHistory(open, onOpenChange);
-
   const [state, dispatch] = useReducer(savingsReducer, {
     name: "",
     color: COLORS[0],
     targetAmount: "",
   });
 
-  useEffect(() => {
-    if (open) {
-      dispatch({
-        type: "RESET",
-        payload: {
-          name: editingItem?.name || "",
-          color: editingItem?.color || COLORS[0],
-          targetAmount: editingItem?.targetAmount
-            ? (editingItem.targetAmount / 100).toString()
-            : "",
-        },
-      });
-    }
-  }, [open, editingItem]);
+  useSheetFormReset(open, editingItem?.id ?? null, () => {
+    dispatch({
+      type: "RESET",
+      payload: {
+        name: editingItem?.name || "",
+        color: editingItem?.color || COLORS[0],
+        targetAmount: editingItem?.targetAmount ? (editingItem.targetAmount / 100).toString() : "",
+      },
+    });
+  });
 
   const handleSave = () => {
     if (!state.name.trim()) {

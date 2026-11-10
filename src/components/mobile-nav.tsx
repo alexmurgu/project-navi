@@ -1,24 +1,27 @@
-import React from "react";
-import { Home, ArrowUpCircle, TrendingDown, Settings, Plus } from "lucide-react";
+import { Home, ArrowUpCircle, TrendingDown, Settings, Plus, type LucideIcon } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 
-export function MobileNav() {
-  const routerState = useRouterState();
-  const pathname = routerState.location.pathname;
+type NavItem = { kind: "link"; to: string; icon: LucideIcon; label: string } | { kind: "fab" };
 
-  const navItems = [
-    { to: "/", icon: <Home className="size-5" strokeWidth={1} />, label: "Home" },
-    { to: "/incomes", icon: <ArrowUpCircle className="size-5" strokeWidth={1} />, label: "Income" },
-    { to: "fab", icon: null, label: "Add" }, // Placeholder for FAB
-    {
-      to: "/expenses",
-      icon: <TrendingDown className="size-5" strokeWidth={1} />,
-      label: "Expenses",
-    },
-    { to: "/settings", icon: <Settings className="size-5" strokeWidth={1} />, label: "Settings" },
-  ];
+const NAV_ITEMS: NavItem[] = [
+  { kind: "link", to: "/", icon: Home, label: "Home" },
+  { kind: "link", to: "/incomes", icon: ArrowUpCircle, label: "Income" },
+  { kind: "fab" },
+  { kind: "link", to: "/expenses", icon: TrendingDown, label: "Expenses" },
+  { kind: "link", to: "/settings", icon: Settings, label: "Settings" },
+];
+
+function isActivePath(pathname: string, to: string) {
+  if (to === "/") return pathname === "/";
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
+
+export function MobileNav() {
+  // `location` switches as soon as a navigation starts, so the active tab
+  // updates on tap rather than after the next page has loaded.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const handleFabClick = () => {
     haptic.medium();
@@ -27,41 +30,52 @@ export function MobileNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-60 px-5 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-2 pointer-events-none">
-      <div className="relative mx-auto max-w-lg">
-        <div className="pointer-events-auto grid grid-cols-5 items-center gap-1 rounded-full border border-navi-border/30 bg-white/95 px-3 py-3 shadow-none backdrop-blur-xl">
-          {navItems.map((item) => {
-            if (item.to === "fab") {
+      <div className="pointer-events-auto mx-auto max-w-lg rounded-full border border-navi-border/30 bg-white/90 p-2 shadow-[0_12px_40px_-16px_rgba(25,28,31,0.25)] backdrop-blur-xl">
+        <div className="grid grid-cols-5 items-center">
+          {NAV_ITEMS.map((item) => {
+            if (item.kind === "fab") {
               return (
                 <button
                   key="fab"
                   type="button"
                   onClick={handleFabClick}
                   aria-label="Add transaction"
-                  className="mx-auto flex size-14 items-center justify-center rounded-full bg-navi-dark text-white transition-all duration-300 hover:opacity-90 active:scale-95 touch-manipulation"
+                  className="relative mx-auto flex size-14 items-center justify-center rounded-full bg-navi-dark text-white shadow-[0_8px_20px_-8px_rgba(25,28,31,0.6)] transition-transform duration-200 active:scale-90 touch-manipulation"
                 >
-                  <Plus className="size-6" />
+                  <Plus className="size-6" strokeWidth={2} />
                 </button>
               );
             }
 
-            const isActive = pathname === item.to;
+            const isActive = isActivePath(pathname, item.to);
+            const Icon = item.icon;
             return (
               <Link
                 key={item.to}
                 to={item.to as any}
                 search={(prev: any) => prev}
+                aria-current={isActive ? "page" : undefined}
                 onClick={() => {
                   if (!isActive) haptic.light();
                 }}
                 className={cn(
-                  "flex flex-col items-center justify-center h-14 rounded-full transition-all duration-500 touch-manipulation",
-                  isActive
-                    ? "text-navi-blue bg-navi-blue/5"
-                    : "text-navi-gray hover:text-navi-dark",
+                  "relative flex h-14 flex-col items-center justify-center gap-1 rounded-full transition-[color,transform] duration-300 active:scale-90 touch-manipulation",
+                  isActive ? "text-navi-dark" : "text-navi-gray",
                 )}
               >
-                {item.icon}
-                <span className="mt-1 text-[9px] font-display font-medium uppercase tracking-widest">
+                <Icon
+                  className={cn(
+                    "size-[22px] transition-transform duration-300",
+                    isActive && "-translate-y-px",
+                  )}
+                  strokeWidth={isActive ? 2 : 1.5}
+                />
+                <span
+                  className={cn(
+                    "text-[10px] leading-none font-display tracking-wide transition-[font-weight] duration-300",
+                    isActive ? "font-semibold" : "font-medium",
+                  )}
+                >
                   {item.label}
                 </span>
               </Link>

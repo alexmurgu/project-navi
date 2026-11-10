@@ -124,14 +124,22 @@ export function CategoryCombobox({
   );
 
   const searchContent = (
-    <Command className="bg-transparent">
+    <Command className={cn("bg-transparent", isMobile && "flex min-h-0 flex-1 flex-col")}>
       <CommandInput
         placeholder="Search categories..."
         value={searchValue}
         onValueChange={setSearchValue}
         className="h-12 border-none bg-transparent text-base md:text-sm font-display font-medium"
       />
-      <CommandList id={listboxId} className="max-h-[300px] overflow-y-auto">
+      {/* On phones the list fills whatever space the keyboard leaves while the
+          search field stays pinned; on desktop the popover keeps a fixed cap. */}
+      <CommandList
+        id={listboxId}
+        className={cn(
+          "overflow-y-auto overscroll-contain",
+          isMobile ? "max-h-none min-h-0 flex-1" : "max-h-[300px]",
+        )}
+      >
         <CommandEmpty className="px-6 py-8 text-center">
           {!showAddNew && (
             <p className="text-[10px] font-display font-medium uppercase tracking-widest text-navi-gray/40">
@@ -210,6 +218,7 @@ export function CategoryCombobox({
           side="bottom"
           className="rounded-t-[40px] border-none px-6 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] pt-4 bg-white flex flex-col max-h-[85dvh] z-[100]"
           showCloseButton={false}
+          fullHeight
         >
           {/* iOS Native Pull Handle */}
           <div className="mx-auto w-12 h-1.5 rounded-full bg-navi-border/30 mb-6 shrink-0" />
@@ -227,7 +236,7 @@ export function CategoryCombobox({
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto min-h-0">{searchContent}</div>
+          <div className="flex min-h-0 flex-1 flex-col">{searchContent}</div>
         </SheetContent>
       </Sheet>
     );

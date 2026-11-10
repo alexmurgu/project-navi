@@ -6,11 +6,13 @@ export function getRouter() {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 0,
-        refetchOnMount: "always",
-        refetchOnWindowFocus: "always",
-        refetchOnReconnect: "always",
-        refetchInterval: 30000,
+        // Cached data renders instantly; anything older than this is refreshed
+        // in the background on mount, focus (app resumed) and reconnect.
+        staleTime: 15_000,
+        refetchOnMount: true,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+        refetchInterval: 30_000,
       },
     },
   });
@@ -19,6 +21,10 @@ export function getRouter() {
     routeTree,
     context: { queryClient, user: undefined, session: undefined },
     scrollRestoration: true,
+    // Start loading a tab's route on touchstart, before the tap completes.
+    defaultPreload: "intent",
+    // React Query owns caching; let the router always call the (cheap) loader.
+    defaultPreloadStaleTime: 0,
   });
 
   return router;

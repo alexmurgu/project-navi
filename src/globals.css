@@ -212,6 +212,42 @@
   transform: translateY(100%);
 }
 
+/*
+ * Phone bottom sheets and the on-screen keyboard. iOS overlays the keyboard
+ * without resizing the layout viewport, so a plain `bottom: 0` sheet hides its
+ * lower part behind it. Like native sheets, we keep the sheet anchored to the
+ * bottom edge and let it run *behind* the keyboard: a bottom border in the
+ * sheet's own colour fills the keyboard area (no dimmed backdrop peeking
+ * around the keyboard's rounded corners), and the content above it is capped
+ * to the visible area. Variables come from useVisualViewportVars(). Unlayered
+ * on purpose so it wins over per-sheet `max-h-*` / padding utilities.
+ */
+@media (max-width: 639px) {
+  [data-slot="sheet-content"][data-side="bottom"] {
+    max-height: calc(
+      min(92dvh, calc(var(--vv-height, 100dvh) - env(safe-area-inset-top, 0px) - 8px)) +
+        var(--keyboard-inset, 0px)
+    );
+    border-bottom: var(--keyboard-inset, 0px) solid var(--color-background);
+  }
+
+  /* The home-indicator padding sits under the keyboard while it is open. */
+  [data-keyboard-open] [data-slot="sheet-content"][data-side="bottom"] {
+    padding-bottom: 8px;
+  }
+
+  /*
+   * Full-height sheets (e.g. search pickers) pin their top just below the
+   * status bar, so neither the keyboard nor a shrinking result list moves the
+   * sheet. Follows the visible area if iOS pans it while focusing an input.
+   */
+  [data-slot="sheet-content"][data-side="bottom"][data-full-height] {
+    top: calc(var(--vv-offset-top, 0px) + env(safe-area-inset-top, 0px) + 8px);
+    height: auto;
+    max-height: none;
+  }
+}
+
 /* Right Sheet */
 [data-slot="sheet-content"][data-side="right"] {
   transform: translateX(0);
