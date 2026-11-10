@@ -21,7 +21,7 @@ export function RouteError({ error, reset }: RouteErrorProps) {
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.08),transparent_28%),linear-gradient(180deg,rgba(248,251,251,1)_0%,rgba(241,249,248,1)_100%)] px-4 py-10 text-foreground">
+    <main className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.08),transparent_28%),linear-gradient(180deg,rgba(248,251,251,1)_0%,rgba(241,249,248,1)_100%)] px-4 py-10 text-foreground">
       {/* Background elements */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-32 -top-32 h-72 w-72 rounded-full bg-destructive/5 blur-3xl" />

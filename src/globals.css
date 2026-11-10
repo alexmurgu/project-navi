@@ -2,9 +2,9 @@
 
 @theme {
   --color-background: oklch(100% 0 0);
-  --color-foreground: oklch(20.9% 0.015 258.1); /* #191c1f */
+  --color-foreground: oklch(20.9% 0.015 258.1); /* #14181f */
 
-  --color-navi-dark: oklch(20.9% 0.015 258.1);
+  --color-navi-dark: oklch(20.9% 0.015 258.1); /* #14181f — mirrored in lib/page-chrome.ts */
   --color-navi-blue: oklch(45.5% 0.22 269.9); /* #494fdf */
   --color-navi-teal: oklch(61.2% 0.16 166.5); /* #00a87e */
   --color-navi-danger: oklch(57.7% 0.2 19.3); /* #e23b4a */

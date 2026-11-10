@@ -77,7 +77,7 @@ export function SettingsContent() {
   }, []);
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-white antialiased">
+    <div className="w-full min-h-dvh flex flex-col bg-white antialiased">
       {/* High-Impact Header */}
       <section className="bg-navi-dark pt-[calc(env(safe-area-inset-top,0px)+64px)] pb-20 px-6 md:px-12 flex flex-col gap-4 relative overflow-hidden text-white">
         <div className="space-y-4 relative z-10">

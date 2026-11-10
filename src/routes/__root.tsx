@@ -23,21 +23,35 @@ import { RouteError } from "@/components/route-error";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
 import { cn } from "@/lib/utils";
+import { chromeColor, hasDarkHeader } from "@/lib/page-chrome";
 import { useVisualViewportVars } from "@/hooks/use-visual-viewport-vars";
 import { haptic } from "@/lib/haptics";
 
 function RootDocument({ children }: { children: ReactNode }) {
+  // Rendered (not set from an effect) so the server HTML already has the right
+  // colours: no white flash under the iOS status bar on launch.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const chrome = chromeColor(pathname);
+
   return (
-    <html lang="en" className="bg-[#191c1f]">
+    <html lang="en" style={{ backgroundColor: chrome }}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-        <meta name="theme-color" content="#191c1f" />
+        <meta name="theme-color" content={chrome} />
         <meta name="application-name" content="Navi" />
         <meta name="apple-mobile-web-app-title" content="Navi" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/*
+          No apple-mobile-web-app-status-bar-style on purpose. Since iOS 26.1,
+          "black-translucent" makes iOS draw a Liquid Glass blur/gradient over
+          the top of installed web apps that CSS cannot remove (Apple's advice
+          on WebKit bug 317153: drop the tag). iOS still lays the app out edge
+          to edge and tints the bar from the page background, so html, body
+          and theme-color all follow the page header (see lib/page-chrome).
+          iOS reads the tag at install time: re-add the app after changing it.
+        */}
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/navi-touch-icon.png" />
@@ -73,7 +87,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         />
         <HeadContent />
       </head>
-      <body>
+      <body style={{ backgroundColor: chrome }}>
         {children}
         <Scripts />
       </body>
@@ -114,25 +128,7 @@ function RootLayout() {
     }
   }, [user, session]);
 
-  const isDarkHeader =
-    pathname === "/" ||
-    pathname.startsWith("/settings") ||
-    pathname.startsWith("/members/") ||
-    pathname.startsWith("/categories/") ||
-    pathname.startsWith("/accounts/");
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const targetColor = isDarkHeader ? "#191c1f" : "#ffffff";
-    document.documentElement.style.backgroundColor = targetColor;
-    let metaTag = document.querySelector('meta[name="theme-color"]');
-    if (!metaTag) {
-      metaTag = document.createElement("meta");
-      metaTag.setAttribute("name", "theme-color");
-      document.head.appendChild(metaTag);
-    }
-    metaTag.setAttribute("content", targetColor);
-  }, [isDarkHeader]);
+  const isDarkHeader = hasDarkHeader(pathname);
 
   useEffect(() => {
     const handleOpenQuickAddChoice = () => setUiState((prev) => ({ ...prev, quickAddOpen: true }));

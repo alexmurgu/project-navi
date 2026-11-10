@@ -423,7 +423,7 @@ export function DashboardContent({ data }: PageProps) {
   }, []);
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-white antialiased">
+    <div className="w-full min-h-dvh flex flex-col bg-white antialiased">
       <StatsHero
         balance={stats.balance}
         monthlyExp={stats.monthlyExp}

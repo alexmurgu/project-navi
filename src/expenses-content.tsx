@@ -215,7 +215,7 @@ export function ExpensesContent({ data }: PageProps) {
   }, []);
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-background antialiased px-6 md:px-12 pt-[calc(env(safe-area-inset-top,0px)+24px)] pb-32">
+    <div className="w-full min-h-dvh flex flex-col bg-background antialiased px-6 md:px-12 pt-[calc(env(safe-area-inset-top,0px)+24px)] pb-32">
       {/* Dynamic Header */}
       <div className="flex items-center justify-between pt-4 mb-10">
         <div className="space-y-1">
