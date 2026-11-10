@@ -1,0 +1,41 @@
+# Dependabot version updates.
+# Grouped so a small family project gets at most a couple of PRs a week
+# instead of one per package. Security fixes are not grouped and arrive
+# as soon as an advisory lands (requires Dependabot security updates to be
+# enabled in the repo settings).
+version: 2
+
+updates:
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00" # UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # Patch and minor bumps for everything, in one PR.
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      # Major bumps of tightly coupled families land together.
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+      drizzle:
+        patterns:
+          - "drizzle-orm"
+          - "drizzle-kit"
