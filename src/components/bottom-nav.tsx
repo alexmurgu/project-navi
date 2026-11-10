@@ -24,7 +24,7 @@ function isActivePath(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-export function MobileNav() {
+export function BottomNav() {
   // `location` switches as soon as a navigation starts, so the active tab
   // updates on tap rather than after the next page has loaded.
   const pathname = useRouterState({ select: (s) => s.location.pathname });

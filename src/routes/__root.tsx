@@ -11,13 +11,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "../globals.css";
 import { resolveSession, useAuthStore } from "../store/useAuthStore";
 import { useEffect, useState, type ReactNode } from "react";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { MobileNav } from "@/components/mobile-nav";
+import { BottomNav } from "@/components/bottom-nav";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ArrowDownCircle, ArrowUpCircle, Plus } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { NotFound } from "@/components/not-found";
 import { RouteError } from "@/components/route-error";
 import { PullToRefresh } from "@/components/pull-to-refresh";
@@ -231,58 +229,39 @@ function RootLayout() {
           </div>
         ) : null}
         {user && <PwaInstallBanner />}
-        {/* Mobile PWA status bar safe area cover */}
-        <div className="fixed top-0 inset-x-0 h-[env(safe-area-inset-top,0px)] bg-navi-dark z-50 pointer-events-none lg:hidden" />
-        <SidebarProvider>
-          {/* Desktop Sidebar - Hidden on mobile/tablets */}
-          {user && (
-            <div className="hidden lg:block">
-              <AppSidebar />
-            </div>
+        {/* PWA status bar safe area cover (zero height outside iOS standalone) */}
+        <div className="fixed top-0 inset-x-0 h-[env(safe-area-inset-top,0px)] bg-navi-dark z-50 pointer-events-none" />
+        {/* One layout for every screen size: page content + floating bottom nav. */}
+        <div
+          className={cn(
+            "relative flex min-h-dvh w-full flex-col bg-background",
+            isDarkHeader && "bg-navi-dark",
           )}
+        >
+          <PullToRefresh
+            onRefresh={async () => {
+              // Ensure at least 800ms of visual feedback
+              await Promise.all([
+                queryClient.invalidateQueries(),
+                new Promise((resolve) => setTimeout(resolve, 800)),
+              ]);
+            }}
+          >
+            {/* Bottom padding keeps content clear of the floating nav. */}
+            <main className="pb-32">
+              <Outlet />
+            </main>
+          </PullToRefresh>
 
-          <SidebarInset className={cn("bg-background", isDarkHeader && "bg-navi-dark")}>
-            <PullToRefresh
-              onRefresh={async () => {
-                // Ensure at least 800ms of visual feedback
-                await Promise.all([
-                  queryClient.invalidateQueries(),
-                  new Promise((resolve) => setTimeout(resolve, 800)),
-                ]);
-              }}
-            >
-              <main className="pb-32 lg:pb-0">
-                <Outlet />
-              </main>
-            </PullToRefresh>
-
-            {/* Mobile Bottom Nav - Hidden on Desktop */}
-            {user && (
-              <div className="lg:hidden">
-                <MobileNav />
-              </div>
-            )}
-
-            {/* Desktop FAB - Only visible on LG+ */}
-            {user && (
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent("open-quick-add-choice"))}
-                className="fixed bottom-12 right-12 z-50 hidden lg:flex size-16 items-center justify-center rounded-full bg-navi-dark text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3)] transition-all duration-500 hover:scale-110 active:scale-95 group"
-                aria-label="Add entry"
-              >
-                <Plus className="size-8 transition-transform duration-500 group-hover:rotate-90" />
-              </button>
-            )}
-          </SidebarInset>
-        </SidebarProvider>
+          {user && <BottomNav />}
+        </div>
         <Sheet
           open={uiState.quickAddOpen}
           onOpenChange={(open) => setUiState((prev) => ({ ...prev, quickAddOpen: open }))}
         >
           <SheetContent
             side="bottom"
-            className="h-auto sm:max-w-xl sm:left-1/2 sm:-translate-x-1/2 sm:bottom-6 sm:rounded-[36px] border-t sm:border sm:border-navi-border/20 rounded-t-[36px] p-8 pb-12 shadow-2xl bg-white"
+            className="h-auto sm:max-w-xl sm:rounded-[36px] border-t sm:border sm:border-navi-border/20 rounded-t-[36px] p-8 pb-12 shadow-2xl bg-white"
           >
             {/* Mobile grab handle */}
             <div className="mx-auto -mt-3 mb-5 h-1.5 w-12 shrink-0 rounded-full bg-navi-gray/25 sm:hidden" />

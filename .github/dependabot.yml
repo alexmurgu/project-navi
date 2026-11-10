@@ -22,9 +22,15 @@ updates:
           - "minor"
           - "patch"
       # Major bumps of tightly coupled families land together.
-      tanstack:
+      # Vite, its plugins and TanStack Start/Router depend on each other's
+      # versions (e.g. @vitejs/plugin-react 6 and TanStack Start need vite 8),
+      # so their majors must land in one PR or none of them can install.
+      vite-and-tanstack:
         patterns:
+          - "vite"
+          - "@vitejs/*"
           - "@tanstack/*"
+          - "@tailwindcss/vite"
       react:
         patterns:
           - "react"

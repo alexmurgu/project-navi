@@ -200,7 +200,7 @@ export function CategoriesContent({
       <Sheet open={isPickerOpen} onOpenChange={setIsPickerOpen}>
         <SheetContent
           side="bottom"
-          className="h-full max-h-[90dvh] sm:h-fit sm:max-h-[95dvh] sm:side-right border-t sm:border-l rounded-t-[40px] sm:rounded-l-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
+          className="h-full max-h-[90dvh] sm:h-fit sm:max-h-[88vh] sm:max-w-2xl border-t sm:border rounded-t-[40px] sm:rounded-[40px] p-0 shadow-none border-none overflow-hidden flex flex-col bg-white"
         >
           <div className="p-6 sm:p-8 pb-2 text-left shrink-0">
             <h2 className="text-[28px] sm:text-[32px] md:text-[48px] font-display font-medium tracking-tight uppercase italic text-navi-dark">

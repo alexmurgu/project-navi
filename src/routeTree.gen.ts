@@ -9,34 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as IncomesRouteImport } from './routes/incomes'
-import { Route as ImportRouteImport } from './routes/import'
-import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SettingsIndexRouteImport } from './routes/settings/index'
-import { Route as SettingsUsersRouteImport } from './routes/settings/users'
-import { Route as SettingsSavingsRouteImport } from './routes/settings/savings'
-import { Route as SettingsCreditCardsRouteImport } from './routes/settings/credit-cards'
-import { Route as SettingsCategoriesRouteImport } from './routes/settings/categories'
-import { Route as MembersMemberIdRouteImport } from './routes/members.$memberId'
-import { Route as CategoriesCategoryRouteImport } from './routes/categories.$category'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as ImportRouteImport } from './routes/import'
+import { Route as IncomesRouteImport } from './routes/incomes'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AccountsAccountIdRouteImport } from './routes/accounts.$accountId'
+import { Route as CategoriesCategoryRouteImport } from './routes/categories.$category'
+import { Route as MembersMemberIdRouteImport } from './routes/members.$memberId'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsCategoriesRouteImport } from './routes/settings/categories'
+import { Route as SettingsCreditCardsRouteImport } from './routes/settings/credit-cards'
+import { Route as SettingsSavingsRouteImport } from './routes/settings/savings'
+import { Route as SettingsUsersRouteImport } from './routes/settings/users'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IncomesRoute = IncomesRouteImport.update({
-  id: '/incomes',
-  path: '/incomes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImportRoute = ImportRouteImport.update({
-  id: '/import',
-  path: '/import',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExpensesRoute = ExpensesRouteImport.update({
@@ -44,39 +34,24 @@ const ExpensesRoute = ExpensesRouteImport.update({
   path: '/expenses',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ImportRoute = ImportRouteImport.update({
+  id: '/import',
+  path: '/import',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
+const IncomesRoute = IncomesRouteImport.update({
+  id: '/incomes',
+  path: '/incomes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsUsersRoute = SettingsUsersRouteImport.update({
-  id: '/settings/users',
-  path: '/settings/users',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsSavingsRoute = SettingsSavingsRouteImport.update({
-  id: '/settings/savings',
-  path: '/settings/savings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsCreditCardsRoute = SettingsCreditCardsRouteImport.update({
-  id: '/settings/credit-cards',
-  path: '/settings/credit-cards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
-  id: '/settings/categories',
-  path: '/settings/categories',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MembersMemberIdRoute = MembersMemberIdRouteImport.update({
-  id: '/members/$memberId',
-  path: '/members/$memberId',
+const AccountsAccountIdRoute = AccountsAccountIdRouteImport.update({
+  id: '/accounts/$accountId',
+  path: '/accounts/$accountId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesCategoryRoute = CategoriesCategoryRouteImport.update({
@@ -84,9 +59,34 @@ const CategoriesCategoryRoute = CategoriesCategoryRouteImport.update({
   path: '/categories/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountsAccountIdRoute = AccountsAccountIdRouteImport.update({
-  id: '/accounts/$accountId',
-  path: '/accounts/$accountId',
+const MembersMemberIdRoute = MembersMemberIdRouteImport.update({
+  id: '/members/$memberId',
+  path: '/members/$memberId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
+  id: '/settings/categories',
+  path: '/settings/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsCreditCardsRoute = SettingsCreditCardsRouteImport.update({
+  id: '/settings/credit-cards',
+  path: '/settings/credit-cards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsSavingsRoute = SettingsSavingsRouteImport.update({
+  id: '/settings/savings',
+  path: '/settings/savings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsUsersRoute = SettingsUsersRouteImport.update({
+  id: '/settings/users',
+  path: '/settings/users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -214,25 +214,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/incomes': {
-      id: '/incomes'
-      path: '/incomes'
-      fullPath: '/incomes'
-      preLoaderRoute: typeof IncomesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/import': {
-      id: '/import'
-      path: '/import'
-      fullPath: '/import'
-      preLoaderRoute: typeof ImportRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/expenses': {
@@ -242,53 +228,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExpensesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/import': {
+      id: '/import'
+      path: '/import'
+      fullPath: '/import'
+      preLoaderRoute: typeof ImportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/': {
-      id: '/settings/'
-      path: '/settings'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof SettingsIndexRouteImport
+    '/incomes': {
+      id: '/incomes'
+      path: '/incomes'
+      fullPath: '/incomes'
+      preLoaderRoute: typeof IncomesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/users': {
-      id: '/settings/users'
-      path: '/settings/users'
-      fullPath: '/settings/users'
-      preLoaderRoute: typeof SettingsUsersRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/savings': {
-      id: '/settings/savings'
-      path: '/settings/savings'
-      fullPath: '/settings/savings'
-      preLoaderRoute: typeof SettingsSavingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings/credit-cards': {
-      id: '/settings/credit-cards'
-      path: '/settings/credit-cards'
-      fullPath: '/settings/credit-cards'
-      preLoaderRoute: typeof SettingsCreditCardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings/categories': {
-      id: '/settings/categories'
-      path: '/settings/categories'
-      fullPath: '/settings/categories'
-      preLoaderRoute: typeof SettingsCategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/members/$memberId': {
-      id: '/members/$memberId'
-      path: '/members/$memberId'
-      fullPath: '/members/$memberId'
-      preLoaderRoute: typeof MembersMemberIdRouteImport
+    '/accounts/$accountId': {
+      id: '/accounts/$accountId'
+      path: '/accounts/$accountId'
+      fullPath: '/accounts/$accountId'
+      preLoaderRoute: typeof AccountsAccountIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categories/$category': {
@@ -298,11 +263,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/accounts/$accountId': {
-      id: '/accounts/$accountId'
-      path: '/accounts/$accountId'
-      fullPath: '/accounts/$accountId'
-      preLoaderRoute: typeof AccountsAccountIdRouteImport
+    '/members/$memberId': {
+      id: '/members/$memberId'
+      path: '/members/$memberId'
+      fullPath: '/members/$memberId'
+      preLoaderRoute: typeof MembersMemberIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/categories': {
+      id: '/settings/categories'
+      path: '/settings/categories'
+      fullPath: '/settings/categories'
+      preLoaderRoute: typeof SettingsCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/credit-cards': {
+      id: '/settings/credit-cards'
+      path: '/settings/credit-cards'
+      fullPath: '/settings/credit-cards'
+      preLoaderRoute: typeof SettingsCreditCardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/savings': {
+      id: '/settings/savings'
+      path: '/settings/savings'
+      fullPath: '/settings/savings'
+      preLoaderRoute: typeof SettingsSavingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/users': {
+      id: '/settings/users'
+      path: '/settings/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof SettingsUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {

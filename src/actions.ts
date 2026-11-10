@@ -248,7 +248,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(async 
 });
 
 export const addExpense = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -271,7 +271,7 @@ export const addExpense = createServerFn({ method: "POST" })
   });
 
 export const updateExpense = createServerFn({ method: "POST" }) // Start uses POST for 'mutations' generally
-  .inputValidator((data: { id: string; [key: string]: any }) => data)
+  .validator((data: { id: string; [key: string]: any }) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -306,9 +306,7 @@ export const updateExpense = createServerFn({ method: "POST" }) // Start uses PO
   });
 
 export const updateTransactionStatus = createServerFn({ method: "POST" })
-  .inputValidator(
-    (data: { id: string; type: "expense" | "income"; status: "pending" | "paid" }) => data,
-  )
+  .validator((data: { id: string; type: "expense" | "income"; status: "pending" | "paid" }) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -318,7 +316,7 @@ export const updateTransactionStatus = createServerFn({ method: "POST" })
     return { success: true };
   });
 export const deleteExpense = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -327,7 +325,7 @@ export const deleteExpense = createServerFn({ method: "POST" })
   });
 
 export const addIncome = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -344,7 +342,7 @@ export const addIncome = createServerFn({ method: "POST" })
   });
 
 export const updateIncome = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string; [key: string]: any }) => data)
+  .validator((data: { id: string; [key: string]: any }) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -365,7 +363,7 @@ export const updateIncome = createServerFn({ method: "POST" })
   });
 
 export const deleteIncome = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -374,7 +372,7 @@ export const deleteIncome = createServerFn({ method: "POST" })
   });
 
 export const bulkDeleteTransactions = createServerFn({ method: "POST" })
-  .inputValidator((data: { ids: string[]; type: "expense" | "income" }) => data)
+  .validator((data: { ids: string[]; type: "expense" | "income" }) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -386,7 +384,7 @@ export const bulkDeleteTransactions = createServerFn({ method: "POST" })
   });
 
 export const bulkImportTransactions = createServerFn({ method: "POST" })
-  .inputValidator((data: any[]) => data)
+  .validator((data: any[]) => data)
   .handler(async ({ data: transactions }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -422,7 +420,7 @@ export const bulkImportTransactions = createServerFn({ method: "POST" })
 // --- Savings & Transfer Actions ---
 
 export const addSavingsAccount = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -438,7 +436,7 @@ export const addSavingsAccount = createServerFn({ method: "POST" })
   });
 
 export const updateSavingsAccount = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -457,7 +455,7 @@ export const updateSavingsAccount = createServerFn({ method: "POST" })
   });
 
 export const deleteSavingsAccount = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -467,7 +465,7 @@ export const deleteSavingsAccount = createServerFn({ method: "POST" })
   });
 
 export const addTransfer = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -486,7 +484,7 @@ export const addTransfer = createServerFn({ method: "POST" })
   });
 
 export const deleteTransfer = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -497,7 +495,7 @@ export const deleteTransfer = createServerFn({ method: "POST" })
 // --- Credit Card Actions ---
 
 export const addCreditCard = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -513,7 +511,7 @@ export const addCreditCard = createServerFn({ method: "POST" })
   });
 
 export const updateCreditCard = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -532,7 +530,7 @@ export const updateCreditCard = createServerFn({ method: "POST" })
   });
 
 export const deleteCreditCard = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -557,7 +555,7 @@ export const getAdminUsers = createServerFn({ method: "GET" }).handler(async () 
 });
 
 export const addAdminUser = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .validator((data: any) => data)
   .handler(async ({ data }) => {
     await checkAdmin();
     await auth.api.signUpEmail({ body: data });
@@ -565,7 +563,7 @@ export const addAdminUser = createServerFn({ method: "POST" })
   });
 
 export const deleteAdminUser = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     await checkAdmin();
     const [userToDelete] = await db.select().from(userSchema).where(eq(userSchema.id, id)).limit(1);
@@ -575,7 +573,7 @@ export const deleteAdminUser = createServerFn({ method: "POST" })
   });
 
 export const addAdminCategory = createServerFn({ method: "POST" })
-  .inputValidator((data: { name: string; color: string; icon?: string | null }) => data)
+  .validator((data: { name: string; color: string; icon?: string | null }) => data)
   .handler(async ({ data }) => {
     await checkAdmin();
     await db
@@ -596,7 +594,7 @@ export const addAdminCategory = createServerFn({ method: "POST" })
   });
 
 export const deleteAdminCategory = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     await checkAdmin();
     await db.delete(categoryConfig).where(eq(categoryConfig.id, id));
@@ -604,7 +602,7 @@ export const deleteAdminCategory = createServerFn({ method: "POST" })
   });
 
 export const getTransactionSuggestions = createServerFn({ method: "GET" })
-  .inputValidator((query: string) => query)
+  .validator((query: string) => query)
   .handler(async ({ data: query }) => {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");

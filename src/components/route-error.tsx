@@ -5,11 +5,13 @@ import { Button } from "./ui/button";
 import { IconMark } from "@/components/icon-mark";
 
 interface RouteErrorProps {
-  error: Error;
+  /** Anything can be thrown, not only Error instances. */
+  error: unknown;
   reset?: () => void;
 }
 
-export function RouteError({ error, reset }: RouteErrorProps) {
+export function RouteError({ error: thrown, reset }: RouteErrorProps) {
+  const error = thrown instanceof Error ? thrown : new Error(String(thrown));
   const router = useRouter();
   const [showDetails, setShowDetails] = useState(false);
 
