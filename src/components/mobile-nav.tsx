@@ -35,7 +35,11 @@ export function MobileNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-60 px-5 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-2 pointer-events-none">
+    <nav
+      // Own view-transition layer: the bar stays still while pages slide.
+      style={{ viewTransitionName: "tab-bar" }}
+      className="fixed bottom-0 left-0 right-0 z-60 px-5 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-2 pointer-events-none"
+    >
       <div className="pointer-events-auto mx-auto max-w-lg rounded-full border border-navi-border/30 bg-white/90 p-2 backdrop-blur-xl">
         <div className="grid grid-cols-5 items-center">
           {NAV_ITEMS.map((item) => {

@@ -1,6 +1,7 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { QueryClient } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
+import { pageTransitions, trackHistoryPops } from "./lib/page-transitions";
 
 export function getRouter() {
   const queryClient = new QueryClient({
@@ -17,6 +18,9 @@ export function getRouter() {
     },
   });
 
+  // Before the router exists, so this popstate listener runs ahead of its own.
+  trackHistoryPops();
+
   const router = createTanStackRouter({
     routeTree,
     context: { queryClient, user: undefined, session: undefined },
@@ -25,6 +29,8 @@ export function getRouter() {
     defaultPreload: "intent",
     // React Query owns caching; let the router always call the (cheap) loader.
     defaultPreloadStaleTime: 0,
+    // iOS-style push/pop for drill-down pages; tabs stay instant.
+    defaultViewTransition: pageTransitions,
   });
 
   return router;

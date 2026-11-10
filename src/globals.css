@@ -313,3 +313,60 @@
   transform: scale(0.95);
   opacity: 0;
 }
+
+/*
+ * Page transitions (see lib/page-transitions.ts for when each type runs).
+ * iOS "push": the new page slides in from the right over the old one, which
+ * drifts left and dims; "pop" is the reverse. Only the page moves — the tab
+ * bar is its own layer and stays put. Untyped transitions (browsers without
+ * transition types) and desktop layouts get no animation at all.
+ */
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-group(tab-bar) {
+  animation: none;
+}
+
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  :root {
+    --page-push-duration: 380ms;
+    --page-push-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  html:active-view-transition-type(push)::view-transition-new(root) {
+    animation: page-slide-in var(--page-push-duration) var(--page-push-ease) both;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, 0.12);
+  }
+  html:active-view-transition-type(push)::view-transition-old(root) {
+    animation: page-recede var(--page-push-duration) var(--page-push-ease) both;
+  }
+
+  html:active-view-transition-type(pop)::view-transition-old(root) {
+    z-index: 1;
+    animation: page-slide-in var(--page-push-duration) var(--page-push-ease) reverse both;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, 0.12);
+  }
+  html:active-view-transition-type(pop)::view-transition-new(root) {
+    animation: page-recede var(--page-push-duration) var(--page-push-ease) reverse both;
+  }
+}
+
+@keyframes page-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes page-recede {
+  from {
+    transform: translateX(0);
+    filter: brightness(1);
+  }
+  to {
+    transform: translateX(-30%);
+    filter: brightness(0.9);
+  }
+}
