@@ -18,6 +18,7 @@ import {
 import { TransferSheet } from "@/components/transfer-sheet";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
 import { useViewedMonth } from "@/hooks/use-viewed-month";
+import { IconMark } from "@/components/icon-mark";
 
 interface User {
   id: string;
@@ -263,9 +264,7 @@ export function IncomesContent({ data }: PageProps) {
       {/* Redesigned List */}
       {filteredHistory.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-secondary/5 rounded-[40px] border border-dashed border-secondary/20">
-          <div className="size-20 rounded-full bg-secondary/10 flex items-center justify-center mb-8">
-            <Calendar className="size-10 text-muted-foreground/30" />
-          </div>
+          <IconMark icon={Calendar} size="2xl" className="mb-8 text-muted-foreground/40" />
           <h3 className="text-2xl font-black text-foreground/80 mb-3 tracking-tight italic uppercase">
             No Income
           </h3>

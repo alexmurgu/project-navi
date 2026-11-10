@@ -15,12 +15,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  CategoryIcon,
-  type CategoryConfig,
-  getCategoryConfig,
-  withAlpha,
-} from "@/lib/category-visuals";
+import { type CategoryConfig, getCategoryConfig } from "@/lib/category-visuals";
+import { CategoryMark, IconMark } from "@/components/icon-mark";
 
 interface CategoryComboboxProps {
   value: string;
@@ -94,20 +90,7 @@ export function CategoryCombobox({
       style={style}
     >
       <div className="flex items-center gap-3 overflow-hidden">
-        {value && (
-          <div
-            className="size-6 rounded-lg flex items-center justify-center shrink-0"
-            style={{ backgroundColor: withAlpha(color, 0.1), color: color }}
-          >
-            <CategoryIcon
-              category={value}
-              config={config}
-              className="size-3.5"
-              color={color}
-              strokeWidth={1.5}
-            />
-          </div>
-        )}
+        {value && <CategoryMark category={value} config={config} color={color} size="sm" />}
         <span
           className={cn(
             "truncate",
@@ -162,18 +145,7 @@ export function CategoryCombobox({
                 }}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-navi-surface data-[selected=true]:bg-navi-surface transition-colors"
               >
-                <div
-                  className="size-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: withAlpha(itemColor, 0.05), color: itemColor }}
-                >
-                  <CategoryIcon
-                    category={cat}
-                    config={itemConfig}
-                    className="size-4"
-                    color={itemColor}
-                    strokeWidth={1.2}
-                  />
-                </div>
+                <CategoryMark category={cat} config={itemConfig} color={itemColor} />
                 <span className="flex-1 font-display font-medium text-sm text-navi-dark">
                   {cat}
                 </span>
@@ -193,9 +165,7 @@ export function CategoryCombobox({
               }}
               className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer hover:bg-navi-blue/5 data-[selected=true]:bg-navi-blue/5 text-navi-blue transition-colors"
             >
-              <div className="size-8 rounded-xl bg-navi-blue/10 flex items-center justify-center shrink-0">
-                <PlusCircle className="size-4" strokeWidth={1.5} />
-              </div>
+              <IconMark icon={PlusCircle} />
               <span className="flex-1 font-display font-medium text-sm">
                 Create &quot;{searchValue}&quot;
               </span>

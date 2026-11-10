@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Plus, PiggyBank, Target, ArrowLeft, ChevronRight } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addSavingsAccount, updateSavingsAccount, deleteSavingsAccount } from "@/actions";
-import { withAlpha } from "@/lib/category-visuals";
 import { SavingsAccountSheet } from "@/components/savings-account-sheet";
 import { Link } from "@tanstack/react-router";
+import { IconMark } from "@/components/icon-mark";
 
 interface SavingsAccount {
   id: string;
@@ -86,9 +86,7 @@ export function SavingsSettingsContent({ accounts }: SavingsSettingsContentProps
             onClick={handleAdd}
             className="w-full navi-card p-8 border-2 border-dashed border-navi-border/20 flex flex-col items-center justify-center gap-4 group hover:border-navi-dark/20 transition-all bg-navi-surface/30"
           >
-            <div className="size-14 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform group-hover:scale-110">
-              <Plus className="size-6 text-navi-dark" />
-            </div>
+            <IconMark icon={Plus} size="xl" className="text-navi-dark" />
             <div className="text-center">
               <h3 className="text-[20px] font-display font-medium text-navi-dark">
                 Create New Goal
@@ -117,15 +115,7 @@ export function SavingsSettingsContent({ accounts }: SavingsSettingsContentProps
                 className="navi-card flex items-center justify-between p-6 text-left group"
               >
                 <div className="flex items-center gap-6">
-                  <div
-                    className="size-14 rounded-[18px] flex items-center justify-center border transition-colors"
-                    style={{
-                      backgroundColor: withAlpha(sa.color, 0.05),
-                      borderColor: withAlpha(sa.color, 0.1),
-                    }}
-                  >
-                    <PiggyBank className="size-6" style={{ color: sa.color }} strokeWidth={1.2} />
-                  </div>
+                  <IconMark icon={PiggyBank} color={sa.color} size="lg" />
                   <div>
                     <h4 className="text-[18px] font-display font-medium text-navi-dark tracking-tight">
                       {sa.name}

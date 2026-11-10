@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Plus, CreditCard, ArrowLeft, ChevronRight } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addCreditCard, updateCreditCard, deleteCreditCard } from "@/actions";
-import { withAlpha } from "@/lib/category-visuals";
 import { CreditCardSheet } from "@/components/credit-card-sheet";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { IconMark } from "@/components/icon-mark";
 
 interface CreditCardType {
   id: string;
@@ -86,9 +86,7 @@ export function CreditCardsSettingsContent({ cards }: CreditCardsSettingsContent
             onClick={handleAdd}
             className="w-full navi-card p-8 border-2 border-dashed border-navi-border/20 flex flex-col items-center justify-center gap-4 group hover:border-navi-dark/20 transition-all bg-navi-surface/30"
           >
-            <div className="size-14 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform group-hover:scale-110">
-              <Plus className="size-6 text-navi-dark" />
-            </div>
+            <IconMark icon={Plus} size="xl" className="text-navi-dark" />
             <div className="text-center">
               <h3 className="text-[20px] font-display font-medium text-navi-dark">
                 Track New Card
@@ -121,19 +119,7 @@ export function CreditCardsSettingsContent({ cards }: CreditCardsSettingsContent
                   className="navi-card flex items-center justify-between p-6 text-left group"
                 >
                   <div className="flex items-center gap-6">
-                    <div
-                      className="size-14 rounded-[18px] flex items-center justify-center border transition-colors"
-                      style={{
-                        backgroundColor: withAlpha(card.color, 0.05),
-                        borderColor: withAlpha(card.color, 0.1),
-                      }}
-                    >
-                      <CreditCard
-                        className="size-6"
-                        style={{ color: card.color }}
-                        strokeWidth={1.2}
-                      />
-                    </div>
+                    <IconMark icon={CreditCard} color={card.color} size="lg" />
                     <div>
                       <h4 className="text-[18px] font-display font-medium text-navi-dark tracking-tight">
                         {card.name}

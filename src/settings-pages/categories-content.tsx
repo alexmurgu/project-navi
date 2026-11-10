@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
+import { CategoryMark } from "@/components/icon-mark";
 
 interface CategoriesContentProps {
   expenseCategories: string[];
@@ -85,22 +86,7 @@ function CategorySection({ names, title, accentColor, configMap, onSelect }: Cat
               onClick={() => onSelect(name)}
             >
               <div className="flex items-center gap-5 flex-1 min-w-0 relative z-10">
-                <div
-                  className="size-12 rounded-[18px] flex items-center justify-center shrink-0 border transition-colors"
-                  style={{
-                    backgroundColor: withAlpha(color, 0.05),
-                    borderColor: withAlpha(color, 0.1),
-                    color: color,
-                  }}
-                >
-                  <CategoryIcon
-                    category={name}
-                    config={config}
-                    className="size-6"
-                    color={color}
-                    strokeWidth={1.2}
-                  />
-                </div>
+                <CategoryMark category={name} config={config} color={color} size="lg" />
                 <div className="min-w-0">
                   <p className="font-display font-medium text-[18px] text-navi-dark truncate">
                     {name}
@@ -246,22 +232,13 @@ export function CategoriesContent({
                     {activeCategory}
                   </p>
                 </div>
-                <div
-                  className="size-16 rounded-[18px] flex items-center justify-center relative z-10 border"
-                  style={{
-                    backgroundColor: withAlpha(draftColor, 0.05),
-                    borderColor: withAlpha(draftColor, 0.1),
-                    color: draftColor,
-                  }}
-                >
-                  <CategoryIcon
-                    category={activeCategory || ""}
-                    config={{ name: activeCategory || "", color: draftColor, icon: draftIcon }}
-                    className="size-8"
-                    color={draftColor}
-                    strokeWidth={1.2}
-                  />
-                </div>
+                <CategoryMark
+                  category={activeCategory || ""}
+                  config={{ name: activeCategory || "", color: draftColor, icon: draftIcon }}
+                  color={draftColor}
+                  size="xl"
+                  className="relative z-10"
+                />
               </div>
 
               {/* Color Picker */}

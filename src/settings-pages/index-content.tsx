@@ -10,7 +10,7 @@ import {
   PiggyBank,
   CreditCard,
 } from "lucide-react";
-import { withAlpha } from "@/lib/category-visuals";
+import { IconMark } from "@/components/icon-mark";
 
 const managementTiles = [
   {
@@ -109,17 +109,8 @@ export function SettingsContent() {
                   to={tile.to}
                   className="navi-card flex items-center justify-between p-6 border-none overflow-hidden group"
                 >
-                  <div className="flex items-center gap-6 relative z-10">
-                    <div
-                      className="size-14 rounded-[18px] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 duration-500 border"
-                      style={{
-                        backgroundColor: withAlpha(tile.color, 0.05),
-                        borderColor: withAlpha(tile.color, 0.1),
-                        color: tile.color,
-                      }}
-                    >
-                      <Icon className="size-6" strokeWidth={1.2} />
-                    </div>
+                  <div className="flex items-center gap-4 relative z-10">
+                    <IconMark icon={Icon} color={tile.color} size="lg" />
                     <div className="min-w-0">
                       <h2 className="text-[18px] font-display font-medium text-navi-dark tracking-tight">
                         {tile.title}
@@ -153,17 +144,8 @@ export function SettingsContent() {
               const Icon = item.icon;
               return (
                 <div key={item.title} className="navi-card flex items-center justify-between p-6">
-                  <div className="flex items-center gap-6">
-                    <div
-                      className="size-12 rounded-[18px] flex items-center justify-center border"
-                      style={{
-                        backgroundColor: withAlpha(item.color, 0.05),
-                        borderColor: withAlpha(item.color, 0.1),
-                        color: item.color,
-                      }}
-                    >
-                      <Icon className="size-5" strokeWidth={1.2} />
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <IconMark icon={Icon} color={item.color} size="lg" />
                     <div>
                       <h4 className="text-[16px] font-display font-medium text-navi-dark tracking-tight">
                         {item.title}
@@ -192,17 +174,8 @@ export function SettingsContent() {
           </div>
 
           <div className="navi-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 border-none">
-            <div className="flex items-center gap-6">
-              <div
-                className="size-14 rounded-[18px] flex items-center justify-center shrink-0 border"
-                style={{
-                  backgroundColor: withAlpha("#00a87e", 0.05),
-                  borderColor: withAlpha("#00a87e", 0.1),
-                  color: "#00a87e",
-                }}
-              >
-                <Smartphone className="size-6" strokeWidth={1.2} />
-              </div>
+            <div className="flex items-center gap-4">
+              <IconMark icon={Smartphone} color="#00a87e" size="lg" />
               <div>
                 <h4 className="text-[18px] font-display font-medium text-navi-dark tracking-tight">
                   {isStandalone ? "Installed Standalone PWA" : "Running in Web Browser"}

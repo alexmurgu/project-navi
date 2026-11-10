@@ -1,7 +1,8 @@
 import React from "react";
 import { format } from "date-fns";
-import { CategoryIcon, withAlpha, type CategoryConfig } from "@/lib/category-visuals";
+import { withAlpha, type CategoryConfig } from "@/lib/category-visuals";
 import { cn } from "@/lib/utils";
+import { CategoryMark } from "@/components/icon-mark";
 
 interface Transaction {
   id: string;
@@ -50,15 +51,13 @@ export function OverviewTransactionList({
                 style={{ backgroundColor: bgColor }}
               >
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="size-11 rounded-lg flex items-center justify-center shrink-0">
-                    <CategoryIcon
-                      category={item.category}
-                      config={config}
-                      kind={item.type}
-                      className="size-6"
-                      color={color}
-                    />
-                  </div>
+                  <CategoryMark
+                    category={item.category}
+                    config={config}
+                    kind={item.type}
+                    color={color}
+                    size="lg"
+                  />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-bold text-sm tracking-tight truncate">

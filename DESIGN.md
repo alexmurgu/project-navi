@@ -124,8 +124,7 @@ What distinguishes Navi is its pill-everything button system. Every button uses 
 - Background: Consistent neutral surface (`bg-navi-surface` / `oklch(96.5% 0 0)`) or White (`#ffffff`)
 - No shadows — depth achieved through surface contrast and borders
 - **Transaction Card Content**:
-  - Icon: Left-aligned in a **Squircle** container (`rounded-[18px]`)
-  - Icon Background: Category-tinted (`withAlpha(color, 0.05)`) with a 1px subtle border (`withAlpha(color, 0.1)`)
+  - Icon: Left-aligned bare category glyph (`<CategoryMark size="lg">`), tinted in the category colour — no tile behind it
   - Typography: Aeonik Pro for primary titles/amounts, Inter for metadata
   - Metadata: `CATEGORY • DATE, TIME` (uppercase, tracking-widest, Inter font)
   - Status/Actions: Right-aligned relative to content
@@ -133,7 +132,11 @@ What distinguishes Navi is its pill-everything button system. Every button uses 
 
 ### Icons
 
-- **Stroke Width**: Standardized at `1.2` for UI elements (Transaction cards) and `1` for general actions
+- **Style**: Bare thin line glyphs. No tinted squares, squircles, circles, borders or shadows behind decorative icons — colour alone carries identity (category, card, goal).
+- **Component**: Always render decorative icons through `IconMark` / `CategoryMark` (`src/components/icon-mark.tsx`). They fix the stroke (`ICON_STROKE` = 1.25) and give each size a fixed-width slot so text aligns across rows.
+- **Sizes**: `sm` 18px (inline/triggers), `md` 22px (list items), `lg` 24px (cards, rows), `xl` 32px (feature/add tiles), `2xl` 40px (empty states).
+- **Exceptions**: Interactive controls keep their shapes — back/close buttons, radio dots, colour swatches, icon pickers, member avatars, the add (+) button.
+- **Navigation bar**: Same stroke; active tab is shown by colour only (dark vs grey), never by fills or pills.
 - **Library**: Lucide React
 - **Branding**: The `Navigation` icon (branded 'N') is the universal fallback for unknown categories.
 - **Placement**: Integrated into buttons and list items with consistent spacing.

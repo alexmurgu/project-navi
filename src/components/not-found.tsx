@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { MoveLeft, Search } from "lucide-react";
 import { Button } from "./ui/button";
+import { IconMark } from "@/components/icon-mark";
 
 export function NotFound() {
   return (
@@ -13,12 +14,7 @@ export function NotFound() {
 
       <div className="relative flex flex-col items-center text-center">
         {/* Icon with animated border */}
-        <div className="relative mb-8">
-          <div className="absolute inset-0 animate-ping rounded-full bg-primary/20 duration-3000" />
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-2xl backdrop-blur-sm">
-            <Search className="size-10 text-primary" strokeWidth={1.5} />
-          </div>
-        </div>
+        <IconMark icon={Search} size="2xl" className="mb-8 text-primary" />
 
         {/* 404 Text */}
         <div className="mb-4">

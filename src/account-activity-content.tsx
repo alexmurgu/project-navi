@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 import { MonthSelector, filterTransactionsByMonth } from "@/components/month-selector";
 import { useViewedMonth } from "@/hooks/use-viewed-month";
+import { IconMark } from "@/components/icon-mark";
 
 interface PageProps {
   data: {
@@ -204,9 +205,7 @@ export function AccountActivityContent({ data, account }: PageProps) {
 
         {activity.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 px-6 text-center bg-secondary/5 rounded-[40px] border border-dashed border-secondary/20">
-            <div className="size-20 rounded-full bg-secondary/10 flex items-center justify-center mb-8">
-              <ArrowRightLeft className="size-10 text-muted-foreground/30" />
-            </div>
+            <IconMark icon={ArrowRightLeft} size="2xl" className="mb-8 text-muted-foreground/40" />
             <h3 className="text-2xl font-black text-foreground/80 mb-3 tracking-tight italic uppercase">
               No Activity
             </h3>

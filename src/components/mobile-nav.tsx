@@ -1,15 +1,21 @@
-import { Home, ArrowUpCircle, TrendingDown, Settings, Plus, type LucideIcon } from "lucide-react";
+import { House, ArrowDownLeft, ArrowUpRight, Settings, Plus, type LucideIcon } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
+import { ICON_STROKE } from "@/components/icon-mark";
 
-type NavItem = { kind: "link"; to: string; icon: LucideIcon; label: string } | { kind: "fab" };
+type NavItem =
+  | { kind: "link"; to: string; icon: LucideIcon; label: string; iconClassName?: string }
+  | { kind: "fab" };
+
+// Bare arrows fill less of their box than House/Settings; they get a larger
+// size so all four read as the same optical weight.
 
 const NAV_ITEMS: NavItem[] = [
-  { kind: "link", to: "/", icon: Home, label: "Home" },
-  { kind: "link", to: "/incomes", icon: ArrowUpCircle, label: "Income" },
+  { kind: "link", to: "/", icon: House, label: "Home" },
+  { kind: "link", to: "/incomes", icon: ArrowDownLeft, label: "Income", iconClassName: "size-6" },
   { kind: "fab" },
-  { kind: "link", to: "/expenses", icon: TrendingDown, label: "Expenses" },
+  { kind: "link", to: "/expenses", icon: ArrowUpRight, label: "Expenses", iconClassName: "size-6" },
   { kind: "link", to: "/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -30,7 +36,7 @@ export function MobileNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-60 px-5 pb-[calc(env(safe-area-inset-bottom,0px)+6px)] pt-2 pointer-events-none">
-      <div className="pointer-events-auto mx-auto max-w-lg rounded-full border border-navi-border/30 bg-white/90 p-2 shadow-[0_12px_40px_-16px_rgba(25,28,31,0.25)] backdrop-blur-xl">
+      <div className="pointer-events-auto mx-auto max-w-lg rounded-full border border-navi-border/30 bg-white/90 p-2 backdrop-blur-xl">
         <div className="grid grid-cols-5 items-center">
           {NAV_ITEMS.map((item) => {
             if (item.kind === "fab") {
@@ -40,9 +46,9 @@ export function MobileNav() {
                   type="button"
                   onClick={handleFabClick}
                   aria-label="Add transaction"
-                  className="relative mx-auto flex size-14 items-center justify-center rounded-full bg-navi-dark text-white shadow-[0_8px_20px_-8px_rgba(25,28,31,0.6)] transition-transform duration-200 active:scale-90 touch-manipulation"
+                  className="relative mx-auto flex size-14 items-center justify-center rounded-full bg-navi-dark text-white transition-transform duration-200 active:scale-90 touch-manipulation"
                 >
-                  <Plus className="size-6" strokeWidth={2} />
+                  <Plus className="size-6" strokeWidth={ICON_STROKE} />
                 </button>
               );
             }
@@ -60,22 +66,11 @@ export function MobileNav() {
                 }}
                 className={cn(
                   "relative flex h-14 flex-col items-center justify-center gap-1 rounded-full transition-[color,transform] duration-300 active:scale-90 touch-manipulation",
-                  isActive ? "text-navi-dark" : "text-navi-gray",
+                  isActive ? "text-navi-dark" : "text-navi-gray/70",
                 )}
               >
-                <Icon
-                  className={cn(
-                    "size-[22px] transition-transform duration-300",
-                    isActive && "-translate-y-px",
-                  )}
-                  strokeWidth={isActive ? 2 : 1.5}
-                />
-                <span
-                  className={cn(
-                    "text-[10px] leading-none font-display tracking-wide transition-[font-weight] duration-300",
-                    isActive ? "font-semibold" : "font-medium",
-                  )}
-                >
+                <Icon className={cn("size-5", item.iconClassName)} strokeWidth={ICON_STROKE} />
+                <span className="text-[10px] leading-none font-display font-medium tracking-wide">
                   {item.label}
                 </span>
               </Link>

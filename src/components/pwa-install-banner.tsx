@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { X, Share, Plus, Sparkles, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { IconMark } from "@/components/icon-mark";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -89,9 +90,7 @@ export function PwaInstallBanner() {
         {/* Banner Title Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="size-11 rounded-[16px] bg-white/10 border border-white/20 flex items-center justify-center text-navi-teal shrink-0">
-              <Smartphone className="size-5" />
-            </div>
+            <IconMark icon={Smartphone} size="lg" className="text-navi-teal" />
             <div>
               <div className="flex items-center gap-1.5">
                 <p className="text-[10px] font-display font-medium uppercase tracking-[0.25em] text-white/50">

@@ -2,13 +2,9 @@ import React from "react";
 import { format } from "date-fns";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  CategoryIcon,
-  getCategoryConfig,
-  type CategoryConfig,
-  withAlpha,
-} from "@/lib/category-visuals";
+import { getCategoryConfig, type CategoryConfig } from "@/lib/category-visuals";
 import { Link } from "@tanstack/react-router";
+import { CategoryMark } from "@/components/icon-mark";
 
 interface Transaction {
   id: string;
@@ -59,24 +55,14 @@ export function TransactionCard({
         }
       }}
     >
-      <div className="flex items-center gap-4 md:gap-5 flex-1 min-w-0">
-        {/* Category Squircle */}
-        <div
-          className="size-12 md:size-14 rounded-[18px] flex items-center justify-center shrink-0 border transition-colors"
-          style={{
-            backgroundColor: withAlpha(color, 0.05),
-            borderColor: withAlpha(color, 0.1),
-          }}
-        >
-          <CategoryIcon
-            category={transaction.category}
-            config={config}
-            kind={transaction.type}
-            className="size-5 md:size-6"
-            color={color}
-            strokeWidth={1.2}
-          />
-        </div>
+      <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+        <CategoryMark
+          category={transaction.category}
+          config={config}
+          kind={transaction.type}
+          color={color}
+          size="lg"
+        />
 
         {/* Text Content */}
         <div className="flex-1 min-w-0 flex flex-col justify-center">

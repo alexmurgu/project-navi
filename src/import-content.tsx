@@ -24,6 +24,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { bulkImportTransactions } from "./actions";
 import { CategoryCombobox } from "@/components/category-combobox";
 import type { CategoryConfig } from "@/lib/category-visuals";
+import { IconMark } from "@/components/icon-mark";
 
 interface Transaction {
   id: string;
@@ -187,9 +188,7 @@ export function ImportContent({
                 htmlFor="csv-upload"
                 className="flex flex-col items-center cursor-pointer text-center"
               >
-                <div className="flex size-12 items-center justify-center rounded-lg bg-muted text-muted-foreground mb-4 shadow-sm border">
-                  <FileUp className="size-6" />
-                </div>
+                <IconMark icon={FileUp} size="lg" className="mb-4 text-muted-foreground" />
                 <span className="text-sm font-semibold text-foreground mb-1">
                   Click to upload CSV
                 </span>
