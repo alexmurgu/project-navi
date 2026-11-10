@@ -48,7 +48,7 @@
     "@types/papaparse": "^5.5.2",
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^6.2.1",
     "autoprefixer": "^10.4.20",
     "oxfmt": "^0.45.0",
     "oxlint": "^1.60.0",
