@@ -44,6 +44,14 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
   );
 }
 
+/**
+ * Bottom sheets are full-width on phones and, from the `sm` breakpoint up, a
+ * centred floating card 24px above the bottom edge. Callers only set the
+ * card's max width (e.g. `sm:max-w-2xl`). The centring lives here because a
+ * caller's plain `sm:left-1/2` loses to the base `data-[side=bottom]:inset-x-0`
+ * (attribute selectors are more specific) and would leave the card half off
+ * screen.
+ */
 function SheetContent({
   className,
   children,
@@ -68,7 +76,7 @@ function SheetContent({
         data-side={side}
         data-full-height={fullHeight || undefined}
         className={cn(
-          "fixed z-[90] flex flex-col bg-background bg-clip-padding text-sm shadow-lg data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-screen data-[side=left]:border-r data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-screen data-[side=right]:border-l data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=left]:sm:max-w-md data-[side=right]:sm:max-w-md",
+          "fixed z-[90] flex flex-col bg-background bg-clip-padding text-sm shadow-lg data-[side=bottom]:inset-x-0 data-[side=bottom]:bottom-0 data-[side=bottom]:h-auto data-[side=bottom]:border-t data-[side=bottom]:sm:right-auto data-[side=bottom]:sm:bottom-6 data-[side=bottom]:sm:left-1/2 data-[side=bottom]:sm:w-[calc(100%-3rem)] data-[side=bottom]:sm:-translate-x-1/2 data-[side=left]:inset-y-0 data-[side=left]:left-0 data-[side=left]:h-full data-[side=left]:w-screen data-[side=left]:border-r data-[side=right]:inset-y-0 data-[side=right]:right-0 data-[side=right]:h-full data-[side=right]:w-screen data-[side=right]:border-l data-[side=top]:inset-x-0 data-[side=top]:top-0 data-[side=top]:h-auto data-[side=top]:border-b data-[side=left]:sm:max-w-md data-[side=right]:sm:max-w-md",
           className,
         )}
         {...props}

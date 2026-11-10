@@ -9,8 +9,12 @@ import {
   Smartphone,
   PiggyBank,
   CreditCard,
+  FileUp,
+  LogOut,
 } from "lucide-react";
 import { IconMark } from "@/components/icon-mark";
+import { signOut } from "@/lib/auth-client";
+import { haptic } from "@/lib/haptics";
 
 const managementTiles = [
   {
@@ -40,6 +44,13 @@ const managementTiles = [
     description: "Manage debt & limits",
     icon: CreditCard,
     color: "#e23b4a",
+  },
+  {
+    to: "/import",
+    title: "Import Data",
+    description: "Bring in transactions from CSV",
+    icon: FileUp,
+    color: "#8d969e",
   },
 ] as const;
 
@@ -203,6 +214,35 @@ export function SettingsContent() {
               </span>
             )}
           </div>
+        </section>
+
+        {/* Account Section */}
+        <section className="space-y-8">
+          <div className="flex items-center gap-4 px-2">
+            <div className="h-1.5 w-8 bg-navi-danger/40 rounded-full" />
+            <h3 className="text-[20px] font-display font-medium uppercase tracking-widest text-navi-dark/40">
+              Account
+            </h3>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              haptic.medium();
+              void signOut();
+            }}
+            className="navi-card flex w-full items-center gap-4 p-6 text-left transition-transform active:scale-[0.99]"
+          >
+            <IconMark icon={LogOut} color="#e23b4a" size="lg" />
+            <div>
+              <h4 className="text-[16px] font-display font-medium text-navi-danger tracking-tight">
+                Log out
+              </h4>
+              <p className="text-[10px] font-sans font-medium uppercase tracking-widest text-navi-gray/60 mt-0.5">
+                Sign out of NAVI on this device
+              </p>
+            </div>
+          </button>
         </section>
 
         {/* Footer info */}

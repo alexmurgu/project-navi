@@ -94,7 +94,7 @@ export function CreditCardSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="h-full max-h-[92dvh] sm:h-auto sm:max-h-[88vh] sm:max-w-xl sm:left-1/2 sm:-translate-x-1/2 sm:bottom-6 sm:rounded-[36px] border-t sm:border sm:border-navi-border/20 rounded-t-[36px] p-0 shadow-2xl overflow-hidden flex flex-col bg-white"
+        className="h-full max-h-[92dvh] sm:h-auto sm:max-h-[88vh] sm:max-w-xl sm:rounded-[36px] border-t sm:border sm:border-navi-border/20 rounded-t-[36px] p-0 shadow-2xl overflow-hidden flex flex-col bg-white"
       >
         {/* Mobile grab handle */}
         <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-navi-gray/25 sm:hidden" />

@@ -269,7 +269,7 @@ export function TransactionForm({
                       setOpenDatePicker(false);
                     }}
                     defaultMonth={date || new Date()}
-                    initialFocus
+                    autoFocus
                     className="p-4 bg-transparent border-none scale-105"
                   />
                 </div>
@@ -300,7 +300,7 @@ export function TransactionForm({
                   selected={date}
                   onSelect={onDateChange}
                   defaultMonth={date || new Date()}
-                  initialFocus
+                  autoFocus
                   className="p-4"
                 />
               </PopoverContent>

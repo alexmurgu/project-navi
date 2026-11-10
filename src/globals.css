@@ -15,6 +15,27 @@
   --color-popover: oklch(100% 0 0);
   --color-popover-foreground: oklch(20.9% 0.015 258.1);
 
+  /*
+   * shadcn semantic colours. Components use classes like text-muted-foreground
+   * and bg-card; without these definitions those classes produced no colour
+   * and silently inherited whatever was behind them. Values mirror :root below.
+   */
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(20.9% 0.015 258.1);
+  --color-primary: oklch(20.9% 0.015 258.1);
+  --color-primary-foreground: oklch(100% 0 0);
+  --color-secondary: oklch(96.5% 0 0);
+  --color-secondary-foreground: oklch(20.9% 0.015 258.1);
+  --color-muted: oklch(96.5% 0 0);
+  --color-muted-foreground: oklch(64.6% 0.015 258.1);
+  --color-accent: oklch(96.5% 0 0);
+  --color-accent-foreground: oklch(20.9% 0.015 258.1);
+  --color-destructive: oklch(57.7% 0.2 19.3);
+  --color-destructive-foreground: oklch(100% 0 0);
+  --color-border: oklch(84.4% 0.005 258.1);
+  --color-input: oklch(84.4% 0.005 258.1);
+  --color-ring: oklch(45.5% 0.22 269.9);
+
   --font-display: "Aeonik Pro", "Inter", sans-serif;
   --font-sans: "Inter", "Arial", sans-serif;
 

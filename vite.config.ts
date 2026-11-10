@@ -2,12 +2,15 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 const buildId = new Date().toISOString();
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Native in Vite 8: resolves the "@/..." aliases from tsconfig.json.
+  resolve: {
+    tsconfigPaths: true,
+  },
   define: {
     __APP_BUILD_ID__: JSON.stringify(buildId),
   },
@@ -22,7 +25,6 @@ export default defineConfig({
         entry: "./ssr.tsx",
       },
     }),
-    tsconfigPaths(),
     react(),
     tailwindcss(),
   ],
