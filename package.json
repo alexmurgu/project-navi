@@ -54,7 +54,7 @@
     "oxlint": "^1.60.0",
     "postcss": "^8.5.1",
     "tailwindcss": "^4.1.18",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vite": "^6.1.0",
     "vite-tsconfig-paths": "^5.1.4"
   }
