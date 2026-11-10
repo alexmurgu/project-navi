@@ -1,0 +1,48 @@
+# Runs the project's completion checks (AGENTS.md) plus a production build on
+# every pull request — including Dependabot's — and on pushes to master, so a
+# dependency bump that breaks the app shows up red before it is merged.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# A newer push to the same PR/branch cancels the run already in progress.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read-only token: CI never needs to write to the repo.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Format, lint & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          # Same version as the production LXC, so CI builds what prod builds.
+          bun-version: 1.3.10
+
+      - name: Install dependencies
+        # Fails if bun.lock is out of date with package.json.
+        run: bun install --frozen-lockfile
+
+      - name: Check formatting
+        run: bunx oxfmt --check .
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Build
+        # No secrets needed: env vars are only read at runtime, not build time.
+        run: bun run build
