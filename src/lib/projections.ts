@@ -2,6 +2,7 @@ import {
   startOfMonth,
   endOfMonth,
   subMonths,
+  addMonths,
   isWithinInterval,
   isBefore,
   isAfter,
@@ -66,6 +67,22 @@ export interface RawTransaction {
   status?: "pending" | "paid";
   isTransfer?: boolean;
   accountType?: string;
+  accountId?: string | null;
+}
+
+export interface RawTransfer {
+  id: string;
+  amount: number;
+  date: string | Date;
+  fromType: "main" | "savings" | "credit";
+  fromId?: string | null;
+  toType: "main" | "savings" | "credit";
+  toId?: string | null;
+}
+
+export interface RawCreditCard {
+  id: string;
+  currentBalance: number;
 }
 
 function median(nums: number[]): number {
@@ -116,22 +133,28 @@ function normalizeIncomeKey(inc: RawTransaction): {
 export function calculateProjections({
   expenses,
   incomes,
+  creditCards = [],
+  transfers = [],
   currentBalance,
   selectedDate,
   now = new Date(),
 }: {
   expenses: RawTransaction[];
   incomes: RawTransaction[];
+  creditCards?: RawCreditCard[];
+  transfers?: RawTransfer[];
   currentBalance: number;
   selectedDate: Date;
   now?: Date;
 }): MonthProjections {
   const currentMonthStart = startOfMonth(now);
+  const currentMonthEnd = endOfMonth(now);
   const selectedMonthStart = startOfMonth(selectedDate);
   const selectedMonthEnd = endOfMonth(selectedDate);
 
   const isCurrentMonth = isSameMonth(selectedDate, now);
   const isFutureMonth = isAfter(selectedMonthStart, currentMonthStart);
+  const isNextMonth = isSameMonth(selectedDate, addMonths(currentMonthStart, 1));
   const isPastMonth = isBefore(selectedMonthStart, currentMonthStart);
 
   // Filter settled, non-transfer, main account items
@@ -393,9 +416,46 @@ export function calculateProjections({
     return valB - valA;
   });
 
+  // Credit card payoff due in the selected month:
+  // - In the current month, only carryover debt from prior months (not yet paid off this month)
+  // - In the next month, the current unpaid balance on each card
+  let creditCardPayoff = 0;
+  if (isNextMonth) {
+    creditCardPayoff = creditCards.reduce((acc, cc) => acc + Math.max(0, cc.currentBalance), 0);
+  } else if (isCurrentMonth) {
+    creditCardPayoff = creditCards.reduce((acc, cc) => {
+      const priorCcExpenses = expenses
+        .filter(
+          (e) =>
+            e.accountType === "credit" &&
+            e.accountId === cc.id &&
+            e.status !== "pending" &&
+            isBefore(new Date(e.date), currentMonthStart),
+        )
+        .reduce((sum, e) => sum + e.amount, 0);
+      const transfersFromCc = transfers
+        .filter(
+          (t) =>
+            t.fromType === "credit" &&
+            t.fromId === cc.id &&
+            !isAfter(new Date(t.date), currentMonthEnd),
+        )
+        .reduce((sum, t) => sum + t.amount, 0);
+      const paymentsToCc = transfers
+        .filter(
+          (t) =>
+            t.toType === "credit" &&
+            t.toId === cc.id &&
+            !isAfter(new Date(t.date), currentMonthEnd),
+        )
+        .reduce((sum, t) => sum + t.amount, 0);
+      return acc + Math.max(0, priorCcExpenses + transfersFromCc - paymentsToCc);
+    }, 0);
+  }
+
   const projectedExpenses = isPastMonth
     ? actualExpenses
-    : categoryProjections.reduce((acc, c) => acc + c.expectedAmount, 0);
+    : categoryProjections.reduce((acc, c) => acc + c.expectedAmount, 0) + creditCardPayoff;
 
   for (const cp of categoryProjections) {
     const basis = isPastMonth ? actualExpenses : projectedExpenses;

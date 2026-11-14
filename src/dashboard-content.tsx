@@ -316,10 +316,12 @@ export function DashboardContent({ data }: PageProps) {
     return calculateProjections({
       expenses: data.expenses as any,
       incomes: data.incomes as any,
+      creditCards: data.creditCards as any,
+      transfers: data.transfers as any,
       currentBalance: stats.balance,
       selectedDate,
     });
-  }, [data.expenses, data.incomes, stats.balance, selectedDate]);
+  }, [data.expenses, data.incomes, data.creditCards, data.transfers, stats.balance, selectedDate]);
 
   const categoryBreakdownData = useMemo(() => {
     if (projections.isPastMonth) {
